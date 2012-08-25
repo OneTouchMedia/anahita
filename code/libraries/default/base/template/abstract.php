@@ -388,13 +388,7 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 		settype($paths, 'array');
 		
 		foreach($paths as $path) 
-		{
-			//path is given an idenifier
-			if ( strpos($path, '/') === false ) {
-				//fake a filename to get the list part as a dictory
-				$path = dirname(KLoader::path($path.'.filename'));
-			}
-			
+		{						
 			if ( in_array($path, $this->_paths) )
 				continue;
 				
