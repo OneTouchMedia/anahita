@@ -61,11 +61,11 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 				
 		parent::__construct($config);
 		
-		//if a data is passed then add the data		
-		if ( $config->data ) {
-			$this->_loaded = true;
-			foreach($config->data as $entity) $this->insert($entity);
-		}
+        //if set has been instantiated with 
+        //data, then it's already loaded
+        if ( count($this) ) {
+            $this->_loaded = true;                
+        }
 	}
 	
     /**

@@ -108,14 +108,9 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 		
 		$this->getService($config->repository, KConfig::unbox($config));
 		
-		//if there are no keys
-		if ( !count($this->description()->getKeys()) ) 
-		{
-		    //try to guess the key
-		    $this->description()->setAttribute('id', array('key'=>true));
-		    
-		    if ( !count($this->description()->getKeys()) )
-		        throw new AnDomainDescriptionException('Entity '.$this->getIdentifier().' needs at least one key');
+		//if there are no keys throws exception
+		if ( !count($this->description()->getKeys()) ) {
+		    throw new AnDomainDescriptionException('Entity '.$this->getIdentifier().' needs at least one key');		        
 		}
 	}
 	
@@ -534,7 +529,8 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
                 foreach($description->getProperty() as $name => $property ) 
                     if ( $property instanceof AnDomainPropertySerializable)
                         $data[$name] = $name;
-                unset($data[$description->getIdentityProperty()->getName()]);
+                //@TODO why are we forcing to unset the property
+                //unset($data[$description->getIdentityProperty()->getName()]);
                 break;
             case AnDomain::STATE_MODIFIED : 
                 //get all the updated serializable property/value pairs

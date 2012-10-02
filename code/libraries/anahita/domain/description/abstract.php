@@ -152,17 +152,31 @@ abstract class AnDomainDescriptionAbstract
 		    $this->_abstract_identifier = $config->abstract_identifier;
 		}
 		
-		//if there's no propoerty set
-		//then set the properties automatically from the its columns
+		//try to generate some of the propreties
+        //from the database columns
 		if ( $config->auto_generate )
 		{
-		    $attributes = array();
-		    $attributes[$this->_identity_property] = array('key'=>true);		    
+            //if auto generate default set the identity property with the primary key 
+            $config->append(array(
+                'attributes' => array(
+                    $this->_identity_property => array('key'=>true)
+                )
+            ));
+            
+		    $attributes = $config['attributes'];
+            
 		    $columns = $this->_repository->getResources()->main()->getColumns();
-		    foreach($columns as $column) {
-		        $attributes[KInflector::variablize($column->name)] = array('required'=>$column->required, 'column'=>$column, 'type'=>$column->type, 'default'=>$column->default);
+            
+		    foreach($columns as $column) 
+            {
+                $name    = KInflector::variablize($column->name);
+                //merge the existing attributes
+		        $attributes[$name] = array_merge(
+                        array('required'=>$column->required, 'column'=>$column, 'type'=>$column->type, 'default'=>$column->default),
+                        isset($attributes[$name]) ? $attributes[$name] : array());
 		    }
-		    $config['attributes'] = $attributes;
+		    
+            $config['attributes'] = $attributes;
 		}
 	}
 	
@@ -206,6 +220,15 @@ abstract class AnDomainDescriptionAbstract
 	public function setProperty($property)
 	{
 		$this->_properties[$property->getName()] = $property;
+        
+        //if property name is the same as the identity property
+        //then set the identity property
+        if ( is_string($this->_identity_property) && 
+             $property->getName() == $this->_identity_property ) 
+        {             
+             $this->setIdentityProperty($property);   
+        }
+		
 		return $this;
 	}
 	
@@ -317,7 +340,7 @@ abstract class AnDomainDescriptionAbstract
 	 * @return array
 	 */
 	public function getKeys()
-	{
+	{        
 		return $this->_keys;		
 	}
 	

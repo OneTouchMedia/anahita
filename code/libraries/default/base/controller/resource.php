@@ -179,7 +179,7 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
             }
             else $identifier = $this->getIdentifier($view);
             
-            register_default(array('identifier'=>$identifier, 'prefix'=>$this, 'name'=>'View'.ucfirst($identifier->name)));
+            register_default(array('identifier'=>$identifier, 'prefix'=>$this, 'name'=>array('View'.ucfirst($identifier->name),'ViewDefault')));
             
             $view = $identifier;
         }

@@ -86,7 +86,16 @@ class AnDomain
 	const OPERATION_UPDATE  = 4;
 	const OPERATION_DELETE  = 8;
     const OPERATION_DESTROY = 16;
-	const OPERATION_COMMIT  = 32;	
+	const OPERATION_COMMIT  = 32;
+    
+    
+    /**
+     * Require Flags. A NOT_NULL value can be empty such as 0 or '' 
+     * A NOT_EMPTy value can not be '', 0 or null. The requireds are by 
+     * default VALUE_NO_NULL unless explicitly set in the entity description
+     */
+    const VALUE_NOT_NULL  = true;
+    const VALUE_NOT_EMPTY = 1;	
 	
 	/**
 	 * Entity Identifers must have application in their path. This method set the 

@@ -101,7 +101,7 @@ abstract class AnDomainPropertyAbstract
 	/**
 	 * If set to true, the property can not have a null or empty value
 	 * 
-	 * @var boolean
+	 * @var int
 	 */
 	protected $_required;
 

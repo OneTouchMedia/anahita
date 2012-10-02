@@ -209,6 +209,21 @@ abstract class AnDomainValidatorAbstract extends KObject
     }
     
     /**
+     * Removes a property validation
+     * 
+     * @param string $property   The property to validate
+     * @param string $validation The validation name
+     * 
+     * @return void
+     */
+    public function removeValidation($property, $validation)
+    {
+        $validations = $this->getValidations($property);        
+        unset($validations[$validation]);
+        return $this;
+    }
+    
+    /**
      * Return an array of validations for a property
      * 
      * @param AnDomainPropertyAbstract|string $property Property
@@ -375,12 +390,19 @@ abstract class AnDomainValidatorAbstract extends KObject
             return true;
         
         //if the serial id is missing for a new entity, then don't validate
+        //@TODO this causes no-incremental primary keys
+        //to pass the validation. Need a new serial type the represet 
+        //incremental identity property
         if ( $entity->state() == AnDomain::STATE_NEW && $property === $entity->description()->getIdentityProperty() )
             return true;
         
         if ( $property->isAttribute() )
         {
-            if ( $property->getType() == 'string')
+            //if string and value can not be null
+            //then return false if values are either empty strings
+            //or just whitespace
+            if ( $property->getType() == 'string' && 
+                    $property->isRequired() === AnDomain::VALUE_NOT_EMPTY )
             {
                 //check if the value exists
                 if ( KHelperString::strlen($value) <= 0 || ctype_space($value) ) {
@@ -390,7 +412,11 @@ abstract class AnDomainValidatorAbstract extends KObject
             }
             else 
             {
-                $present = $value !== null;
+                if ( $property->isRequired() === AnDomain::VALUE_NOT_EMPTY ) {
+                    $present = !empty($value);
+                } else {
+                    $present = !is_null($value);   
+                }
             }
         }
         elseif ( $property->isRelationship() && $property->isManyToOne() )

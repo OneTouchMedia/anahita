@@ -145,7 +145,17 @@ class AnDomainAttributeProperty extends AnDomainPropertyAbstract implements AnDo
 	{
 		return $this->_type;
 	}
-		
+    
+    /**
+     * Set the attribute type
+     * 
+     * @return void
+     */
+    public function setType($type)
+    {
+        $this->_type = $type;
+    }
+    
 	/**
 	 * Clones the default value or create a new one if a type is given
 	 * 

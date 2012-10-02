@@ -39,7 +39,12 @@ class LibUsersDomainEntityUser extends AnDomainEntityDefault
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-			'resources'   => array('users')
+			'resources'   => array('users'),
+            'attributes'  => array(
+                'params'     => array('required'=>false, 'default'=>''),
+                'activation' => array('required'=>false, 'default'=>''),                
+            ),
+            'auto_generate' => true            
 		));
 		
 		return parent::_initialize($config);
