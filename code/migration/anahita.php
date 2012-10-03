@@ -368,3 +368,58 @@ function anahita_17()
     dbexec("UPDATE jos_anahita_nodes SET mimetype = NULL WHERE type LIKE 'ComMediumDomainEntityMedium%'");
     dbexec("UPDATE jos_anahita_nodes SET mimetype = NULL, filename = IF(filename NOT LIKE '%.jpg%',CONCAT(filename,'.jpg'), filename) WHERE type LIKE 'ComActorsDomainEntityActor%'AND filename <> ''");
 }
+
+//story migration
+function anahita_18()
+{
+    //bug fix. delete any edge associated with stories that are not story_add, private_message
+    dbexec("delete e.* from jos_anahita_edges as e inner join jos_anahita_nodes as n on n.id = e.node_b_id where node_b_type like 'com:stories.domain.entity.story' and (n.name != 'story_add' and n.name != 'private_message') ");
+    dbexec("UPDATE jos_anahita_edges as e,jos_anahita_nodes as n SET e.node_b_type = 'com:posts.domain.entity.post' WHERE n.id = e.node_b_id and node_b_type like 'com:stories.domain.entity.story'");
+    
+    $set = array(
+      '`type` = "ComMediumDomainEntityMedium,ComPostsDomainEntityPost,com:posts.domain.entity.post"' ,
+      '`name` = ""',
+      '`alias` = ""',
+      '`component` = "com_posts"',
+    );
+    $set   = implode($set,',');
+    $query = 'UPDATE jos_anahita_nodes SET '.$set." where type like 'ComMediumDomainEntityMedium,ComStoriesDomainEntityStory,com:stories.domain.entity.story' and (name = 'story_add' or name = 'private_message')";
+    dbexec($query);
+    
+    //create the stories for posts
+    $query = "insert into jos_anahita_nodes(type,component,name,owner_id,owner_type, story_subject_id, story_object_type, story_object_id, story_target_id,meta,created_on,created_by,modified_on,modified_by) select 'ComStoriesDomainEntityStory,com:stories.domain.entity.story' as type,'com_posts','post_add',owner_id,owner_type,story_subject_id, 'com:posts.domain.entity.post' AS story_object_type,id AS story_object_id,story_target_id,meta,created_on,created_by,modified_on,modified_by from jos_anahita_nodes where type like 'ComMediumDomainEntityMedium,ComPostsDomainEntityPost,com:posts.domain.entity.post'";
+    dbexec($query);
+    
+    //convert the notifications to point to the post
+    $query = "update jos_anahita_nodes as nf, jos_anahita_nodes as post set nf.story_object_type = 'com:posts.domain.entity.post', nf.name = IF(nf.name='story_comment','post_comment',IF(nf.name='story_add' or nf.name='private_message','post_add',nf.name)) where post.id = nf.story_object_id and post.type like 'ComMediumDomainEntityMedium,ComPostsDomainEntityPost,com:posts.domain.entity.post' and nf.story_object_type like 'com:stories.domain.entity.story' and nf.type like 'ComNotificationsDomainEntityNotification,com:notifications.domain.entity.notification'";
+    dbexec($query);
+    
+    //set the story data in the posts to null
+    $query = "update jos_anahita_nodes set story_subject_id = null,story_object_type=null,story_object_id=null,story_target_id=null where type like 'ComMediumDomainEntityMedium,ComPostsDomainEntityPost,com:posts.domain.entity.post'";
+    dbexec($query);
+        
+    //convert the parent_type of comments
+    $query = "update jos_anahita_nodes as comment, jos_anahita_nodes as post set comment.type = 'ComBaseDomainEntityComment,com:posts.domain.entity.comment', comment.parent_type = 'com:posts.domain.entity.post' where post.id = comment.parent_id and comment.type like 'ComBaseDomainEntityComment,%' and comment.parent_type like 'com:stories.domain.entity.story'";
+    dbexec($query);
+    
+    //delete any dangling comment 
+    $query = "delete comment from jos_anahita_nodes as comment left join jos_anahita_nodes as post on post.id = comment.parent_id where comment.type like 'ComBaseDomainEntityComment,%' and post.id IS NULL";
+    dbexec($query);
+    
+    //delete any remaining story edge. storeis shouldn't have any edge (since they are no longer subscribable,votable)
+    $query = "delete edge.* from jos_anahita_edges as edge where node_b_type like 'com:stories.domain.entity.story'";
+    dbexec($query);
+   
+    //somehow we have stories for commenting on a sotry we need to delete those
+    $query = "delete edge.* from jos_anahita_edges as edge where node_a_id IN (select id from jos_anahita_nodes where story_object_type like 'com:stories.domain.entity.story') or node_b_id IN (select id from jos_anahita_nodes where story_object_type like 'com:stories.domain.entity.story')";
+    dbexec($query);
+    
+    $query = "delete from jos_anahita_nodes where story_object_type like 'com:stories.domain.entity.story'";
+    dbexec($query); 
+
+    // story doesn't have any subscribable, commentable,describable, privatable, votable behavior
+    // set the respective columns to null
+    //last but not least set all the story type as non-medium    
+    $query = "update jos_anahita_nodes set type = 'ComStoriesDomainEntityStory,com:stories.domain.entity.story', subscriber_count = null,subscriber_ids=null,comment_status=null,comment_count=null,alias=null,voter_up_ids=null,voter_down_ids=null,vote_up_count=null,vote_down_count=null,access=null,permissions=null where type like 'ComMediumDomainEntityMedium,ComStoriesDomainEntityStory,com:stories.domain.entity.story'";
+    dbexec($query);
+}
