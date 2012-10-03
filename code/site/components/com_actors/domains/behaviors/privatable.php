@@ -45,7 +45,7 @@ class ComActorsDomainBehaviorPrivatable extends LibBaseDomainBehaviorPrivatable
             'graph_check'		  => true
         ));
       
-        $where = $this->_createWhere('@col(id)', $config, '@col(access)');
+        $where = $this->buildCondition('@col(id)', $config, '@col(access)');
                                 
         $query->where($where);
     }    
