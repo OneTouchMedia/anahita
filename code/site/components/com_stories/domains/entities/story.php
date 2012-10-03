@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComStoriesDomainEntityStory extends ComMediumDomainEntityMedium 
+class ComStoriesDomainEntityStory extends ComBaseDomainEntityNode
 {
 	/**
 	 * Initializes the default configuration for the object
@@ -49,7 +49,11 @@ class ComStoriesDomainEntityStory extends ComMediumDomainEntityMedium
 				'comment' => array('parent'=>'com:base.domain.entity.comment',  'child_column'=>'story_comment_id'),
 				'object'	 => array('polymorphic'=>true, 'type_column'=>'story_object_type', 'child_column'=>'story_object_id', 'parent'=>'com:medium.domain.entity.medium')
 			 ),
-             'behaviors' => array('commentable'=>array('comment'=>array('format'=>'string')))
+             'behaviors' => array(
+                'authorizer',
+                'modifiable',
+                'ownable'
+              )
 		));
 						
 		parent::_initialize($config);		
