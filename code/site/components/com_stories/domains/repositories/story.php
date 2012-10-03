@@ -76,6 +76,21 @@ class ComStoriesDomainRepositoryStory extends AnDomainRepositoryDefault
                         
 		if ( $query->summerize )
 			$this->_summerize($query, $query->summerize);
+        
+        //apply the privacy 
+        $privtable = $this->getBehavior('com://site/medium.domain.behavior.privatable');
+             
+        $query->privacy     = pick($query->privacy, new KConfig());
+        
+        //weak link  the stories with object nodes
+        //and use the object.access instead of the story access if there are ny
+        $query->link('object', array('type'=>'weak','bind_type'=>false));
+        //we are using the object.access as the privacy reference
+        $query->privacy->append(array(
+             'use_access_column' => '@col(object.access)'                
+        ));
+        
+        $privtable->execute('before.fetch', $context);
 	}
 
 	/**
