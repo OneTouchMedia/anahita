@@ -36,6 +36,7 @@ class ComPostsControllerToolbarPost extends ComMediumControllerToolbarDefault
     {
         parent::addToolbarCommands();
         
+        //no need to have comment status for messages
         $this->_commands->extract('commentstatus');
     }
 }
