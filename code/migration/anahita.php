@@ -422,4 +422,9 @@ function anahita_18()
     //last but not least set all the story type as non-medium    
     $query = "update jos_anahita_nodes set type = 'ComStoriesDomainEntityStory,com:stories.domain.entity.story', subscriber_count = null,subscriber_ids=null,comment_status=null,comment_count=null,alias=null,voter_up_ids=null,voter_down_ids=null,vote_up_count=null,vote_down_count=null,access=null,permissions=null where type like 'ComMediumDomainEntityMedium,ComStoriesDomainEntityStory,com:stories.domain.entity.story'";
     dbexec($query);
+    
+    //insert posts component    
+    dbexec("INSERT INTO `jos_components` VALUES(null, 'Posts', 'option=com_posts', 0, 0, 'option=com_posts', 'Posts', 'com_posts', 0, 'js/ThemeOffice/component.png', 1, '', 1)");
+    
+    dbexec("UPDATE jos_anahita_nodes SET permissions = REPLACE(permissions,'com_stories:story','com_posts:post') WHERE type LIKE 'ComActorsDomainEntityActor%' ");
 }
