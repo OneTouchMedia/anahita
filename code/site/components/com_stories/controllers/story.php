@@ -29,19 +29,7 @@ define('STORY_MAX_LIMIT', 5000);
  * @link       http://www.anahitapolis.com
  */
 class ComStoriesControllerStory extends ComBaseControllerService
-{
-	/**
-	 * Constructor.
-	 *
-	 * @param 	object 	An optional KConfig object with configuration options
-	 */
-	public function __construct(KConfig $config)
-	{
-		parent::__construct($config);
-		
-		$this->getCommentController()->registerCallback('after.add', array($this, 'createStoryCommentNotification'));		
-	}
-		
+{		
     /**
      * Initializes the options for the object
      *
