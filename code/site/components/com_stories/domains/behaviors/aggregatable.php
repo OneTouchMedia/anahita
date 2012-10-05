@@ -219,6 +219,10 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
      */
     protected function _getPreloadedNode($data)
     {
+        if ( !$this->aggregated() ) {
+            return $this->_mixer->get($data);
+        }
+        
         if ( !isset($this->_mixer->__ids) ) {
             $this->_mixer->__ids = array();
         }
@@ -288,6 +292,14 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
      */
     public function aggregated()
     {
+        if ( $this->state() & AnDomain::STATE_NEW ) {
+            return false;    
+        }
+        
+        if ( $this->getRowData('bundle_key') == null ) {
+            return false;    
+        }
+        
         return count($this->getIds()) > 0;
     }             
 }
