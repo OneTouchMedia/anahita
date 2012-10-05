@@ -55,7 +55,7 @@ elseif ( $_SERVER['DOCUMENT_ROOT'] )
     $base = dirname($_SERVER['DOCUMENT_ROOT'].$_SERVER['SCRIPT_NAME']);
 else
     $base = dirname(__FILE__);
-
+date_default_timezone_set('UTC');
 $base = str_replace('/components/com_notifications','',$base);
 
 init($base);
