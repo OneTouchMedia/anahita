@@ -171,9 +171,8 @@ class ComStoriesControllerStory extends ComBaseControllerService
 			$query->owner($this->actor);
 		}
 	
-		$apps 		  =	 $this->getService('repos:apps.app')->fetchSet();
-		
-        $summary_keys =  new KConfig();
+		$apps 		  =	 $this->getService('repos:apps.app')->fetchSet();		
+        $keys         =  new KConfig();
 		
         if ( count($apps ) ) 
         {
@@ -181,15 +180,15 @@ class ComStoriesControllerStory extends ComBaseControllerService
             {
     			$context = new KCommandContext();
     			$app->getDelegate()->setStoryOptions($context);
-    			$summary_keys->append(array(
+    			$keys->append(array(
     				$app->component => pick($context->summarize, array())
     			));
     		}
         }
-		
-		$keys = KConfig::unbox($summary_keys);
-		        
-        return $this->setList($query->summerize($keys)->toEntitySet())
+        
+        $query->aggregateKeys($keys);
+        
+        return $this->setList($query->toEntitySet())
                     ->getList();
 	}
 	

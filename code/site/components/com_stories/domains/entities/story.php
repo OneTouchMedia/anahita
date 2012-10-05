@@ -50,6 +50,7 @@ class ComStoriesDomainEntityStory extends ComBaseDomainEntityNode
 				'object'	 => array('polymorphic'=>true, 'type_column'=>'story_object_type', 'child_column'=>'story_object_id', 'parent'=>'com:medium.domain.entity.medium')
 			 ),
              'behaviors' => array(
+                'aggregatable',
                 'authorizer',
                 'modifiable',
                 'ownable'
