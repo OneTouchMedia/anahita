@@ -109,7 +109,7 @@ class ComStoriesControllerToolbarStory extends ComBaseControllerToolbarDefault
         $entity = $this->getController()->getItem();
         $link   = 'option=com_stories&view=story';
         foreach($entity->getIds() as $id) {
-            $link .= '&ids[]='.$id;
+            $link .= '&id[]='.$id;
         }
         $command->append(array('label'=>JText::_('LIB-AN-ACTION-DELETE')))
         ->href($link.'&action=delete')
