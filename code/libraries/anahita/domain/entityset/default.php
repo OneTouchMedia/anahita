@@ -63,8 +63,8 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 		
         //if set has been instantiated with 
         //data, then it's already loaded
-        if ( count($this) ) {
-            $this->_loaded = true;                
+        if ( count($this->_object_set) ) {
+            $this->_loaded = true;
         }
 	}
 	
