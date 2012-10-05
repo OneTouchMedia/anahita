@@ -45,15 +45,13 @@ class ComStoriesControllerToolbarStory extends ComBaseControllerToolbarDefault
             $this->getController()->setItem($story);
         }
         
-        $commentable = $story->authorize('add.comment');
-        
-        if ( $commentable !== false ) {
-            if ( $story->hasObject() && is_array($story->object) )
-                $commentable = false;
-        }
-        
-        if( $commentable ) {
+        if ( $story->authorize('add.comment') ) 
+        {
+            $this->getController()->setItem($story->object);
+            
             $this->addCommand('comment');
+            
+            $this->getController()->setItem($story);
         }
         
         if ( $story->numOfComments > 10 ) {
@@ -106,10 +104,12 @@ class ComStoriesControllerToolbarStory extends ComBaseControllerToolbarDefault
     protected function _commandDelete($command)
     {
         $entity = $this->getController()->getItem();
-    
+        $link   = 'option=com_stories&view=story';
+        foreach($entity->getIds() as $id) {
+            $link .= '&ids[]='.$id;
+        }
         $command->append(array('label'=>JText::_('LIB-AN-ACTION-DELETE')))
-        ->href($entity->getStoryURL(true).'&action=delete')
+        ->href($link.'&action=delete')
         ->setAttribute('data-trigger','Remove');
     }
-        
 }
