@@ -25,85 +25,45 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPostsControllerPost extends ComBaseControllerService
+class ComPostsControllerPost extends ComMediumControllerDefault
 {
-    /**
-     * Post a story
+    /** 
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
      * 
-     * @param  KCommandContext $context
-     * @return string;
-     */
-    protected function _actionPost($context)
+     * @return void
+     */ 
+    public function __construct(KConfig $config)
     {
-        $data    = $context->data;
-        $actor   = $this->actor;
-        $viewer  = get_viewer();
+        parent::__construct($config);
+    }
+      
+    protected function _actionAdd($context)
+    {   
+        $data   = $context->data;         
+        $entity = parent::_actionAdd($context);
         
-        if ( $data->private_message && is_person($actor) && !$actor->eql($viewer) ) {
-            $name = 'private_message';
-        } else
-            $name = 'story_add';
-            
-        $component = $actor->component ;
-        
-        $story = $this->setItem($this->createStory(array(
-            'component' => $component,
-            'name'      => $name,
-            'subject'   => get_viewer(),
-            'target'    => $actor,
-            'owner'     => $actor,
-            'body'      => $data['body']
-        )))->getItem();
-          
-        if ( !$story->sanitizeData('body', array('length'=>STORY_MAX_LIMIT))
-                    ->validateData('body', 'required') ) 
-        
-           return false;
-                
-        if ( $name == 'private_message' ) {
-            $this->getItem()->setAccess(array($actor->id, $viewer->id));
-        }                   
-
-        if ( $this->commit($context) === false ) {
-            return false;
+        //if a person posting a message on his profile
+        //or if a target is not actor then it can't be a private message
+        if ( get_viewer()->eql($this->actor) || !is_person($this->actor) ) {
+            unset($data->private_message);       
         }
-                
-        $this->actor = $actor;
-        $output      = $this->setView('story')->layout('list')->display();
-            
-        $helper = clone $this->getView()->getTemplate()->getHelper('parser');
         
-        $data   = array(
-            'story'     => $story,
-            'actor'     => $actor,
-            'viewer'    => $viewer,
-            'channels'  => $data->channels,
-            'data'      => $helper->parse($story) 
-        );
-        
-        if ( $name != 'private_message' )
-            dispatch_plugin('connect.onPostStory', $data);
-        
-
-        $subscribers = array();
-        
-        if ( $actor->isSubscribable() ) {
-            $subscribers   = $actor->subscriberIds->toArray();
-            $subscribers[] = $actor;
+        //if a private message then
+        //set the privacy to subject/target
+        if ( $data->private_message ) {
+            $entity->setAccess(array($this->actor->id, $viewer->id));
         }
-        else 
-            $subscribers = array($actor);
-            
-        $notifcation = $this->createNotification(array(
-            'component' => $component,   
-            'name'      => $name,
-            'target'    => $actor,
-            'object'         => $story,
-            'subscribers'    => $subscribers
-        ))
-        ->setType('post', array('new_post'=>true))
-        ;
-
-        return $output;
-    }    
+        
+        if ( $entity->owner->isSubscribable() ) {
+            $notification = $this->createNotification(array(
+                'name'             => 'post_add',
+                'object'           => $entity,
+                'subscribers'      => $entity->owner->subscriberIds->toArray()
+            ))->setType('post', array('new_post'=>true));
+        }
+        
+        return $entity;
+    }
 }
