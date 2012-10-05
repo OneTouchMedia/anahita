@@ -103,8 +103,8 @@ class ComAppsDomainModelApp extends KObject
 	 */
 	static public function syncApps()
 	{
-		$components = KService::get('repos:components.component', array('resources'=>'components'))->fetchSet();
-		$apps 		= KService::get('repos:apps.app')->fetchSet();
+		$components = KService::get('repos://admin/components.component', array('resources'=>'components'))->fetchSet();
+		$apps 		= KService::get('repos://admin/apps.app')->fetchSet();
 		$options	= array_unique($components->option);
 		foreach($apps as $app) 
 		{
