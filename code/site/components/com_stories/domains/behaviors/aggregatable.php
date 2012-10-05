@@ -178,6 +178,68 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
         $this->_loaded_nodes = $nodes;
     }
     
+    /**
+     * Return the object of the node
+     * 
+     * @return ComBaseDomainEntityNode
+     */
+    public function getObject()
+    {        
+        return $this->_getPreloadedNode('object');
+    }
+    
+    /**
+     * Return the object of the node
+     * 
+     * @return ComActorsDomainEntityActor
+     */
+    public function getSubject()
+    {
+        return $this->_getPreloadedNode('subject');
+    } 
+    
+    /**
+     * Return the object of the node
+     * 
+     * @return ComActorsDomainEntityActor
+     */
+    public function getTarget()
+    {
+        return $this->_getPreloadedNode('target');
+    }        
+    
+    /**
+     * Since nodes related to an aggregated set have been preloaded
+     * we just fetch them from the cache list _loaded_nodes
+     * 
+     * @TODO we need to this in the _preloadData method after the nodes
+     * have been loaded
+     * 
+     * @return ComBaseDomainEntityNode
+     */
+    protected function _getPreloadedNode($data)
+    {
+        if ( !isset($this->_mixer->__ids) ) {
+            $this->_mixer->__ids = array();
+        }
+                
+        if ( !isset($this->_mixer->__ids[$data]) )
+        {
+            $nodes = array();
+            $ids   = $this->getIds($data) ;
+            foreach($ids as $id) {
+                if ( isset($this->_loaded_nodes[$id]) ) {   
+                    $nodes[] = $this->_loaded_nodes[$id];
+                }
+            }
+            if ( count($nodes) < 2 ) {
+                $nodes = array_pop($nodes);
+            }
+            $this->_mixer->__ids[$data]  = $nodes;
+        }
+
+        return $this->_mixer->__ids[$data];
+    }
     
     /**
      * Return an array of previously loaded nodes
@@ -187,5 +249,45 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
     public function getLoadedNodes()
     {
         return $this->_loaded_nodes;
-    }        
+    } 
+    
+    /**
+     * Return an array of aggregated IDs
+     * 
+     * @param  string
+     * @return array 
+     */
+    public function getIds($key = null)
+    { 
+        if ( !isset($this->_mixer->__ids) ) {
+            $this->_mixer->__ids = array();
+        }
+        
+        $prop = $key ? $key : 'id';
+        $key  = $key ? $key.'_ids' : 'ids';
+        
+        if ( !isset($this->_mixer->__ids[$key]) ) 
+        {
+            $columns = $this->getRowData();
+            
+            if ( !empty($columns[$key]) )       
+                $ids = explode(',',$columns[$key]);
+            else {
+                $ids = isset($this->$prop) ? ($prop == 'id' ? array($this->id) : array($this->$prop->id)) : array();
+            }
+                        
+            $this->_mixer->__ids[$key] = $ids;
+        }
+        return $this->_mixer->__ids[$key];
+    }
+
+    /**
+     * Return if a story is an aggregation of multiple stories
+     * 
+     * @return boolean
+     */
+    public function aggregated()
+    {
+        return count($this->getIds()) > 0;
+    }             
 }
