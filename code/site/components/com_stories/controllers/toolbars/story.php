@@ -49,7 +49,10 @@ class ComStoriesControllerToolbarStory extends ComBaseControllerToolbarDefault
         {
             $this->getController()->setItem($story->object);
             
-            $this->addCommand('comment');
+            $this->addCommand('comment')
+                 ->getCommand('comment')
+                 ->storyid($story->id)
+                ;
             
             $this->getController()->setItem($story);
         }
@@ -91,8 +94,8 @@ class ComStoriesControllerToolbarStory extends ComBaseControllerToolbarDefault
         $command->append(array('label'=>JText::_('LIB-AN-ACTION-COMMENT')))
             ->href($entity->getURL())
             ->class('comment')
-            ->storyid($entity->id);     
-    }   
+            ;
+    }
      
     /**
      * Delete Command for a story
