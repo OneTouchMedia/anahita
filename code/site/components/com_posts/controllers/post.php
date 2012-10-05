@@ -27,21 +27,17 @@
  */
 class ComPostsControllerPost extends ComMediumControllerDefault
 {
-    /** 
-     * Constructor.
-     *
-     * @param KConfig $config An optional KConfig object with configuration options.
+    /**
+     * Adds a new post
+     * 
+     * @param KCommandContext $context Context parameter         
      * 
      * @return void
-     */ 
-    public function __construct(KConfig $config)
-    {
-        parent::__construct($config);
-    }
-      
+     */      
     protected function _actionAdd($context)
     {   
-        $data   = $context->data;         
+        $data   = $context->data;
+        
         $entity = parent::_actionAdd($context);
         
         //if a person posting a message on his profile
@@ -53,14 +49,18 @@ class ComPostsControllerPost extends ComMediumControllerDefault
         //if a private message then
         //set the privacy to subject/target
         if ( $data->private_message ) {
-            $entity->setAccess(array($this->actor->id, $viewer->id));
+            $entity->setAccess(array($this->actor->id, get_viewer()->id));
         }
-        
-        if ( $entity->owner->isSubscribable() ) {
+
+        //create a notification for the subscribers and 
+        //the post owner as well
+        if ( $entity->owner->isSubscribable() ) 
+        {
+            //create a notification and pass the owner
             $notification = $this->createNotification(array(
                 'name'             => 'post_add',
                 'object'           => $entity,
-                'subscribers'      => $entity->owner->subscriberIds->toArray()
+                'subscribers'      => array($entity->owner->subscriberIds->toArray(),$entity->owner)
             ))->setType('post', array('new_post'=>true));
         }
         
