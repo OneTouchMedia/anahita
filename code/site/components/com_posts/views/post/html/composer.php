@@ -4,7 +4,7 @@
 <div id="post-composer">
 	<form id="post-composer-form" action="<?= @route('option=com_posts&view=post&oid='.$actor->id) ?>" method="POST" data-formvalidator-options="'evaluateFieldsOnBlur':true">
 		<textarea class="input-xxlarge" data-validators="minLength:1 maxLength:<?=STORY_MAX_LIMIT?>" id="composer-textarea"  name="body" overtext="<?= @text('COM-POSTS-SHARE-PROMPT') ?>"></textarea>
-	
+	    <input type="hidden" name="composed" value="1" />
 		<div class="post-actions">
 		    <?php 
 		        $app = @service('repos://site/apps.app')->fetch(array('component'=>'com_connect'));		    
