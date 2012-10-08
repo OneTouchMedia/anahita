@@ -76,6 +76,24 @@ class LibThemeViewHtml extends LibBaseViewTemplate
      */
     public function display()
     {
+        $output = $this->output;
+        
+        if ( $this->getLayout() != 'raw' ) {
+            $output = $this->getTemplate()->loadTemplate($this->getLayout(), array('output'=>$this->output))->render();            
+        }
+        
+        return $output;
+        
+        //if raw template then just render the content
+        if ( $this->getLayout() == 'raw' ) {
+            $this->output = $this->content;
+        }
+        else {
+            
+        }
+        
+        $output;
+        
         if ( $this->document && $this->document instanceof JDocumentError ) 
         {
             $error   = $this->document->_error;
@@ -114,7 +132,7 @@ class LibThemeViewHtml extends LibBaseViewTemplate
      * @return KConfig
      */
     public function getParams()
-    {   
+    {
         return $this->_params;
     }  
 }

@@ -172,7 +172,7 @@ class LibThemeTemplateHelperRender extends KTemplateHelperAbstract
         
         //if no content then get the content from the view
         if ( !isset($config->content) ) {
-            $config['content'] = $modules->render('toolbar').$this->_template->getView()->content;             
+            $config['content'] = $modules->render('toolbar').$this->_template->getView()->output;             
         }
                 
         $sb_a_modules = JModuleHelper::getModules('sidebar-a');

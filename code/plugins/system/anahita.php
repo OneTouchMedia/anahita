@@ -13,10 +13,6 @@
  * @link       http://www.anahitapolis.com
  */
 
-jimport('joomla.plugin.plugin');
-
-require_once JPATH_PLUGINS.'/system/koowa.php';
-
 /**
  * Anahita System Plugin
  * 
@@ -78,27 +74,11 @@ class PlgSystemAnahita extends JPlugin
             ini_set('safeex.url_include_proto_whitelist', $whitelist);
         }
         
-        //Set constants
-        define('KDEBUG'      , JDEBUG);
-        
-        //Set path definitions
-        define('JPATH_FILES' , JPATH_ROOT);
-        define('JPATH_IMAGES', JPATH_ROOT.DS.'images');
-        
         //Set exception handler
-        set_exception_handler(array(new AnExceptionHandler(), 'exceptionHandler'));
-        
-        // Koowa : setup
-        require_once( JPATH_LIBRARIES.'/anahita/anahita.php');
-        
-        //instantiate anahita
-        Anahita::getInstance(array(           
-            'cache_prefix'    => md5(JFactory::getApplication()->getCfg('secret')).'-cache-koowa',
-            'cache_enabled'   => JFactory::getApplication()->getCfg('caching')
-        ));
-        
+        //set_exception_handler(array(new AnExceptionHandler(), 'exceptionHandler'));
+
         //Setup the request
-        KRequest::root(str_replace('/'.JFactory::getApplication()->getName(), '', KRequest::base()));                
+        
 
         if ( !JFactory::getApplication()->getCfg('caching') ) 
         {
@@ -114,11 +94,6 @@ class PlgSystemAnahita extends JPlugin
         }
         
 		KService::get('plg:storage.default');
-		
-        if ( JDEBUG && JFactory::getApplication()->isAdmin() )
-        {
-            JError::raiseNotice('','Anahita is running in the debug mode. Please make sure to turn the debug off for production.');
-        }
         
         JFactory::getLanguage()->load('overwrite',   JPATH_ROOT);
 		JFactory::getLanguage()->load('lib_anahita', JPATH_ROOT);
@@ -135,6 +110,7 @@ class PlgSystemAnahita extends JPlugin
 	 */
 	public function onAfterRoute()
 	{
+        return;
 		$type 	= strtolower(KRequest::get('request.format', 'cmd', 'html'));
 				
 		$format = $type;
@@ -344,7 +320,7 @@ class AnExceptionHandler
                 'code'    => $error->code
             );
             
-            if(KDEBUG)
+            if(JDEBUG)
             {
                 $properties['data'] = array(
                     'file'      => $error->file,
@@ -369,7 +345,10 @@ class AnExceptionHandler
             JFactory::getApplication()->close(0);
         }
         else {
-            JError::customErrorPage($error);
+            print JFactory::getApplication()
+                ->getTemplate(true)
+                ->setError($error)->display();
+            JFactory::getApplication()->close(0);            
         }
         
     }
@@ -441,7 +420,8 @@ class AnDocumentDecorator
         if ( $this->_document instanceof JDocumentError )
         {
             JResponse::setHeader('status', $this->_document->_error->code.' '.str_replace( "\n", ' ', $this->_document->_error->message ));
-            
+            _die();
+            die;
             $error = $this->_document->_error;
             
             if ( !isset($error) ) {
