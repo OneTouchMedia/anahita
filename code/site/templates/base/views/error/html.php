@@ -14,7 +14,7 @@
  */
 
 /**
- * Base Template View
+ * Error Page
  *
  * @category   Anahita
  * @package    Lib_Themes
@@ -23,7 +23,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class TmplBaseViewHtml extends LibThemeViewHtml
+class TmplBaseViewErrorHtml extends LibThemeViewErrorHtml
 {
     /**
     * Initializes the default configuration for the object
@@ -38,11 +38,12 @@ class TmplBaseViewHtml extends LibThemeViewHtml
     {
         $identifier = clone $this->getIdentifier();        
         $identifier->path = array();
-       
+        $paths[] = dirname(dirname(__FILE__)).'/'.$this->getFormat();
+        $paths[] = dirname($identifier->filepath).'/'.$this->getFormat();
         $config->append(array(
-            'template_paths' => array(dirname(__FILE__).DS.$this->getFormat(),dirname($identifier->filepath).DS.$this->getFormat()),                      
+            'template_paths' => $paths,                      
         ));
                
         parent::_initialize($config);
-    }   
+    }
 }
