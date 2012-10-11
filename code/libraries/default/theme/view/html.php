@@ -14,7 +14,7 @@
  */
 
 /**
- * Theme view object
+ * Abstract html view
  *
  * @category   Anahita
  * @package    Lib_Theme
@@ -63,6 +63,8 @@ class LibThemeViewHtml extends LibBaseViewTemplate
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
+            'params'            => array(),        
+            'media_url'         => 'base://media',
             'template_filters'  => array('shorttag','html','alias')
         ));
                 
@@ -76,54 +78,14 @@ class LibThemeViewHtml extends LibBaseViewTemplate
      */
     public function display()
     {
-        $output = $this->output;
-        
         if ( $this->getLayout() != 'raw' ) {
-            $output = $this->getTemplate()->loadTemplate($this->getLayout(), array('output'=>$this->output))->render();            
-        }
-        
-        return $output;
-        
-        //if raw template then just render the content
-        if ( $this->getLayout() == 'raw' ) {
-            $this->output = $this->content;
+            $this->output = $this->getTemplate()->loadTemplate($this->getLayout(), array('output'=>$this->content))->render();            
         }
         else {
-            
+            $this->output = $this->content;   
         }
         
-        $output;
-        
-        if ( $this->document && $this->document instanceof JDocumentError ) 
-        {
-            $error   = $this->document->_error;
-            
-            $layout  = $error->code;
-            
-            if ( !$this->getTemplate()->findPath('errors/'.$layout.'.php') ) {
-                $layout = 'default';
-            }
-            
-            $output = $this->getTemplate()->loadTemplate('errors/'.$layout, array('error'=>$error))->render();
-            
-            if ( JDEBUG ) {
-                $output .= '<pre>'.$this->document->renderBacktrace().'</pre>';    
-            }
-            
-            $this->content = $output;
-            
-            $this->setLayout('error');
-        }
-        
-        //if raw template then just render the content
-        if ( $this->getLayout() == 'raw' ) {
-            $this->output = $this->content;    
-        }
-        else {
-            $this->output = $this->getTemplate()->loadTemplate($this->getLayout(), $this->_data)->render();
-        }
-                   
-        return $this->output; 
+        return $this->output;
     }
     
     /**
