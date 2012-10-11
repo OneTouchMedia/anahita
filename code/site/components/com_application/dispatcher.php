@@ -66,8 +66,6 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     {
         parent::__construct($config);
         
-        //loads the application
-        $this->registerCallback('before.run', array($this, 'loadApplication'));
         //parse route
         $this->registerCallback('after.run',   array($this, 'route'));
         //authorize after routing
@@ -76,6 +74,11 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         $this->registerCallback('after.authorize', array($this, 'dispatch'));
         //render the result
         $this->registerCallback('after.dispatch', array($this, 'render'));
+        
+        //legacy register error handling
+        JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
+        //register exception handler
+        set_exception_handler(array($this, 'error'));        
     }
         
     /**
@@ -104,32 +107,38 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * @return boolean
      */
     protected function _actionRun(KCommandContext $context)
-    {        
+    {       
+        //load the JSite
+        KLoader::loadIdentifier('com://site/application.application');
+        
+        jimport('joomla.application.component.helper');
+        
+        $this->_application = JFactory::getApplication('site');
+        
+        global $mainframe;
+        
+        $mainframe = $this->_application; 
+                 
         $error_reporting =  $this->_application->getCfg('error_reporting');
+        
+        define('JDEBUG', $this->_application->getCfg('debug'));
         
         //taken from nooku application dispatcher
         if ($error_reporting > 0)
         {
-            //Development mode
-            if($error_reporting == 1) {
-                error_reporting( E_ALL | E_STRICT | ~E_DEPRECATED );
-                ini_set( 'display_errors', 1 );
-
-            }
-
-            //Production mode
-            if($error_reporting == 2) {
-                error_reporting( E_ERROR | E_WARNING | E_PARSE );
-                ini_set( 'display_errors', 0 );
-            }
+            error_reporting( $error_reporting );
+            ini_set( 'display_errors', 1 );
         }
-        
-        define('JDEBUG', $this->_application->getCfg('debug'));
-        
+                        
         //set the default timezone to UTC
         date_default_timezone_set('UTC');
         
         KRequest::root(str_replace('/'.$this->_application->getName(), '', KRequest::base()));
+        
+        //initialize the application and load system plugins
+        $this->_application->initialise();
+        JPluginHelper::importPlugin('system');
+        $this->_application->triggerEvent('onAfterInitialise');        
     }
    
     /**
@@ -145,8 +154,18 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         if ( !empty($component) ) 
         {
-            //render the component
-            $result = JComponentHelper::renderComponent($component);
+            $item    = JMenu::getInstance('site')->getActive();
+                         
+            switch(true) 
+            {
+                //don't render if home menu or front page                            
+                case isset($item) && $item->alias == 'home' :
+                case $component   == 'com_content' && $this->view == 'frontpage' :
+                    $result = '';
+                    break;
+                default :
+                    $result = JComponentHelper::renderComponent($component);    
+            }
             
             //legacy. joomla event
             $this->_application->triggerEvent('onAfterDispatch', $result);
@@ -167,38 +186,30 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      */        
     protected function _actionRender(KCommandContext $context)
     {
-        $template = $this->_application->getTemplate();
-        $page     = $this->getService('tmpl://site/'.$template.'.controller.page');
-        $result   = $page->setContent($context->result)                                                
-                         ->display();
+        $config = array(
+            'base_url'  => KRequest::base(),
+            'template'  => $this->_application->getTemplate() 
+        );
+        
+        if ( $context->getError() ) {
+            $context->result = $this->getService('com://site/application.controller.error', $config)
+                 ->getView()->error($context->getError())->display();
+                 
+            $context->setError(null);            
+        }
+        else 
+        {
+            $context->result = $this->getService('com://site/application.controller.page', $config)
+                 ->getView()->content($context->result)->display();
+        }
                       
-        JResponse::setBody($result);
+        JResponse::setBody($context->result);
         
         $this->_application->triggerEvent('onAfterRender');
         
         print JResponse::toString();
-        exit(0);
-    }
-    
-    /**
-     * 
-     */
-    protected $_theme;
-    
-    /**
-     * Returns the template object
-     * 
-     * @return 
-     */
-    public function getTheme()
-    {
-        if ( !isset($this->_theme) ) 
-        {
-            $template = $this->_application->getTemplate();            
-            $this->_theme = $this->getService('tmpl://site/'.$template.'.theme');
-        }
         
-        return $this->_theme;
+        exit(0);
     }
     
     /**
@@ -215,10 +226,17 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
                 
         // trigger the onAfterRoute events
         $this->_application->triggerEvent('onAfterRoute');
-                
+
+        //globally set ItemId
+        global $Itemid;
+        
+        $Itemid = KRequest::get('get.Itemid','int',0);
+        
+        //JRequest::set($request, 'get');
+        
         //set the request
-        $this->setRequest( KRequest::get('get','raw') );
-    }    
+        $this->setRequest(KRequest::get('get','raw'));
+    }
     
     /**
      * Authorize a request
@@ -233,20 +251,25 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     }
     
     /**
-     * Loads the JApplication object. 
+     * Callback to handle both JError and Exception
      * 
-     * @return void
+     * @param KCommandContext $context Command chain context
+     * caller => KObject, data => mixed
+     * 
+     * @return void;
      */
-    public function loadApplication()
+    protected function _actionError($context)
     {
-        //load the JSite        
-        KLoader::loadIdentifier('com://site/application.application');
-        jimport('joomla.application.component.helper');                       
-        $this->_application = JFactory::getApplication('site');
-        global $mainframe;
-        $mainframe = $this->_application;
-        $this->_application->initialise();
-        JPluginHelper::importPlugin('system');
-        $this->_application->triggerEvent('onAfterInitialise');        
+        $error = $context->data;
+                
+        //if JException then conver it to KException
+        if ( $context->data instanceof JException ) {
+            $error = new KException($context->data->getMessage(),$context->data->getCode());
+        }
+        
+        $context = $this->getCommandContext();
+        $context->setError($error);
+        $this->execute('render', $context);
+        exit(0);
     }
 }
