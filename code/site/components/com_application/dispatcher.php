@@ -67,13 +67,19 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         parent::__construct($config);
         
         //parse route
-        $this->registerCallback('after.run',   array($this, 'route'));
-        //authorize after routing
-        $this->registerCallback('after.route', array($this, 'authorize'));        
-        //dispatch the component
-        $this->registerCallback('after.authorize', array($this, 'dispatch'));
+        $this->registerCallback('after.run',   array($this, 'dispatch'));
+
+        //befire authorizing route        
+        $this->registerCallback('before.authorize', array($this, 'route'));
+        
+        //before dispatching then authorizer
+        $this->registerCallback('before.dispatch', array($this, 'authorize'));
+        
         //render the result
         $this->registerCallback('after.dispatch', array($this, 'render'));
+        
+        //render after an error
+        $this->registerCallback('after.error',  array($this, 'render'));
         
         //legacy register error handling
         JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
@@ -93,7 +99,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-        
+            'request'=> array('layout'=>'default')
         ));   
 
         parent::_initialize($config);
@@ -154,7 +160,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         if ( !empty($component) ) 
         {
-            $item    = JMenu::getInstance('site')->getActive();
+            $item    = $this->_application->getMenu()->getActive();
                          
             switch(true) 
             {
@@ -171,7 +177,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             $this->_application->triggerEvent('onAfterDispatch', $result);
         }
         else {
-            throw new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND);
+            $context->setError(new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND));
+            return false;
         }
         
         return $result;
@@ -187,22 +194,21 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _actionRender(KCommandContext $context)
     {
         $config = array(
-            'base_url'  => KRequest::base(),
-            'template'  => $this->_application->getTemplate() 
+            'base_url'  => (string)KRequest::base(),
+            'template'  => $this->_application->getTemplate(),
+            'request'   => $this->_request
         );
         
-        if ( $context->getError() ) {
-            $context->result = $this->getService('com://site/application.controller.error', $config)
-                 ->getView()->error($context->getError())->display();
-                 
-            $context->setError(null);            
-        }
-        else 
-        {
-            $context->result = $this->getService('com://site/application.controller.page', $config)
-                 ->getView()->content($context->result)->display();
-        }
-                      
+        $name    = $context->result instanceof KException ? 'error' : 'page';
+        
+        $view    = $this->getService('com://site/application.controller.'.$name, $config)
+                        ->getView();
+                
+        $view->layout($this->tmpl);
+        
+        $context->result = $view->content($context->result)->display();
+        
+                              
         JResponse::setBody($context->result);
         
         $this->_application->triggerEvent('onAfterRender');
@@ -232,10 +238,11 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         $Itemid = KRequest::get('get.Itemid','int',0);
         
-        //JRequest::set($request, 'get');
-        
-        //set the request
+        //set the request        
         $this->setRequest(KRequest::get('get','raw'));
+
+        //set the tmpl to the default        
+        $this->_request->tmpl = KRequest::get('get.tmpl','cmd','default');
     }
     
     /**
@@ -247,7 +254,31 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      */
     protected function _actionAuthorize(KCommandContext $context)
     {
-        //authorize
+        $menus  =& $this->_application->getMenu();        
+        $user   =& JFactory::getUser();
+        $aid    = $user->get('aid');
+        $itemid = $this->Itemid;
+        
+        if( !$menus->authorize($itemid, $aid)  )
+        {
+            //@TODO this is so useless and could create
+            //sense of false security.
+            if ( !$aid ) 
+            {
+                // Redirect to login                 
+                $url  = 'index.php?option=com_user&view=login';
+                $url .= '&return='.base64_encode(KRequest::url());
+
+                $this->_application->redirect($url, JText::_('You must login first') );
+            }
+            else {
+                $context->setError(
+                    new KDispatcherException(JText::_('ALERTNOTAUTH'), KHttpResponse::METHOD_NOT_ALLOWED)
+                );
+            }
+            
+            return false;
+        }
     }
     
     /**
@@ -256,7 +287,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * @param KCommandContext $context Command chain context
      * caller => KObject, data => mixed
      * 
-     * @return void;
+     * @return KException
      */
     protected function _actionError($context)
     {
@@ -267,9 +298,6 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             $error = new KException($context->data->getMessage(),$context->data->getCode());
         }
         
-        $context = $this->getCommandContext();
-        $context->setError($error);
-        $this->execute('render', $context);
-        exit(0);
+        return $error;
     }
 }
