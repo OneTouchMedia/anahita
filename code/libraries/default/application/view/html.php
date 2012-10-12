@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Lib_Themes
+ * @package    Lib_Application
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -14,18 +14,25 @@
  */
 
 /**
- * Abstract html view
+ * Application HTML view
  *
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage View 
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class LibThemeViewHtml extends LibBaseViewTemplate
+class LibApplicationViewHtml extends LibBaseViewTemplate
 {
+    /**
+     * Page content to display
+     * 
+     * @return KException|string
+     */
+    public $content;
+    
     /**
      * Template Parameters
      * 
@@ -78,6 +85,22 @@ class LibThemeViewHtml extends LibBaseViewTemplate
      */
     public function display()
     {
+        if ( $this->content instanceof KException ) 
+        {
+            $layout  = $this->content->getCode();
+            
+            if ( !$this->getTemplate()->findPath('errors/'.$layout.'.php') ) {
+                $layout = 'default';
+            }
+            
+            $this->content = $this->getTemplate()->loadTemplate('errors/'.$layout, array('error'=>$this->content))->render();
+            
+            if ( JDEBUG ) {
+               // $output .= $this->_renderBacktrace();
+                //$output .= '<pre>'.$this->document->renderBacktrace().'</pre>';    
+            }
+        }
+        
         if ( $this->getLayout() != 'raw' ) {
             $this->output = $this->getTemplate()->loadTemplate($this->getLayout(), array('output'=>$this->content))->render();            
         }

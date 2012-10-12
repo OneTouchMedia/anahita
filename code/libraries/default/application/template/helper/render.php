@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage Template_Helper
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -18,14 +18,14 @@
  * Rendering script
  * 
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage Template_Helper
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class LibThemeTemplateHelperRender extends KTemplateHelperAbstract
+class LibApplicationTemplateHelperRender extends KTemplateHelperAbstract
 {    
     /**
      * Template parameters
@@ -89,10 +89,10 @@ class LibThemeTemplateHelperRender extends KTemplateHelperAbstract
             'compile'      => pick((int)$this->_params->compilestyle,0),
             'compress'     => pick((int)$this->_params->compresstyle,0),
         ));
-        
+
         $paths = array(
             JPATH_ROOT.DS.'media'.DS.'lib_anahita'.DS.'css',
-            JPATH_ROOT.DS.'templates'.DS.'base'.DS.'css',
+            JPATH_THEMES.DS.'base'.DS.'css',
             $css_folder = JPATH_ROOT.DS.'templates'.DS.$this->getIdentifier()->package.DS.'css'.DS.$config->style
         );
         

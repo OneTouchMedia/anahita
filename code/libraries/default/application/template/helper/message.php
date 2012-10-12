@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage Template_Helper
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -19,14 +19,14 @@
  * level to render system messages
  * 
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage Template_Helper
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class LibThemeTemplateHelperMessage extends KTemplateHelperAbstract 
+class LibApplicationTemplateHelperMessage extends KTemplateHelperAbstract 
 {         
     /**
      * Renders a message using the passed configuration

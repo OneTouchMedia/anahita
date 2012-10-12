@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    LibTheme
+ * @package    Lib_Application
  * @subpackage Helper
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -20,14 +20,14 @@ require_once 'compiler.php';
  * Less Compiler Template Helper
  * 
  * @category   Anahita
- * @package    LibTheme
+ * @package    Lib_Application
  * @subpackage Helper
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class LibThemeTemplateHelperLess extends KTemplateHelperAbstract
+class LibApplicationTemplateHelperLess extends KTemplateHelperAbstract
 {    
     /**
      * Compiles a less css file. The the compiler will create a css file output

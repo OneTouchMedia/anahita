@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage Template_Filter
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -18,14 +18,14 @@
  * Alias Filter
  *
  * @category   Anahita
- * @package    Lib_Theme
+ * @package    Lib_Application
  * @subpackage Template_Filter
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class LibThemeTemplateFilterAlias extends KTemplateFilterAlias
+class LibApplicationTemplateFilterAlias extends KTemplateFilterAlias
 {
     /**
      * Constructor.
