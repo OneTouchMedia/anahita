@@ -173,9 +173,12 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     {
         $view  = $this->getController()->getView();
         
-        $document = JFactory::getDocument();
-        $document->setMimeEncoding($view->mimetype);
-                
+        $context->append(array(
+            'headers' => array(
+                'Content-Type' => $view->mimetype
+            )
+        ));
+               
         if ( KRequest::format() == 'html' && KRequest::type() == 'HTTP' ) {
             $this->_setPageTitle();          
         }
