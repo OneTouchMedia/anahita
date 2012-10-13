@@ -76,10 +76,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         $this->registerCallback('before.dispatch', array($this, 'authorize'));
         
         //render the result
-        $this->registerCallback('after.dispatch', array($this, 'render'));
-        
-        //render after an error
-        $this->registerCallback('after.error',  array($this, 'render'));
+        $this->registerCallback('after.dispatch', array($this, 'render'));       
         
         //legacy register error handling
         JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
@@ -281,10 +278,10 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         $error = $context->data;
                 
         //if JException then conver it to KException
-        if ( $context->data instanceof JException ) {
-            $error = new KException($context->data->getMessage(),$context->data->getCode());
+        if ( $context->data instanceof KException ) {
+            $error = new JException($context->data->getMessage(),$context->data->getCode());
         }
-        
-        return $error;
+        JError::customErrorPage($error);
+        exit(0);
     }    
 }
