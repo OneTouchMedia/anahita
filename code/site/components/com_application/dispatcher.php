@@ -65,26 +65,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     public function __construct(KConfig $config)
     {
         parent::__construct($config);
-        
+                 
         //parse route
-        $this->registerCallback('after.run',   array($this, 'dispatch'));
-
-        //befire authorizing route        
-        $this->registerCallback('before.authorize', array($this, 'route'));
-        
-        //before dispatching then authorizer
-        $this->registerCallback('before.dispatch', array($this, 'authorize'));
-        
-        //render the result
-        $this->registerCallback('after.dispatch', array($this, 'render'));
-        
-        //render after an error
-        $this->registerCallback('after.error',  array($this, 'render'));
-        
-        //legacy register error handling
-        JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
-        //register exception handler
-        set_exception_handler(array($this, 'error'));        
+        $this->registerCallback('before.run',  array($this, 'load'));                       
     }
         
     /**
@@ -113,37 +96,26 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * @return boolean
      */
     protected function _actionRun(KCommandContext $context)
-    {       
-        //load the JSite
-        KLoader::loadIdentifier('com://site/application.application');
+    {          
+        $this->registerCallback('after.run',   array($this, 'dispatch'));
+
+        //befire authorizing route        
+        $this->registerCallback('before.authorize', array($this, 'route'));
         
-        jimport('joomla.application.component.helper');
+        //before dispatching then authorizer
+        $this->registerCallback('before.dispatch', array($this, 'authorize'));
         
-        $this->_application = JFactory::getApplication('site');
+        //render the result
+        $this->registerCallback('after.dispatch', array($this, 'render'));
         
-        global $mainframe;
-        
-        $mainframe = $this->_application; 
-                 
-        $error_reporting =  $this->_application->getCfg('error_reporting');
-        
-        define('JDEBUG', $this->_application->getCfg('debug'));
-        
-        //taken from nooku application dispatcher
-        if ($error_reporting > 0)
-        {
-            error_reporting( $error_reporting );
-            ini_set( 'display_errors', 1 );
-        }
-                        
-        //set the default timezone to UTC
-        date_default_timezone_set('UTC');
-        
-        KRequest::root(str_replace('/'.$this->_application->getName(), '', KRequest::base()));
+        //render after an error
+        $this->registerCallback('after.error',  array($this, 'render'));
         
         //initialize the application and load system plugins
         $this->_application->initialise();
+                     
         JPluginHelper::importPlugin('system');
+        
         $this->_application->triggerEvent('onAfterInitialise');        
     }
    
@@ -282,6 +254,59 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     }
     
     /**
+     * Loads the application
+     * 
+     * @return void
+     */
+    protected function _actionLoad($context)
+    {        
+        //legacy register error handling
+        JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
+        
+        //register exception handler
+        set_exception_handler(array($this, 'error')); 
+                
+        //load the JSite
+        KLoader::loadIdentifier('com://site/application.application');
+                
+        jimport('joomla.application.component.helper');
+        
+        //no need to create session when using CLI (command line interface)
+        
+        $this->_application = JFactory::getApplication('site', array('session'=>PHP_SAPI !== 'cli'));
+        
+        //set the session handler to none for
+        if ( PHP_SAPI == 'cli' ) {
+            JFactory::getConfig()->setValue('config.session_handler','none');
+        }
+        
+        global $mainframe;
+        
+        $mainframe = $this->_application; 
+                 
+        $error_reporting =  $this->_application->getCfg('error_reporting');
+        
+        define('JDEBUG', $this->_application->getCfg('debug'));
+        
+        //taken from nooku application dispatcher
+        if ($error_reporting > 0)
+        {            
+            error_reporting( $error_reporting );
+            ini_set('display_errors',1);
+            ini_set('display_startup_errors',1);
+        }
+                        
+        //set the default timezone to UTC
+        date_default_timezone_set('UTC');
+        
+        JPluginHelper::importPlugin('system');        
+        
+        KRequest::root(str_replace('/'.$this->_application->getName(), '', KRequest::base()));
+        
+                      
+    }
+    
+    /**
      * Callback to handle both JError and Exception
      * 
      * @param KCommandContext $context Command chain context
@@ -296,6 +321,14 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         //if JException then conver it to KException
         if ( $context->data instanceof JException ) {
             $error = new KException($context->data->getMessage(),$context->data->getCode());
+        }
+        
+        //if cli just print the error and exit
+        if ( PHP_SAPI == 'cli' ) {
+            print "\n";
+            print $error."\n";
+            print debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            exit(0);
         }
         
         return $error;
