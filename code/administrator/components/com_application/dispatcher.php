@@ -118,7 +118,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         KLoader::loadIdentifier('com://admin/application.application');
         
         jimport('joomla.application.component.helper');
-                
+        jimport('joomla.document.renderer');
+        require_once(JPATH_LIBRARIES.'/joomla/document/renderer.php');                        
         require_once(JPATH_BASE.'/includes/toolbar.php');
         
         $this->_application = JFactory::getApplication('administrator');
