@@ -174,7 +174,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             }
             
             //legacy. joomla event
-            $this->_application->triggerEvent('onAfterDispatch', $result);
+            $this->_application->triggerEvent('onAfterDispatch', array($result));
         }
         else {
             $context->setError(new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND));

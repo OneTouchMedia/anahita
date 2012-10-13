@@ -23,7 +23,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComApplicationDispatcher extends LibApplicationDispatcherAbstract implements KServiceInstantiatable
+class ComApplicationDispatcher extends KControllerAbstract implements KServiceInstantiatable
 {
     /**
      * Application
@@ -64,7 +64,27 @@ class ComApplicationDispatcher extends LibApplicationDispatcherAbstract implemen
      */ 
     public function __construct(KConfig $config)
     {
-        parent::__construct($config);                      
+        parent::__construct($config);
+        
+        //parse route
+        $this->registerCallback('after.run',   array($this, 'dispatch'));
+
+        //befire authorizing route        
+        $this->registerCallback('before.authorize', array($this, 'route'));
+        
+        //before dispatching then authorizer
+        $this->registerCallback('before.dispatch', array($this, 'authorize'));
+        
+        //render the result
+        $this->registerCallback('after.dispatch', array($this, 'render'));
+        
+        //render after an error
+        $this->registerCallback('after.error',  array($this, 'render'));
+        
+        //legacy register error handling
+        JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
+        //register exception handler
+        set_exception_handler(array($this, 'error'));        
     }
         
     /**
@@ -131,6 +151,32 @@ class ComApplicationDispatcher extends LibApplicationDispatcherAbstract implemen
         $this->_application->triggerEvent('onAfterInitialise');        
     }
     
+    /**
+     * Dispatches the component
+     * 
+     * @param KCommandContext $context Command chain context
+     * 
+     * @return boolean
+     */        
+    protected function _actionDispatch(KCommandContext $context)
+    {        
+        $component = $this->option;
+        
+        if ( !empty($component) ) 
+        {
+            $result = JComponentHelper::renderComponent($component);
+            
+            //legacy. joomla event
+            $this->_application->triggerEvent('onAfterDispatch', array($result));
+        }
+        else {
+            $context->setError(new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND));
+            return false;
+        }
+        
+        return $result;
+    }
+        
     /**
      * Renders the output
      * 
@@ -220,4 +266,24 @@ class ComApplicationDispatcher extends LibApplicationDispatcherAbstract implemen
         
         $this->option = $component;
     }
+        
+    /**
+     * Callback to handle both JError and Exception
+     * 
+     * @param KCommandContext $context Command chain context
+     * caller => KObject, data => mixed
+     * 
+     * @return KException
+     */
+    protected function _actionError($context)
+    {
+        $error = $context->data;
+                
+        //if JException then conver it to KException
+        if ( $context->data instanceof JException ) {
+            $error = new KException($context->data->getMessage(),$context->data->getCode());
+        }
+        
+        return $error;
+    }    
 }

@@ -94,7 +94,7 @@ class PlgSystemAnahita extends JPlugin
         
         parent::__construct($subject, $config);
 	}
-	
+    
 	/**
 	 * store user method
 	 *
