@@ -156,13 +156,15 @@ class JLoader
  * @return  boolean
  * @since   1.5
  */
-function __autoload($class)
+function joomla_autoload($class)
 {
 	if(JLoader::load($class)) {
 		return true;
 	}
 	return false;
 }
+//removed __autoload and now using spl_autoload
+spl_autoload_register('joomla_autoload');
 
 /**
  * Global application exit.
