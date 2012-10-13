@@ -29,7 +29,7 @@ define( 'JPATH_THEMES',         JPATH_BASE.'/templates' );
  * Installation check, and check on removal of the install directory.
  */
 if (!file_exists( JPATH_CONFIGURATION.'/configuration.php' ) || (filesize( JPATH_CONFIGURATION.'/configuration.php' ) < 10) ) {
-	echo 'No configuration file found. Exciting...';
+	echo 'No configuration file found. Exiting...';
 	exit();
 }
 
