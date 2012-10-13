@@ -13,6 +13,8 @@
 // no direct access
 defined( 'JPATH_BASE' ) or die( 'Restricted access' );
 
+defined( '_JEXEC' ) or define('_JEXEC', 1);
+
 define( 'DS', DIRECTORY_SEPARATOR );
 
 $parts = explode( DS, JPATH_BASE );
