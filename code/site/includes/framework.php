@@ -11,24 +11,25 @@
  * @link       http://www.anahitapolis.com
  */
 // no direct access
-defined( 'JPATH_BASE' ) or die( 'Restricted access' );
+defined('JPATH_BASE') or die('Restricted access');
+defined('_JEXEC') or define('_JEXEC', 1);
 
-define( 'DS', DIRECTORY_SEPARATOR );
+define('DS', DIRECTORY_SEPARATOR );
 
-define( 'JPATH_ROOT',           JPATH_BASE );
-define( 'JPATH_SITE',           JPATH_ROOT );
-define( 'JPATH_CONFIGURATION',  JPATH_ROOT );
-define( 'JPATH_ADMINISTRATOR',  JPATH_ROOT.'/administrator' );
-define( 'JPATH_XMLRPC',         JPATH_ROOT.'/xmlrpc' );
-define( 'JPATH_LIBRARIES',      JPATH_ROOT.'/libraries' );
-define( 'JPATH_PLUGINS',        JPATH_ROOT.'/plugins'   );
-define( 'JPATH_INSTALLATION',   JPATH_ROOT.'/installation' );
-define( 'JPATH_THEMES',         JPATH_BASE.'/templates' );
+define('JPATH_ROOT',           JPATH_BASE );
+define('JPATH_SITE',           JPATH_ROOT );
+define('JPATH_CONFIGURATION',  JPATH_ROOT );
+define('JPATH_ADMINISTRATOR',  JPATH_ROOT.'/administrator');
+define('JPATH_XMLRPC',         JPATH_ROOT.'/xmlrpc');
+define('JPATH_LIBRARIES',      JPATH_ROOT.'/libraries');
+define('JPATH_PLUGINS',        JPATH_ROOT.'/plugins');
+define('JPATH_INSTALLATION',   JPATH_ROOT.'/installation');
+define('JPATH_THEMES',         JPATH_BASE.'/templates');
 
 /*
  * Installation check, and check on removal of the install directory.
  */
-if (!file_exists( JPATH_CONFIGURATION.'/configuration.php' ) || (filesize( JPATH_CONFIGURATION.'/configuration.php' ) < 10) ) {
+if (!file_exists( JPATH_CONFIGURATION.'/configuration.php') || (filesize( JPATH_CONFIGURATION.'/configuration.php') < 10) ) {
 	echo 'No configuration file found. Exiting...';
 	exit();
 }
@@ -36,17 +37,18 @@ if (!file_exists( JPATH_CONFIGURATION.'/configuration.php' ) || (filesize( JPATH
 // Joomla : setup
 require_once(JPATH_LIBRARIES . '/joomla/import.php');
 
-jimport( 'joomla.application.application' );
-jimport( 'joomla.application.menu' );
-jimport( 'joomla.user.user');
-jimport( 'joomla.environment.uri' );
-jimport( 'joomla.html.html' );
-jimport( 'joomla.html.parameter' );
-jimport( 'joomla.utilities.utility' );
-jimport( 'joomla.event.event');
-jimport( 'joomla.event.dispatcher');
-jimport( 'joomla.language.language');
-jimport( 'joomla.utilities.string' );
+jimport('joomla.application.application');
+jimport('joomla.application.menu');
+jimport('joomla.user.user');
+jimport('joomla.environment.uri');
+jimport('joomla.html.html');
+jimport('joomla.html.parameter');
+jimport('joomla.utilities.utility');
+jimport('joomla.event.event');
+jimport('joomla.event.dispatcher');
+jimport('joomla.language.language');
+jimport('joomla.utilities.string');
+jimport('joomla.plugin.helper');
 
 require_once JPATH_CONFIGURATION . '/configuration.php';
 
