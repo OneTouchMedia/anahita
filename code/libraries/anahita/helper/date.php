@@ -25,6 +25,12 @@
  */
 class AnHelperDate extends KObject 
 {	
+    /**
+     * Scientific values of each time unit
+     */
+    const YEAR_IN_SECONDS  = 3.15569e7;
+    const MONTH_IN_SECONDS = 2.62974e6; 
+    
 	/**
 	 * Converts the $minute into seconds
 	 * 
@@ -77,7 +83,7 @@ class AnHelperDate extends KObject
 	 */
 	static function monthToSeconds($month = 1)
 	{
-		return self::dayToSeconds($month * 31);
+		return self::MONTH_IN_SECONDS * $month;
 	}	
 	
 	/**
@@ -86,9 +92,9 @@ class AnHelperDate extends KObject
 	 * @param int year
 	 * @return int 
 	 */
-	static function yearToSeconds($year = 1)
+	static function yearToSeconds($year = 2)
 	{
-		return self::monthToSeconds($month * 12);
+        return self::YEAR_IN_SECONDS * $year;
 	}
 
 	/**
