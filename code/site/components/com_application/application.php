@@ -206,6 +206,7 @@ class JSite extends JApplication
     {
         $config =& JFactory::getConfig();
         $options['mode'] = $config->getValue('config.sef');
+        //always force the sef
         $router =& parent::getRouter('site', $options);
         return $router;
     }
