@@ -98,6 +98,9 @@ class LibBaseViewJson extends LibBaseViewAbstract
             $this->output = $this->_getItem();
         }
       
+        //if null then return empty string
+        $this->output = pick($this->output, '');
+        
         if (!is_string($this->output)) {
             $this->output = json_encode($this->output);
         }
@@ -124,22 +127,32 @@ class LibBaseViewJson extends LibBaseViewAbstract
             $name = KInflector::singularize($this->getName());
              
             foreach($items as $item) 
-            {                
-               $id = $item->getIdentityProperty();
-            
-               $data[] = array_merge(array(
+            { 
+               if ( is($item,'AnDomainEntityAbstract') ) 
+               {
+                   $id = $item->getIdentityProperty();
+                   $item =  array_merge(array(
                       'href'    => (string) $this->getRoute('view='.$name.'&id='.$item->{$id}),
                     ), $item->toSerializableArray());
+               } else {
+                    $item = (array)$item;                
+               }
+            
+               $data[] = $item; 
             }
             
             $data = array(
-                $this->getName() => $data,
-                'pagination'     => array(
-                    'offset' => (int) $items->getOffset(),
-                    'limit'  => (int) $items->getLimit(),
-                    'total'  => (int) $items->getTotal(),                
-                )
-            );            
+                $this->getName() => $data                
+            );
+            
+            if ( is($items, 'AnDomainEntitysetAbstract') )
+            {
+                $data['pagination'] = array(
+                        'offset' => (int) $items->getOffset(),
+                        'limit'  => (int) $items->getLimit(),
+                        'total'  => (int) $items->getTotal(),                
+                );                
+            }
         }
         
         return $data;
@@ -152,10 +165,14 @@ class LibBaseViewJson extends LibBaseViewAbstract
      */
     protected function _getItem()
     {
-        $data = array(); 
+        $data = null;
         
         if ( $item = $this->_state->getItem() ) {
-            $data = $item->toSerializableArray();   
+            if ( is($item, 'AnDomainBehaviorSerializable') )
+                $data = $item->toSerializableArray();
+            else {
+                $data = (array)$item;
+            }   
         }
         
         return $data;
