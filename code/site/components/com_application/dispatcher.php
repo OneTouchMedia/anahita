@@ -96,9 +96,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * @return boolean
      */
     protected function _actionRun(KCommandContext $context)
-    {          
-        $this->registerCallback('after.run',   array($this, 'dispatch'));
-
+    {
+        
         //befire authorizing route        
         $this->registerCallback('before.authorize', array($this, 'route'));
         
@@ -116,7 +115,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
                      
         JPluginHelper::importPlugin('system');
         
-        $this->_application->triggerEvent('onAfterInitialise');        
+        $this->_application->triggerEvent('onAfterInitialise');
+        
+        $this->dispatch();
     }
    
     /**
@@ -137,7 +138,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             switch(true) 
             {
                 //don't render if home menu or front page                            
-                case isset($item) && $item->alias == 'home' :
+                case isset($item) && $item->alias == 'home' && KRequest::method() == 'GET' :
                 case $component   == 'com_content' && $this->view == 'frontpage' :
                     $result = '';
                     break;
@@ -201,7 +202,12 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     {
         //route the application
         $this->_application->route();
-                
+        
+        //synchronize the request format with the accept format
+        KRequest::set('request.format', pick(KRequest::format(),'html'));
+        
+        KRequest::set('get.option', KRequest::get('request.option','cmd'));
+                    
         // trigger the onAfterRoute events
         $this->_application->triggerEvent('onAfterRoute');
 
@@ -212,7 +218,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         //set the request        
         $this->setRequest(KRequest::get('get','raw'));
-
+        
         //set the tmpl to the default        
         $this->_request->tmpl = KRequest::get('get.tmpl','cmd','default');
     }
@@ -228,6 +234,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     {
         $menus  =& $this->_application->getMenu();        
         $user   =& JFactory::getUser();
+        
         $aid    = $user->get('aid');
         $itemid = $this->Itemid;
         
@@ -268,7 +275,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
                 
         //load the JSite
         KLoader::loadIdentifier('com://site/application.application');
-                
+        KLoader::loadIdentifier('com://site/application.router');
+                      
         jimport('joomla.application.component.helper');
         
         //no need to create session when using CLI (command line interface)
@@ -297,13 +305,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         }
                         
         //set the default timezone to UTC
-        date_default_timezone_set('UTC');
-        
-        JPluginHelper::importPlugin('system');        
+        date_default_timezone_set('UTC');              
         
         KRequest::root(str_replace('/'.$this->_application->getName(), '', KRequest::base()));
-        
-                      
     }
     
     /**
@@ -330,7 +334,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             print debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             exit(0);
         }
-        
+                
+        header(KHttpResponse::getHeader($error->getCode(), KRequest::protocol()));
+                               
         return $error;
     }
 }
