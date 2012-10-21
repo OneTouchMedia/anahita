@@ -103,13 +103,15 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	try 
     	{
     		$result = parent::_actionDispatch($context);
-    	} catch(KHttpException $exception) 
+    	} 
+        catch(KHttpException $exception) 
     	{
 	    	$viewer = get_viewer();
-	    	if ( KRequest::format() == 'html' && $viewer->guest() &&  
-	    	 $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED  ) 
-	    	 {
-	    	 	if ( KRequest::type() == 'HTTP' ) {
+            //if format html then redirect to login
+	    	if ( $this->format == 'html' && $viewer->guest() && $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED  ) 
+            {
+	    	 	if ( KRequest::type() == 'HTTP' ) 
+                {
 					$login_url   = 'index.php?option=com_user&view=login';
 					$return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();						
 					$login_url 	.= '&return='.base64_encode($return_url);
@@ -179,8 +181,8 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
             )
         ));
                
-        if ( KRequest::format() == 'html' && KRequest::type() == 'HTTP' ) {
-            $this->_setPageTitle();          
+        if ( $this->format == 'html' && KRequest::type() == 'HTTP' ) {
+            $this->_setPageTitle();
         }
                
         return parent::_actionRender($context);   
