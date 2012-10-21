@@ -45,45 +45,34 @@ class LibBaseDomainSpace extends AnDomainSpace implements KServiceInstantiatable
         }
         
         return $container->get($config->service_identifier);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param KConfig $config An optional KConfig object with configuration options.
-     *
-     * @return void
-     */
-    public function __construct(KConfig $config)
-    {
-        parent::__construct($config);
-        
-        $this->registerCallback('after.commit', array($this, 'performCleanup'));
     }    
     
     /**
-     * Performs a cleanup after destoryed nodes by deleting any possible related
-     * nodes
-     *
-     * @param KCommandContext $context
+     * After a succesfull commit perform a cleanup of nodes
      * 
-     * @return void
+     * @param mixed &$failed Return the failed set
+     * 
+     * @return boolean Return if all the entities passed the validations
      */
-    public function performCleanup(KCommandContext $context)
+    public function commitEntities(&$failed = null)
     {
-        $entities = $context->entities;
-        $ids       = array();
-        $actor_ids = array();
-        foreach($entities as $entity)
+        if ( $ret = parent::commitEntities($failed) )
         {
-            if ( $entity->state() ==  AnDomain::STATE_DESTROYED )
-            {
-                if ( is($entity, 'ComBaseDomainEntityNode') )
-                    $ids[] = $entity->id;
+            $ids  = array();
+             
+            foreach($this->_entities as $entity)
+            {    
+                if ( $entity->state() ==  AnDomain::STATE_DESTROYED )
+                {
+                    if ( is($entity, 'ComBaseDomainEntityNode') )
+                        $ids[] = $entity->id;
+                }
             }
+            
+            $this->cleanupNodesWithIds($ids);
         }
         
-        $this->cleanupNodesWithIds($ids);
+        return $ret;
     }
     
     /**
