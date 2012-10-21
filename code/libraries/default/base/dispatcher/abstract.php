@@ -39,10 +39,6 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
     {
         parent::_initialize($config);
         
-        $config->request->append(array(
-        	'format'	=> KRequest::format()        	
-        ));
-        
         if ( strpos($config->request->layout, '_') === 0 ) {
 			unset($config->request->layout);
         }
@@ -61,18 +57,15 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
         //Set the controller to the view passed in
         $data = KConfig::unbox($context->data);
         
-        if( !empty($data) ) 
-        	$this->setController($context->data);
-
-        //Redirect if no view information can be found in the request
-        if(!KRequest::has('get.view')) 
-        {
-            $url = clone(KRequest::url());
-            $url->query['view'] = $context->data ? $context->data : $this->getController()->getIdentifier()->name;            
-            JFactory::getApplication()->redirect($url);
-            return;
+        if ( !empty($data) ) {
+            $this->setController($data);    
         }
-    		    			 
+        
+        //if no view is passed then pluralize the identifier name
+        if ( !$this->view ) {
+            $this->getController()->view = KInflector::pluralize($this->getController()->getIdentifier()->name);                                  
+        }
+                 
 	    $action = KRequest::get('post.action', 'cmd', strtolower(KRequest::method()));
 	    
 	    $context->data = new KConfig();
@@ -108,29 +101,18 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 	 * 
 	 */
 	public function _actionForward(KCommandContext $context)
-	{		
-	    //wierd bug in nooku. need to call request referere one
-	    //time before using it
-	    KRequest::referrer();
-	    
+	{
+        //only forward for HTML formats
+        if ( $this->format != 'html' ) {
+            return $context->result;    
+        }
+               	    
 		$redirect = $this->getController()->getRedirect();
-		
-		if ( $context->status_message ) {
-			$redirect->message = $context->status_message;
-		}
-		
-		if ( $context->getError() ) {
-			$redirect->type = 'error';
-		}
-		
-
-		if ( !isset($redirect['type']) ) {
-			$redirect['type'] = 'success';	
-		}
-		
-		if ( empty($redirect->url) ) {		  
-			$redirect['url'] = KRequest::referrer();
-		}
+        
+        $redirect->append(array(
+            'type' => 'success',
+            'url'  => (string)KRequest::referrer()
+        ));
 		
 		//if a the result of disatched is string then
 		//dispaly the returned value	
