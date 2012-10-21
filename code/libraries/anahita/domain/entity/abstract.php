@@ -69,13 +69,6 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	protected $_data;
 	
 	/**
-	 * Entity error object
-	 * 
-	 * @var AnDomainEntityException
-	 */
-	protected $_error;
-	
-	/**
 	 * Flag to determine if an entity has been persisted into the database or not
 	 * this flag is only set after an entity has been fetched from the database
 	 * 
@@ -155,36 +148,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 		//force setting the keys
 		foreach($context['keys'] as $key => $value)	
 			$this->_data[$key] = $value;
-	}
-	
-	/**
-	 * Set an error for the entity
-	 *
-	 * @param string|KException $error The error message or an error object
-	 * @param int               $code  An optional error code
-	 *
-	 * @return void
-	 */
-	public function setError($error, $code = null)
-	{
-	    if ( is_string($error) ) {
-	        $error = new AnDomainEntityException($error, $code);
-	    }
-	
-	    $this->_error = $error;
-	
-	    return $this;
-	}
-	
-	/**
-	 * Returns the entity error
-	 *
-	 * @return KException
-	 */
-	public function getError()
-	{
-	    return $this->_error;
-	}
+	}	
 		
 	/**
 	 * Returns the state of the entity. It returns one of the constants
@@ -193,31 +157,33 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	final public function state()
 	{
-		return $this->__space->getState($this);
+		return $this->__space->getEntityState($this);
 	}
 	
 	/**
-	 * Return whether the entity is in a valid state
-	 * 	 
-	 * @param KCommandContext Context parameter. Can be null
-	 * 
+	 * Forwards the call to the space validate entities. However only return
+     * true/false depending whether the entity has failed validation
+     * 
+     * @param mixed &$failed Return the failed set
+     *  
 	 * @return boolean
 	 */
-	public function validate(KCommandContext $context = null)
+	public function validate(&$failed = null)
 	{
-		return $this->getRepository()->getSpace()->validate($context);
+        $result = $this->getRepository()->getSpace()->validateEntities($failed);
+		return !$failed->contains($this); 
 	}
 
 	/**
-	 * Persists the entity into the repository
+	 * Forwards the call to the space commit entities
 	 * 
-	 * @param KCommandContext Context parameter. Can be null
-	 * 
+     * @param mixed &$failed Return the failed set
+     * 
 	 * @return boolean
 	 */
-	public function save(KCommandContext $context = null)
-	{		
-		return $this->getRepository()->getSpace()->commit($context);
+	public function save(&$failed = null)
+	{
+		return $this->getRepository()->getSpace()->commitEntities($failed);
 	}
 
 	/**
@@ -247,7 +213,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	public function reset()
 	{
-		$this->__space->setState($this, AnDomain::STATE_CLEAN);
+		$this->__space->setEntityState($this, AnDomain::STATE_CLEAN);
 		$this->_modified = array();
 		return $this;
 	}
@@ -378,8 +344,9 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 				//example if $topic->author = new author
 				//then save the new author first before saving topic
 				//only set the dependency 
-				if ( $value->state() == AnDomain::STATE_NEW )
-					$this->__space->setDependent($this, $value);
+				if ( $value->state() == AnDomain::STATE_NEW ) {
+					$this->__space->switchPriority($this, $value);
+                }
 			}
 			//if value is not null do a composite type checking
 			if ( !is_null($value)  )
@@ -459,7 +426,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 			}
 						
 			$this->_data[$property->getName()] 	   = $value;
-			$this->__space->setState($this, AnDomain::STATE_MODIFIED);
+			$this->__space->setEntityState($this, AnDomain::STATE_MODIFIED);
 			
 			//only track modifications for the updated entities
 			if ( $this->state() !== AnDomain::STATE_MODIFIED) {
@@ -869,7 +836,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	public function delete()
 	{
-		return $this->__space->setState($this, AnDomain::STATE_DELETED);
+		return $this->__space->setEntityState($this, AnDomain::STATE_DELETED);
 	}
 	
 	/**
@@ -881,6 +848,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	{
 		if ( $this->delete() )
 			return $this->save();
+            
 		return false;
 	}
 								
