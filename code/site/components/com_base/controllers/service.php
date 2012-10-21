@@ -115,15 +115,9 @@ class ComBaseControllerService extends LibBaseControllerService
 	 * @return void
 	 */
 	protected function _actionPost(KCommandContext $context)
-	{                
+	{
 	   	$action = $this->getItem() && $this->getItem()->persisted() ? 'edit' : 'add';
-        
 		$result = $this->execute($action, $context);
-		
-		if ( is($result, 'AnDomainEntityAbstract') && $result->isDescribable() ) {
-			$this->setRedirect($result->getURL());
-		}
-		
 		return $result;
 	}	
     
