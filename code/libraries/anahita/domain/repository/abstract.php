@@ -223,13 +223,9 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	public function validate($entity)
 	{
 	    //reset the error message
-        $context = $this->getCommandContext();
-        $context['entity'] = $entity;
-        $result = $this->getCommandChain()->run('before.validate', $context);
-        if ( $result === false && !$entity->getError() ) {
-            $entity->setError(sprintf('validation failed for %s', $entity->getIdentifier()->name));
-        }
-        return $result !== false;
+        $context           = $this->getCommandContext();
+        $context->entity   = $entity;
+        return $this->getCommandChain()->run('on.validate', $context);
 	}
 	 
     /**
@@ -538,7 +534,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  			$entity->destroy();
  		}
  		
- 		$this->_space->extract($entity);
+ 		$this->_space->extractEntity($entity);
  	}
  	
  	/**
@@ -560,7 +556,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  		//there's a key in the needle then it must be a unique entity
  		if ( count(array_intersect_key($this->_description->getKeys(), $needle)) > 0 ) 
  		{
-	 		$found = $this->_space->findIdentity($this->_description, $needle);
+	 		$found = $this->_space->findEntity($this->_description, $needle);
  		} 
  		else 
  		{
@@ -713,7 +709,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 		$entity	= $this->_instantiateEntity($identifier, $data);
 
 		//insert the identity
-		$this->_space->insertIdentity($entity, $keys);
+		$this->_space->insertEntity($entity, $keys);
 		
 		$context 	   = new KCommandContext();
 		$context->data = $data;
@@ -818,7 +814,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	{
 	    $entity = $context->entity;
 	    
-	    $this->getSpace()->setState($entity, AnDomain::STATE_NEW);
+	    $this->getSpace()->setEntityState($entity, AnDomain::STATE_NEW);
 	
 	    //set the entity default valuees
 	    $attributes = $this->getDescription()->getAttributes();
@@ -849,7 +845,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	    $id     =  $this->getDescription()->getIdentityProperty()->getName();
 	
 	    //insert the entity into the space
-	    $this->getSpace()->insertIdentity($entity, array($id=>$context['result']));
+	    $this->getSpace()->insertEntity($entity, array($id=>$context['result']));
 	
 	    //set the identity proeprty value
 	    $entity->set($id, $context->result);
@@ -861,7 +857,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	            unset($entity->{$relation->getName()});
 	    }
 	
-	    $this->getSpace()->setState($entity, AnDomain::STATE_INSERTED);
+	    $this->getSpace()->setEntityState($entity, AnDomain::STATE_INSERTED);
 	    
 	    //entity is now persisted
 	    $entity->setPersisted(true);
@@ -876,7 +872,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	 */
 	protected function _afterEntityUpdate(KCommandContext $context)
 	{
-	    $this->getSpace()->setState($context->entity, AnDomain::STATE_UPDATED);
+	    $this->getSpace()->setEntityState($context->entity, AnDomain::STATE_UPDATED);
 	}
 	
 	/**
@@ -888,6 +884,6 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	 */
 	protected function _afterEntityDelete(KCommandContext $context)
 	{
-	    $this->getSpace()->setState($context->entity, AnDomain::STATE_DESTROYED);
-	}	
+	    $this->getSpace()->setEntityState($context->entity, AnDomain::STATE_DESTROYED);
+	}
 }
