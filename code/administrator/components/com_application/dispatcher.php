@@ -235,6 +235,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         //set the request        
         $this->setRequest(KRequest::get('get','raw'));
 
+        $this->_request->option = KRequest::get('request.option','cmd');
+        
         //set the tmpl to the default        
         $this->_request->tmpl = KRequest::get('get.tmpl','cmd','index');
     }
