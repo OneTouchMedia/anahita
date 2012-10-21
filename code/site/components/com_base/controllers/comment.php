@@ -54,7 +54,6 @@ class ComBaseControllerComment extends ComBaseControllerService
 	{
 		$config->append(array(
 		    'behaviors' => array('publisher','parentable','votable'),
-			'publish_comment'  => KRequest::format() == 'html'			
 		));
 	
 		parent::_initialize($config);
