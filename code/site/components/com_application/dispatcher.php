@@ -202,10 +202,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     {
         //route the application
         $this->_application->route();
-        
-        //synchronize the request format with the accept format
-        KRequest::set('request.format', pick(KRequest::format(),'html'));
-        
+                
         KRequest::set('get.option', KRequest::get('request.option','cmd'));
                     
         // trigger the onAfterRoute events
