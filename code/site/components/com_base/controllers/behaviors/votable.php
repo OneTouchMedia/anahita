@@ -36,7 +36,7 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
 	 */	
 	protected function _actionGetvoters($context)
 	{
-		$this->commit($context);
+		$this->commit();
         
 		if ( $this->format == 'html' ) 
         {
