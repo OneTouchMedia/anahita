@@ -192,36 +192,30 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
     /**
      * Set a URL for browser redirection.
      *
-     * @param array $url     The url to set the controller redirect to
-     * @param array $options Options to set the message and type for the redirect
+     * @param array $redriect Redirect options
+     *              ['url'=>'string','message'=>'string','type'=>'string']
      * 
      * @return void
      */
-    public function setRedirect($url = 'back', $options = array())
+    public function setRedirect($redirect = array())
     {
-        if ( !is_array($options) )
-            $options = array('message'=>$options);
-            
-        $options['url'] = (string)$url;
-        
-        $options         = new KConfig($options);
-        
-        $options->append(array(
-            'message'    => '',
-            'type'        => null
-        ));
-        
-        if ( $options->url == 'back') {
-            $options->url = (string)KRequest::referrer();
+        if ( is_string($redirect) ) {
+            $redirect = array('url'=>$redirect);
         }
+        
+        $redirect = new KConfig($redirect);
+        
+        $redirect->append(array(
+            'message'  => '',
+            'type'     => null
+        ));
             
-        $options->url = LibBaseHelperUrl::getRoute($url);
+        $redirect->url = LibBaseHelperUrl::getRoute($redirect->url);
 
-        $this->_redirect = $options;
+        $this->_redirect = $redirect;
             
-        if ( KRequest::method() == 'GET' )
-        {
-            JFactory::getApplication()->redirect($options->url, $options->message, $options->type);
+        if ( KRequest::method() == 'GET' ) {
+            JFactory::getApplication()->redirect($redirect->url, $redirect->message, $redirect->type);
         }
         
         return $this;
