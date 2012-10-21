@@ -55,29 +55,29 @@ class AnDomainSpaceState extends KObject
 		//the entity itself throught its reset/delete/update API
 		$this->_machine = array(
 		//clean
-			$clean.'=>'.$deleted  => array('validateId',	'validateDelete'),
-			$clean.'=>'.$modified  => array('validateId',	'validateChange'),
+			$clean.'=>'.$deleted      => array('validateId',	'validateDelete'),
+			$clean.'=>'.$modified     => array('validateId',	'validateChange'),
 		//new
-			$new.'=>'.$clean       => array('resetrelationships'),
-			$new.'=>'.$deleted     => array('reset', false),
-			$new.'=>'.$modified     => array(false),						
+			$new.'=>'.$clean          => array('resetrelationships'),
+			$new.'=>'.$deleted        => array('reset', false),
+			$new.'=>'.$modified       => array(false),						
 		//modified
-			$modified.'=>'.$deleted  => array('validateDelete'),
+			$modified.'=>'.$deleted   => array('validateDelete'),
 			$modified.'=>'.$modified  => array('validateChange'),
 		//inserted
-			$inserted.'=>'.$deleted  => array('validateDelete'),
+			$inserted.'=>'.$deleted   => array('validateDelete'),
 			$inserted.'=>'.$modified  => array('validateChange'),			
 		//updated
-			$updated.'=>'.$deleted  => array('validateDelete'),
-			$updated.'=>'.$modified  => array('validateChange'),
+			$updated.'=>'.$deleted    => array('validateDelete'),
+			$updated.'=>'.$modified   => array('validateChange'),
 		//deleted
-			$deleted.'=>'.$clean 	=> array(false),
-			$deleted.'=>'.$modified 	=> array(false),
-//			$deleted.'=>'.$deleted 	=> array(false),	
+			$deleted.'=>'.$clean 	  => array(false),
+			$deleted.'=>'.$modified   => array(false),
+//			$deleted.'=>'.$deleted 	  => array(false),	
 		//destoryed
-			$destroyed.'=>'.$clean 		=> array(false),
-			$destroyed.'=>'.$modified 	=> array(false),
-			$destroyed.'=>'.$deleted 	=> array(false)	
+			$destroyed.'=>'.$clean    => array(false),
+			$destroyed.'=>'.$modified => array(false),
+			$destroyed.'=>'.$deleted  => array(false)	
 		);
 	}
 	
