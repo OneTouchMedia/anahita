@@ -48,13 +48,12 @@ class ComBaseControllerToolbarDefault extends ComBaseControllerToolbarAbstract
      */
     public function onAfterControllerGet(KEvent $event)
     {
-        $event->result;
-        
         $can_render = is_string($event->result)  && 
-                      $this->getController()->isDispatched() &&
-                      KRequest::type()   == 'HTTP' &&
-                      KRequest::format() == 'html';
-        
+                      $this->getController()->isDispatched()   &&
+                      $this->getController()->format == 'html' &&
+                      KRequest::type()   == 'HTTP'; 
+                      
+
         if ( $can_render ) 
         {
             $ui     = $this->getController()->getView()->getTemplate()->getHelper('ui');
