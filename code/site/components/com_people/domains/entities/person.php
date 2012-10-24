@@ -36,6 +36,13 @@
 class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor 
 {
     /**
+     * Clear string passwrod.
+     * 
+     * @var string
+     */
+    protected $_password;
+    
+    /**
 	 * Initializes the default configuration for the object
 	 *
 	 * Called from {@link __construct()} as a first step of object instantiation.
@@ -50,7 +57,7 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
 			'attributes' 	=> array(
 				'administratingIds' => array('type'=>'set', 'default'=>'set'),				
 				'userId' 	 => array('column'=>'person_userid',	 	 'key'=>true, 'type'=>'integer'),
-				'username'	 => array('column'=>'person_username',	 	 'key'=>true),
+				'username'	 => array('column'=>'person_username',	 	 'key'=>true, 'format'=>'username'),
 				'userType'	 => array('column'=>'person_usertype'),
 				'email'		 => array('column'=>'person_useremail',	 	 'key'=>true, 'format'=>'email'),
 				'givenName'  => array('column'=>'person_given_name',  'format'=>'string'),
@@ -135,7 +142,59 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
 		$this->set('givenName', $name);
 		$this->set('name', $this->givenName.' '.$this->familyName);
 	}
-
+    
+    /**
+     * Captures the password value when password is set through
+     * magic methods
+     * 
+     * @{inheritdoc}
+     */
+    public function __set($key, $value)
+    {
+        if ( $key == 'password' ) {
+           $this->setPassword($value);
+        }
+        
+        else return parent::__set($key, $value);
+    }
+    
+    /**
+     * Set a person account passwrod. This password is not stored in the database
+     * and only used for validation. @see
+     * <code>
+     * $person->setPassword('somepassowrd')->validate() //will validate the password
+     * </code> 
+     * @param string $password Clear password
+     * 
+     * @return ComPeopleDomainEntityPerson
+     */ 
+    public function setPassword($password)
+    {
+        $this->_password = $password;
+        return $this;
+    }
+    
+    /**
+     * Return the clear password set for validation. If a hash is set to true
+     * then it first hash the password and then return it
+     * 
+     * @param boolean $hash.
+     * 
+     * @return string
+     */
+    public function getPassword($hash = false)
+    {
+        $password = $this->_password;
+        if ( $hash ) {
+            jimport('joomla.user.helper');
+            $salt  = JUserHelper::genRandomPassword(32);
+            $crypt = JUserHelper::getCryptedPassword($array['password'], $salt);
+            $password = $crypt.':'.$salt;            
+        }
+        
+        return $password;
+    }
+    
 	/**
 	 * Return whether this person is a guest
 	 * 
@@ -154,6 +213,5 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
 	public function admin()
 	{
 		return $this->userType == 'Administrator' || $this->userType == 'Super Administrator';
-	}
-	
+	}	
 }
