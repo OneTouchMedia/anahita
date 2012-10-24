@@ -113,8 +113,9 @@ abstract class AnDomainValidatorAbstract extends KObject
      */
     public function sanitizeData($entity, $property, $value, $validations = array())
     {       
-        if ( is_string($property) ) 
-            $property = $this->_description->getProperty($property);   
+        if ( is_string($property) ) {
+            $property = $this->_description->getProperty($property);
+        }   
         
         if ( empty($validations) )        
             $validations = $this->getValidations($property);
@@ -145,7 +146,33 @@ abstract class AnDomainValidatorAbstract extends KObject
         
         return $value;
     }    
-            
+     
+    /**
+     * Called to validate an entity. By deafult it validates all the entity
+     * properties
+     * 
+     * @param AnDomainEntityAbstract $entity The entity that is being validated
+     * 
+     * @return boolean
+     */ 
+    public function validateEntity($entity)
+    {
+        $description = $entity->description();
+        
+        if ( $entity->state() == AnDomain::STATE_NEW )
+            $properties = $description->getProperty();
+        else
+            $properties = array_intersect_key($description->getProperty(), KConfig::unbox($entity->modifications()));
+                    
+        foreach($properties as $property)
+        {
+            $value  = $entity->get($property->getName());
+            $entity->getValidator()->validateData($entity, $property, $value);
+        }
+        
+        return $entity->getErrors()->count() === 0;
+    }
+    
     /**
      * Validates an entity property value against an array of passed validations
      *
