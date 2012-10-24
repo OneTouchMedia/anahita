@@ -46,11 +46,9 @@ class ComActorsControllerBehaviorExecutable extends LibBaseControllerBehaviorExe
 	{	    
 	    if ( $this->layout == 'add' )
 	        return $this->canAdd();	        
-        }
 	   
-        if ( !$this->getItem() ) {   	    
+        if ( !$this->getItem() )    	    
             return false;    
-        }
         
 	    return true;
 	}
