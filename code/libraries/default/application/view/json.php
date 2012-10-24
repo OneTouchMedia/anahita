@@ -42,30 +42,43 @@ class LibApplicationViewJson extends LibBaseViewJson
     {
         $this->output = $this->content;
         
-        if ( $this->content instanceof KException ) {
-            
-            $error = $this->content;
-            
-            $properties = array(
-                'message' => $error->getMessage(),
-                'code'    => $error->getCode()
+        //if content is an exception then
+        //handle               
+        if ( $this->content instanceof Exception )
+        {
+            $errors[] = array(
+                'message' => $this->content->getMessage(),
+                'code'    => $this->content->getCode()
             );
-            
-            if(JDEBUG)
-            {
-                $properties['data'] = array(
-                    'file'      => $error->getFile(),
-                    'line'      => $error->getLine()
-                );
+                        
+            if ( $this->content instanceof AnErrorSet ) {
+                $errors  = $this->_renderErrorSet($this->content);
             }
             
             //Encode data
             $this->output = json_encode(array(
-                'version'  => '1.0', 
-                'error'    => $properties
+                'errors'   => $errors
             ));
         }
         
         return $this->output;
+    }
+    
+    /**
+     * Render error set
+     * 
+     * @param AnErrorSet $errors A set of errors to render
+     * 
+     * @return array
+     */
+    protected function _renderErrorSet($errors)
+    {
+        $data = array();
+        
+        foreach($errors as $error) {
+            $data[] = $error->toArray();
+        }
+        
+        return $data;
     }
 }
