@@ -230,8 +230,19 @@ class AnDomainBehaviorValidatable extends AnDomainBehaviorAbstract
      */
     protected function _beforeEntitySetdata($context)
     {
-       $context['value'] = $context->entity->getValidator()
+       $context['value'] = $this->_repository->getValidator()
                         ->sanitizeData($context->entity, $context->property, $context->value);
+    }
+    
+    /**
+     * Reset the entity errors
+     * 
+     * @return void
+     */
+    public function resetErrors()
+    {
+        //reset the errors
+        unset($this->_errors[$this->_mixer]);
     }
     
     /**
@@ -243,24 +254,6 @@ class AnDomainBehaviorValidatable extends AnDomainBehaviorAbstract
      */
     protected function _onEntityValidate($context)
     {
-        $entity      = $context->entity;
-        
-        //reset the errors
-        unset($this->_errors[$entity]);
-           
-        $description = $entity->description();
-        
-        if ( $entity->state() == AnDomain::STATE_NEW )
-            $properties = $description->getProperty();
-        else
-            $properties = array_intersect_key($description->getProperty(), KConfig::unbox($entity->modifications()));
-                    
-        foreach($properties as $property)
-        {
-            $value  = $entity->get($property->getName());
-            $entity->getValidator()->validateData($entity, $property, $value);
-        }
-        
-        return count($entity->getErrors()) > 0;
+        return $this->_repository->getValidator()->validateEntity($context->entity);        
     }
 }
