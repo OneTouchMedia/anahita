@@ -188,7 +188,7 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
         if ( $hash ) {
             jimport('joomla.user.helper');
             $salt  = JUserHelper::genRandomPassword(32);
-            $crypt = JUserHelper::getCryptedPassword($array['password'], $salt);
+            $crypt = JUserHelper::getCryptedPassword($password, $salt);
             $password = $crypt.':'.$salt;            
         }
         
