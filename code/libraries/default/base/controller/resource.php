@@ -83,7 +83,7 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
     {
         $config->append(array(
             'readonly'  => true,
-            'behaviors' => array('sanitizable','executable'),
+            'behaviors' => array('executable'),
             'request'   => array('format' => 'html'),
         ))->append(array(
             'view'      => $config->request->get ? $config->request->get : ($config->request->view ? $config->request->view : $this->getIdentifier()->name)
