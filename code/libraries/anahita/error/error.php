@@ -14,8 +14,8 @@
  */
 
 /**
- * Error objects allows to detail out a error and can be passed as message inside of 
- * an exception object
+ * Error objects allows to detail out a error. It used with conjuction with
+ * AnErrorSet.
  *
  * @category   Anahita
  * @package    Anahita_Exception
@@ -24,14 +24,21 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class AnError extends KException implements KObjectHandlable
+class AnError extends KObject implements KObjectHandlable
 {
     /**
      * The error reson 
      * 
      * @var String
      */
-    protected $_reason;      
+    protected $_reason;
+    
+    /**
+     * Message
+     * 
+     * @var String
+     */
+    protected $_message;
     
     /**
      * Extra information regarding the error
@@ -47,30 +54,28 @@ class AnError extends KException implements KObjectHandlable
      * 
      * @return void
      */ 
-    public function __construct($message = null, $code = KHttpResponse::INTERNAL_SERVER_ERROR, Exception $previous = null) 
+    public function __construct($config = array()) 
     {
-       $config = $message;
-       
-       if ( !is_array($config) ) {
-            $config['message'] = $message;
-       }
-       
        $config = new KConfig($config);
        
-       $config->append(array(
-            'code' => $code
-       ));
-       
-       parent::__construct($config->message, $config->code, $previous);
-        
-       $this->_reason = $config->reason;
+       $this->_message = $config->message; 
+       $this->_reason  = $config->reason;
        
        unset($config['message']);
-       unset($config['code']);
        unset($config['reason']);
        
        $this->_userinfo = $config->toArray();
-    }  
+    }
+    
+    /**
+     * Return the message
+     * 
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->_message;
+    }
     
     /**
      * Return the reason
@@ -93,6 +98,20 @@ class AnError extends KException implements KObjectHandlable
     }
     
     /**
+     * Return an array represention of the error
+     * 
+     * @return array
+     */
+    public function toArray()
+    {
+        $data            = $this->_userinfo;
+        $data['message'] = $this->getMessage();
+        $data['reason']  = $this->getReason();
+        $data = array_reverse($data);
+        return $data;                
+    }
+    
+    /**
      * Gets the userinfo data
      * 
      * @param string $key Arbituary key data
@@ -100,7 +119,7 @@ class AnError extends KException implements KObjectHandlable
      * @return void
      */
     public function __get($key)
-    {    
+    {
         $result = null;
         
         if ( isset($this->_userinfo[$key]) ) {
@@ -108,15 +127,5 @@ class AnError extends KException implements KObjectHandlable
         }
         
         return $result;
-    }
-    
-    /**
-     * Get a handle for this object     
-     * 
-     * @return string
-     */
-    public function getHandle()
-    {
-        return spl_object_hash( $this );
     }
 }
