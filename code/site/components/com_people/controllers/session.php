@@ -76,11 +76,14 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     
     /**
      * Authenticate a person. If a username password is passed then the user is first logged in. 
-     * If a person is not authenticated a KHttpResponse::UNAUTHORIZED is returned
      * 
      * @param KCommandContext $context Command chain context 
      * 
      * @return void
+     * 
+     * @throws KControllerException with KHttpResponse::UNAUTHORIZED code If authentication failed
+     * @throws KControllerException with KHttpResponse::FORBIDDEN code If person is authenticated but forbidden
+     * @throws KControllerException with KHttpResponse::INTERNAL_SERVER_ERROR code for unkown error
      */
     protected function _actionAuthenticate(KCommandContext $context)
     {
@@ -111,7 +114,16 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             
             // OK, the credentials are authenticated.  Lets fire the onLogin event
             $results = JFactory::getApplication()->triggerEvent('onLoginUser', array($response, $options));
-            if (!in_array(false, $results, true))
+            $failed  = false;
+            
+            foreach($results as $result) 
+            {
+               $failed = $result instanceof JException || $result instanceof Exception || $result === false;
+               if ( $failed )
+                    break; 
+            }
+            
+            if ( !$failed )
             {
                 // Set the remember me cookie if enabled
                 jimport('joomla.utilities.simplecrypt');
@@ -122,19 +134,31 @@ class ComPeopleControllerSession extends ComBaseControllerResource
                 if ( $data->remember === true || $this->format == 'json'  )
                 {
                     //legacy for now
-                    $key = JUtility::getHash(@$_SERVER['HTTP_USER_AGENT']);  
-                    $crypt   = new JSimpleCrypt($key);
+                    $key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
+                    $crypt    = new JSimpleCrypt($key);
                     $cookie  = $crypt->encrypt(serialize($credentials));
                     $lifetime = time() + AnHelperDate::yearToSeconds();
                     setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
                 }
                 
                 return true;
+                
+            } else {
+                
+                $user = $this->getService('repos://site/users.user')->fetch(array('username'=>$response['username']));
+                
+                if ( $user && $user->block ) {
+                    $context->setError(new KControllerException('User is blocked', KHttpResponse::FORBIDDEN));                
+                }
+                else {                    
+                    $context->setError(new KControllerException('Unkown Error'));
+                }
+                return false;
             }
-        } 
+        }
          // Trigger onLoginFailure Event
         JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$response));
-        $context->setError(new KControllerException('Authentication Failed. Check username or password', KHttpResponse::UNAUTHORIZED));
+        $context->setError(new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED));
         return false;              
         
     }
