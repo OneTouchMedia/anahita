@@ -27,11 +27,20 @@
 class AnError extends KObject implements KObjectHandlable
 {
     /**
-     * The error reson 
+     * Generic error codes
+     */
+    const INVALID_FORMAT = 'InvalidFormat';
+    const INVALID_LENGTH = 'InvalidLength';
+    const NOT_UNIQUE     = 'NotUnique';    
+    const MISSING_VALUE  = 'MissingValue';
+    const OUT_OF_SCOPE   = 'OutOfScope';
+    
+    /**
+     * The error type 
      * 
      * @var String
      */
-    protected $_reason;
+    protected $_code;
     
     /**
      * Message
@@ -39,6 +48,13 @@ class AnError extends KObject implements KObjectHandlable
      * @var String
      */
     protected $_message;
+    
+    /**
+     * A data key
+     * 
+     * @string 
+     */
+    protected $_data;
     
     /**
      * Extra information regarding the error
@@ -59,12 +75,24 @@ class AnError extends KObject implements KObjectHandlable
        $config = new KConfig($config);
        
        $this->_message = $config->message; 
-       $this->_reason  = $config->reason;
+       $this->_code    = $config->code;
+       $this->_data    = $config->data;
        
        unset($config['message']);
-       unset($config['reason']);
+       unset($config['code']);
+       unset($config['data']);
        
        $this->_userinfo = $config->toArray();
+    }
+    
+    /**
+     * Return the data
+     * 
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->_data;
     }
     
     /**
@@ -82,9 +110,9 @@ class AnError extends KObject implements KObjectHandlable
      * 
      * @return string
      */
-    public function getReason()
+    public function getCode()
     {
-        return $this->_reason;
+        return $this->_code;
     }
     
     /**
@@ -106,9 +134,10 @@ class AnError extends KObject implements KObjectHandlable
     {
         $data            = $this->_userinfo;
         $data['message'] = $this->getMessage();
-        $data['reason']  = $this->getReason();
+        $data['code']    = $this->getCode();
+        $data['data']    = $this->getData();
         $data = array_reverse($data);
-        return $data;                
+        return $data;
     }
     
     /**

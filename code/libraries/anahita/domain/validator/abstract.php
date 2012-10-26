@@ -369,8 +369,8 @@ abstract class AnDomainValidatorAbstract extends KObject
             {
                 $entity->addError(array(
                     'message'  => $property->getName().' must have the format of '.$filter,
-                    'reason'   => 'PropertyValue.InvalidFormat',
-                    'property' => $property->getName(),
+                    'code'     => AnError::INVALID_FORMAT,
+                    'data'     => $property->getName(),
                     'format'   => $filter
                 ));
                 
@@ -399,8 +399,8 @@ abstract class AnDomainValidatorAbstract extends KObject
         {
             $entity->addError(array(
                 'message'  => $property->getName().' must be one of the value of '.implode($options, ','),
-                'reason'   => 'PropertyValue.OutOfScope',
-                'property' => $property->getName(),
+                'code'     => AnError::OUT_OF_SCOPE,
+                'data'     => $property->getName(),
                 'scope'    => $options
             ));
             
@@ -446,8 +446,8 @@ abstract class AnDomainValidatorAbstract extends KObject
                 {
                     $entity->addError(array(
                         'message' => sprintf(JText::_('%s %s can not be empty!'), $entity->getIdentifier()->name, $property->getName()),
-                        'reason'  => 'PropertyValue.IsEmpty',
-                        'property' => $property->getName()
+                        'code'    => AnError::MISSING_VALUE,
+                        'data'    => $property->getName()
                     ));
                     return false;
                 }
@@ -485,8 +485,8 @@ abstract class AnDomainValidatorAbstract extends KObject
         if ( !$present ) {
             $entity->addError(array(
                 'message' => sprintf(JText::_('%s %s can not be empty!'), $entity->getIdentifier()->name, $property->getName()),
-                'reason'  => 'PropertyValue.IsEmpty',
-                'property' => $property->getName()
+                'code'    => AnError::MISSING_VALUE,
+                'data'    => $property->getName()
             ));
             return false;
         }
@@ -525,8 +525,8 @@ abstract class AnDomainValidatorAbstract extends KObject
                         {
                             $entity->addError(array(
                                 'message'    => sprintf(JText::_('%s %s can not be greater than %d characters'), $this->getIdentifier()->name, $property->getName(), $options['max']),
-                                'reason'     => 'PropertyValue.ExceedMaxLength',
-                                'property'   => $property->getName(),
+                                'code'       => AnError::INVALID_LENGTH,
+                                'data'       => $property->getName(),
                                 'max_lenght' => $options['max']
                             ));
                             return false;
@@ -540,8 +540,8 @@ abstract class AnDomainValidatorAbstract extends KObject
                         {
                             $entity->addError(array(
                                 'message'    => sprintf(JText::_('%s %s can not be less than %d characters'), $this->getIdentifier()->name, $property->getName(), $options['min']),
-                                'reason'     => 'PropertyValue.LessThanMinLength',
-                                'property'   => $property->getName(),
+                                'code'       => AnError::INVALID_LENGTH,
+                                'data'       => $property->getName(),
                                 'min_length' => $options['min']
                             ));
                             return false;
@@ -555,8 +555,8 @@ abstract class AnDomainValidatorAbstract extends KObject
                {
                     $entity->addError(array(
                         'message'    => sprintf(JText::_('%s %s must be %d characters'), $this->getIdentifier()->name, $property->getName(), $options),
-                        'reason'     => 'PropertyValue.NotEqualLength',
-                        'property'   => $property->getName(),
+                        'code'       => AnError::INVALID_LENGTH,
+                        'data'       => $property->getName(),
                         'length'     => (int) $options
                     ));
                     
@@ -601,8 +601,8 @@ abstract class AnDomainValidatorAbstract extends KObject
         {
             $entity->addError(array(
                 'message'    => sprintf(JText::_('%s %s is not unique'), $this->getIdentifier()->name, $property->getName()),
-                'reason'     => 'PropertyValue.NotUnique',
-                'property'   => $property->getName()
+                'code'       => AnError::NOT_UNIQUE,
+                'data'       => $property->getName()
             ));
             return false;
         }
