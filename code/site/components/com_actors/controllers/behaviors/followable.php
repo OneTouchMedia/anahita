@@ -59,6 +59,7 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
      */
     protected function _actionAddrequester(KCommandContext $context)
     {
+        $context->status = KHttpResponse::RESET_CONTENT;
         $this->getItem()->addRequester($this->actor);
         $this->createNotification(array('subject'=>$this->actor,'target'=>$this->getItem(),'name'=>'actor_request'));        
     }
@@ -72,7 +73,8 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
      */
     protected function _actionDeleterequester(KCommandContext $context)
     {
-        $context->status = KHttpResponse::NO_CONTENT;
+        $context->status = KHttpResponse::RESET_CONTENT;
+        
         $this->getItem()->removeRequester($this->actor);        
     }    
             
@@ -113,7 +115,7 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
 	 */
 	protected function _actionDeletefollower(KCommandContext $context)
 	{
-        $context->status = KHttpResponse::NO_CONTENT;
+        $context->status = KHttpResponse::RESET_CONTENT;
 		$this->getItem()->removeFollower( $this->actor );
 	}
     
@@ -140,7 +142,7 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
      */
     protected function _actionDeleteblocked($context)
     {
-        $context->status = KHttpResponse::NO_CONTENT;        
+        $context->status = KHttpResponse::RESET_CONTENT;
         $this->getItem()->removeBlocked($this->actor);    
     }        
     
