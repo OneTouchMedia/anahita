@@ -117,16 +117,6 @@ class JRouterSite extends JRouter
 		{
 			$app =& JFactory::getApplication();
 
-			if($app->getCfg('sef_suffix') && !(substr($route, -9) == 'index.php' || substr($route, -1) == '/'))
-			{
-			    $format = $uri->getVar('format');
-				if( $format && $format != 'html' )
-				{
-					$route .= '.'.$format;
-					$uri->delVar('format');
-				}
-			}
-
 			if($app->getCfg('sef_rewrite'))
 			{
 				//Transform the route
@@ -347,7 +337,18 @@ class JRouterSite extends JRouter
 		// Unset unneeded query information
 		unset($query['Itemid']);
 		unset($query['option']);
-
+        
+        //if format is set then there already not
+        //extenion (just in case) then add the format to the path
+        if ( isset($query['format']) && !pathinfo($route, PATHINFO_EXTENSION) ) 
+        {
+            if ( $query['format'] != 'html' ) {
+               $route .= '.'.$query['format'];
+            }
+            
+            unset($query['format']);
+        }
+        
 		//Set query again in the URI
 		$uri->setQuery($query);
 		$uri->setPath($route);
