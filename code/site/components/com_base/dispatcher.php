@@ -104,28 +104,46 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	{
     		$result = parent::_actionDispatch($context);
     	} 
-        catch(KHttpException $exception) 
+        catch(KException $exception) 
     	{
-	    	$viewer = get_viewer();
-            //if format html then redirect to login
-	    	if ( $this->format == 'html' && $viewer->guest() && $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED  ) 
-            {
-	    	 	if ( KRequest::type() == 'HTTP' ) 
-                {
-					$login_url   = 'index.php?option=com_user&view=login';
-					$return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();						
-					$login_url 	.= '&return='.base64_encode($return_url);
-					$message = JText::_('LIB-AN-PLEASE-LOGIN-TO-SEE');
-					JFactory::getApplication()->redirect($login_url, $message);
-					return false;
-				}
-	    	}
-	    	throw $exception;    		
+	    	$context = $this->getCommandContext();            
+            $context['exception'] = $exception;
+            $result = $this->execute('dispatcherexception', $context);
     	}
   
     	return $result;
+    }    
+    
+    /**
+     * Called after an exception has been thrown in the action dispatch 
+     * 
+     * @param KCommandContext $context ['exception'=>KException]
+     * 
+     * @return boolean
+     */
+    protected function _actionDispatcherexception(KCommandContext $context)
+    {       
+        $exception = $context['exception'];
+        
+        $viewer = get_viewer();
+        
+        //if format html then redirect to login
+        if ( $this->format == 'html' && $viewer->guest() && $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED  ) 
+        {
+            if ( KRequest::type() == 'HTTP' ) 
+            {
+                $login_url   = 'index.php?option=com_user&view=login';
+                $return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();                        
+                $login_url  .= '&return='.base64_encode($return_url);
+                $message = JText::_('LIB-AN-PLEASE-LOGIN-TO-SEE');
+                JFactory::getApplication()->redirect($login_url, $message);
+                return false;
+            }
+        }
+        
+        throw $exception;        
     }
-    	
+    
   	/**
   	 * Forward Action
   	 * 
