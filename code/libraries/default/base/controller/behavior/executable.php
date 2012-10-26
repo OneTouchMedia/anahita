@@ -93,7 +93,7 @@ class LibBaseControllerBehaviorExecutable extends KControllerBehaviorExecutable
                         
             if ( $this->_mixer->canExecute($context) === false ) 
             {
-                $context->setError(new KHttpException(
+                $context->setError(new KControllerException(
                         'Action '.ucfirst($action).' Not Allowed', KHttpResponse::METHOD_NOT_ALLOWED
                     ));
                 
