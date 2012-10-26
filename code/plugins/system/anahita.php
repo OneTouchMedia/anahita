@@ -13,6 +13,8 @@
  * @link       http://www.anahitapolis.com
  */
 
+jimport('joomla.plugin.plugin');
+
 /**
  * Anahita System Plugin
  * 
@@ -25,6 +27,57 @@
  */
 class PlgSystemAnahita extends JPlugin 
 {
+    /**
+     * Remebers handling
+     * 
+     * @return void
+     */
+    public function onAfterInitialise()
+    {
+        global $mainframe;
+
+        // No remember me for admin
+        if ($mainframe->isAdmin()) {
+            return;
+        }
+
+        //if alredy logged in then forget it
+        if ( JFactory::getUser()->id)  {
+            return;    
+        }
+        
+        jimport('joomla.utilities.utility');
+        
+        $cookie = KRequest::get('cookie.'.JUtility::getHash('JLOGIN_REMEMBER'),'raw');
+        
+        if ( $cookie ) 
+        {
+            //first lets clear the cookie
+            setcookie( JUtility::getHash('JLOGIN_REMEMBER'), false, time() - AnHelperDate::dayToSeconds(), '/' );
+            
+            //lets decrypt
+            $key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
+            $crypt    = new JSimpleCrypt($key);
+            $cookie   = $crypt->decrypt($cookie);
+            $data     = (array)@unserialize($cookie);
+            
+            //@TODO what happens when a user is blocked
+            try {
+                KService::get('com://site/people.controller.session')
+                    ->authenticate($data);
+            }
+            
+            catch(KControllerException $e) {
+                //only throws exception if we are using JSON format
+                //otherwise let the current app handle it 
+                if ( KRequest::format() == 'json' && 
+                    $e->getCode() == KHttpResponse::UNAUTHORIZED ) {
+                    throw $e;
+                }
+            }
+        }
+    }
+        
 	/**
 	 * Constructor
 	 * 
@@ -45,12 +98,7 @@ class PlgSystemAnahita extends JPlugin
             if (!isset($_SERVER['REQUEST_METHOD'])) {
                 $_SERVER['REQUEST_METHOD'] = '';
             }
-        }
-        
-        if (!function_exists('mysqli_connect')) 
-        {
-            JFactory::getApplication()->redirect(JURI::base().'templates/system/error_mysqli.html');
-        } 
+        }                
         
         // Check for suhosin
         if(in_array('suhosin', get_loaded_extensions()))
