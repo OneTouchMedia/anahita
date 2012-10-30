@@ -38,6 +38,7 @@ class LibApplicationTemplateHelperModules extends KTemplateHelperAbstract
     public function render($modules, $config = array())
     {
         if ( is_string($modules) ) {
+        	jimport('joomla.application.module.helper');
             $modules = JModuleHelper::getModules($modules);    
         }
         
