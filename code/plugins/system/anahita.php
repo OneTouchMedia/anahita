@@ -47,7 +47,7 @@ class PlgSystemAnahita extends JPlugin
         }
         
         jimport('joomla.utilities.utility');
-        
+        jimport('joomla.utilities.simplecrypt');
         $cookie = KRequest::get('cookie.'.JUtility::getHash('JLOGIN_REMEMBER'),'raw');
         
         if ( $cookie ) 
