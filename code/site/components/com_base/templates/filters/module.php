@@ -90,7 +90,8 @@ class ComBaseTemplateFilterModule extends KTemplateFilterAbstract implements KTe
                 $module->module    = 'mod_dynamic';                
                 $modules[] 		   = $module;
             }
-                        
+
+            jimport('joomla.application.module.helper');
             $mods =& JModuleHelper::_load();
             $mods = array_merge($modules, $mods);
         }
