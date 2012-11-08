@@ -275,16 +275,17 @@ class JRouterSite extends JRouter
 		/*
 		 * Parse the component route
 		 */
-		if(!empty($route) && isset($this->_vars['option']) )
+		if( isset($this->_vars['option']) )
 		{
-			$segments = explode('/', ltrim($route,'/'));
+			$segments = empty($route) ? array() : explode('/', ltrim($route,'/'));
+            
             $router   = $this->_getComponentRouter($this->_vars['option']);
             
             if ( $router === false ) {
                 $function =  substr($this->_vars['option'],4).'ParseRoute';
                 $vars = $function($segments);
             } else {
-                $vars = $router->parseRoute($segments);
+                $vars = $router->parse($segments);
             }
             $this->setVars($vars);
 		}
@@ -323,7 +324,7 @@ class JRouterSite extends JRouter
         $router = $this->_getComponentRouter($query['option']);
         
         if ( $router ) {
-            $parts    = $router->buildRoute($query);
+            $parts    = $router->build($query);
         } else {
             $function = substr($query['option'], 4).'BuildRoute';
             $parts    = $function($query);
