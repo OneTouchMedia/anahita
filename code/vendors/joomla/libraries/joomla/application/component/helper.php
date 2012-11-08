@@ -114,9 +114,19 @@ class JComponentHelper
 		} else {
 			$path = JPATH_COMPONENT.DS.$file.'.php';
 		}
-
+        
+        //if component not found
+        if ( !JComponentHelper::isEnabled( $name ) ) {
+            JError::raiseError( 404, JText::_( 'Component Not Found' ) );
+        }
+                
+        //new way of doing it
+        if ( file_exists(JPATH_COMPONENT) && !file_exists($path) ) {
+            return ComBaseDispatcher::getInstance()->dispatch();
+        }
+        
 		// If component disabled throw error
-		if (!JComponentHelper::isEnabled( $name ) || !file_exists($path)) {
+		elseif ( !file_exists($path) ) {
 			JError::raiseError( 404, JText::_( 'Component Not Found' ) );
 		}
 		
