@@ -127,17 +127,15 @@ class LibBaseViewJson extends LibBaseViewAbstract
             $name = KInflector::singularize($this->getName());
              
             foreach($items as $item) 
-            { 
-               if ( is($item,'AnDomainEntityAbstract') ) 
-               {
-                   $id = $item->getIdentityProperty();
-                   $item =  array_merge(array(
-                      'href'    => (string) $this->getRoute('view='.$name.'&id='.$item->{$id}),
-                    ), $item->toSerializableArray());
-               } else {
-                    $item = (array)$item;                
+            {               
+               $this->_state->setItem($item);
+                
+               $item = $this->_serializeToArray($item);                              
+               
+               if ( count($commands = $this->getToolbarCommands('list')) ) {
+                    $item['commands'] = $commands;
                }
-            
+               
                $data[] = $item; 
             }
             
@@ -165,16 +163,66 @@ class LibBaseViewJson extends LibBaseViewAbstract
      */
     protected function _getItem()
     {
-        $data = null;
-        
-        if ( $item = $this->_state->getItem() ) {
-            if ( is($item, 'AnDomainBehaviorSerializable') )
-                $data = $item->toSerializableArray();
-            else {
-                $data = (array)$item;
-            }   
+        $item = null;
+
+        if ( $item = $this->_state->getItem() ) 
+        {
+           $item = $this->_serializeToArray($item);
+            
+           if ( count($commands = $this->getToolbarCommands('toolbar')) ) {
+                $item['commands'] = $commands;
+           }
         }
         
-        return $data;
+        return $item;
+    }
+    
+    /**
+     * Serializes an item into an array
+     * 
+     * @return array
+     */
+    protected function _serializeToArray($item)
+    {
+        $result = array();
+        
+        if ( is($item, 'AnDomainBehaviorSerializable') )
+            $result = $item->toSerializableArray();
+        else {
+            $result = (array)$item;
+        }
+        
+        return $result;         
+    }
+    
+    /**
+     * Gets the toolbar commands. This method checks if the view state has 
+     * a toolbar 
+     * 
+     * @param string $name The name of the commands
+     * 
+     * @return array Return an array of commands
+     */
+    public function getToolbarCommands($name)
+    {
+        $result = array();
+        
+        if ( $this->_state->toolbar instanceof KControllerToolbarAbstract ) 
+        {
+            $this->_state->toolbar->reset();
+            $method  = 'add'.ucfirst($name).'Commands';
+            
+            if ( method_exists($this->_state->toolbar, $method) ) {
+                $this->_state->toolbar->$method();
+            }
+        
+            $commands = $this->_state->toolbar->getCommands();
+            
+            foreach($commands as $command) {
+                $result[] =$command->getname();
+            }
+        }
+        
+        return $result;
     }
 }
