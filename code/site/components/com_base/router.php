@@ -49,12 +49,56 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
     }
     
     /**
+     * Route patterns
+     * 
+     * @var array
+     */
+    protected $_patterns;
+    
+    /** 
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     * 
+     * @return void
+     */ 
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+        
+        $this->_patterns = $config['patterns'];
+    }
+        
+    /**
+    * Initializes the default configuration for the object
+    *
+    * Called from {@link __construct()} as a first step of object instantiation.
+    *
+    * @param KConfig $config An optional KConfig object with configuration options.
+    *
+    * @return void
+    */
+    protected function _initialize(KConfig $config)
+    {
+        $package = $this->getIdentifier()->package;
+        
+        $config->append(array(
+            'patterns' => array(
+                ''          => array('view'=>$package)                             
+            )
+        ));   
+
+        parent::_initialize($config);
+    }
+        
+    
+    /**
      * Build the route
      *
      * @param   array   An array of URL arguments
      * @return  array   The URL arguments to use to assemble the subsequent URL.
      */
-    public function buildRoute(&$query)
+    public function build(&$query)
     {
         $segments = array();
         return $segments;
@@ -66,7 +110,7 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
      * @param   array   The segments of the URL to parse.
      * @return  array   The URL attributes to be used by the application.
      */
-    public function parseRoute($segments)
+    public function parse($segments)
     {
         $vars = array();
         return $vars;
