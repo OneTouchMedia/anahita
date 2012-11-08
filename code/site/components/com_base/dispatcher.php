@@ -155,10 +155,12 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      */
 	public function _actionForward(KCommandContext $context)
 	{
-		if ( KRequest::has('get.reset') && is($context->result, 'AnDomainEntityAbstract')) {
-			$context->result = $this->getController()->execute('get', $context);
-		}
-			
+        //If content is reset then return the content of the controller
+        if ( ($this->format == 'json' || KRequest::type() == 'AJAX' ) && 
+             $context->status == KHttpResponse::RESET_CONTENT ) {
+            $context->result = $this->getController()->execute('get', $context);
+        }
+        
 		return parent::_actionForward($context);
 	}
 	
@@ -193,12 +195,8 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     {
         $view  = $this->getController()->getView();
         
-        $context->append(array(
-            'headers' => array(
-                'Content-Type' => $view->mimetype
-            )
-        ));
-               
+        header('Content-Type: '.$view->mimetype);
+                       
         if ( $this->format == 'html' && KRequest::type() == 'HTTP' ) {
             $this->_setPageTitle();
         }
