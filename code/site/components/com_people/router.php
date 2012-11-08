@@ -21,7 +21,7 @@ class ComPeopleRouter extends ComBaseRouter
      * @param   array   An array of URL arguments
      * @return  array   The URL arguments to use to assemble the subsequent URL.
      */
-    public function buildRoute(&$query)
+    public function build(&$query)
     {
         $segments = array();
         
@@ -54,20 +54,35 @@ class ComPeopleRouter extends ComBaseRouter
      * @param   array   The segments of the URL to parse.
      * @return  array   The URL attributes to be used by the application.
      */    
-    public function parseRoute($segments)
+    public function parse($segments)
     {
         $vars = array();
         
-        $vars['view']   = array_shift($segments);
+        if ( empty($segments) ) {        
+            $vars['view'] = $this->getIdentifier()->package;
+            return $vars;                       
+        }
         
-        if ( count($segments) )
-            $vars['id'] = array_shift($segments);
-            
-        if ( count($segments) )
+        $view = array_shift($segments);
+        
+        if ( is_numeric($view) ) 
+        {
+            $vars['view'] = 'person';
+            $vars['id']   = $view;
+        } 
+        else {
+            $vars['view'] = $view;
+            if ( count($segments) )
+                $vars['id'] = array_shift($segments);            
+        }
+           
+        if ( count($segments) ) {
             $vars['get'] = array_shift($segments);
+        }
             
-        if ( count($segments) )
+        if ( count($segments) ) {
             $vars['type'] = array_shift($segments);
+        }
                     
         return $vars;        
     }
