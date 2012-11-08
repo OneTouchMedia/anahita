@@ -70,6 +70,7 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
+            'mimetype'          => 'text/html',
             'params'            => array(),        
             'media_url'         => 'base://media',
             'template_filters'  => array('shorttag','html','alias')
