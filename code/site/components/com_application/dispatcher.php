@@ -176,6 +176,25 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         $view    = $this->getService('com://site/application.controller.'.$name, $config)
                         ->getView();
+        
+        //set the content type if already not set
+        //the content-type is set in the component dispatcher
+        //however when there's an exception through a system, no content-type is set
+        //to make a general assumption, we always check if content-type is not set
+        //then set it according to the page format.
+        //@TODO this can be done better. 
+        $content_type_sent = false;
+        
+        foreach(headers_list() as $header) {
+           if ( strpos($header, 'Content-Type') === 0 ) {                    
+                $content_type_sent = true;
+                break;
+           }
+        }
+        
+        if ( !$content_type_sent ) {
+            header('Content-Type: '.$view->mimetype);
+        }
                 
         $view->layout($this->tmpl);
         
