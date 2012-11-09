@@ -368,12 +368,13 @@ class AnDomainQueryBuilder extends KObject
 					$array[] = $scope;
 			}
 			else $array[] = $description;
-			
-			foreach($array as $key => $description) 
+            
+            //the table type column name
+			$type_column_name = $resource.'.'.$description->getInheritanceColumn()->name;
+            
+			foreach($array as $index => $scope) 
 			{
-			    $inheritance = $this->_inheritanceTree($description);
-			    $inheritance = $resource.'.'.$description->getInheritanceColumn()->name.' LIKE \''.$inheritance.'\'';
-			    $array[$key] = $inheritance;
+			    $array[$index] = $type_column_name.' LIKE \''.$this->_inheritanceTree($scope).'\'';;
 			}
 						
             $clauses[] = '('.implode(' OR ', $array).')';
@@ -651,12 +652,17 @@ class AnDomainQueryBuilder extends KObject
 	    if ( is_string($description) && strpos($description, '.') ) {
 	        $description = KService::get($description)->getRepository()->getDescription();
 	    }
-	    
-        $inheritance = (string) $description->getInheritanceColumnValue();
-        
-        if ( $description->isAbstract() ) {
-            $inheritance .= '%';
-        }
+        	    
+        if ( $description instanceof AnDomainDescriptionAbstract ) {
+            $inheritance = (string) $description->getInheritanceColumnValue();
+            
+            if ( $description->isAbstract() ) {
+                $inheritance .= '%';
+            }
+            
+        } else {
+            $inheritance = $description.'%';
+        }        
         
         return $inheritance;
 	}
