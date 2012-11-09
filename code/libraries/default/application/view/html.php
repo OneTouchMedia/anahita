@@ -94,11 +94,20 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
                 $layout = 'default';
             }
             
-            $this->content = $this->getTemplate()->loadTemplate('errors/'.$layout, array('error'=>$this->content))->render();
+            $error = $this->content;
             
-            if ( JDEBUG ) {
-               // $output .= $this->_renderBacktrace();
-                //$output .= '<pre>'.$this->document->renderBacktrace().'</pre>';    
+            $this->content = $this->getTemplate()->loadTemplate('errors/'.$layout, array('error'=>$error))->render();
+            
+            if ( JDEBUG ) 
+            {
+                $traces   = array();
+                $traces[] = '<h4>Exception '.get_class($error).' with message "'.$error->getMessage().'"</h4>';
+                $traces[] = $error->getFile().':'.$error->getLine();
+                foreach($error->getTrace() as $trace) {
+                    $traces[] = $trace['file'].':'.$trace['line'];
+                }
+                
+                $this->content .= '<pre>'.implode('<br />', $traces).'</pre>';    
             }
         }
         
