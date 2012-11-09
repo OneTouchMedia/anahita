@@ -61,9 +61,9 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 				
 		parent::__construct($config);
 		
-        //if set has been instantiated with 
-        //data, then it's already loaded
-        if ( count($this->_object_set) ) {
+        //if config->data has been set
+        //then it has been loaded
+        if ( $config->data != null ) {
             $this->_loaded = true;
         }
 	}
