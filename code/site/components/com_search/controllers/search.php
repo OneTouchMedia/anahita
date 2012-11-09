@@ -41,11 +41,27 @@ class ComSearchControllerSearch extends ComBaseControllerResource
      * @return string The result to render
      */
     protected function _actionGet(KCommandContext $context)
-    {
+    {        
+        if ( $this->type )
+        {
+            $identifier = 'repos://site/'.$this->type;
+            
+            if ( strpos($identifier,'.') === false ) {
+                $identifier = $identifier.'.'.$this->type;
+            }
+          
+            $description = $this->getService(KInflector::singularize($identifier))->getDescription();                      
+        }
+                 
         $repos = $this->getService('repos://site/base.node');
         $query = $repos->getQuery();
-        $query->instanceOf('');
-        $keywords  = $this->q;        
+        
+        if ( !empty($description) ) {
+            $query->instanceOf((string)$description->getEntityIdentifier());
+        }
+        
+        $keywords  = $this->q;
+                
         if ( strpos($keywords,' OR ') ) {
             $keywords  = explode(' OR ',$keywords);
             $operation = 'OR';
@@ -56,10 +72,11 @@ class ComSearchControllerSearch extends ComBaseControllerResource
         foreach($keywords as $keyword) {
             $query->where('CONCAT(name,body) LIKE "%'.$keyword.'%"',$operation);
         }
-        print_query($query);
-        die;
-        $entities = $query->fetchSet();
-        $this->_state->setList($entities);        
+        
+        $query->limit(20);
+        $entities = $repos->fetchSet($query);
+        $this->_state->setList($entities);
+        
         return $this->getView()->display();        
     }
 }
