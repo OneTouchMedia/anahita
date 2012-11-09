@@ -649,18 +649,23 @@ class AnDomainQueryBuilder extends KObject
 	 */
 	protected function _inheritanceTree($description)
 	{
+        $inheritance = '';
+        
 	    if ( is_string($description) && strpos($description, '.') ) {
 	        $description = KService::get($description)->getRepository()->getDescription();
 	    }
         	    
-        if ( $description instanceof AnDomainDescriptionAbstract ) {
+        if ( $description instanceof AnDomainDescriptionAbstract ) 
+        {
             $inheritance = (string) $description->getInheritanceColumnValue();
             
             if ( $description->isAbstract() ) {
                 $inheritance .= '%';
             }
             
-        } else {
+        } 
+        
+        elseif ( is_string($description) ) {
             $inheritance = $description.'%';
         }        
         
