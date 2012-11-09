@@ -46,6 +46,8 @@ class LibApplicationViewJson extends LibBaseViewJson
         //handle               
         if ( $this->content instanceof Exception )
         {
+            $data = array();
+            
             $errors[] = array(
                 'message' => $this->content->getMessage(),
                 'code'    => $this->content->getCode()
@@ -53,12 +55,22 @@ class LibApplicationViewJson extends LibBaseViewJson
                         
             if ( $this->content instanceof AnErrorSet ) {
                 $errors  = $this->_renderErrorSet($this->content);
-            }
+            }            
             
-            //Encode data
-            $this->output = json_encode(array(
-                'errors'   => $errors
-            ));
+            $data['errors'] = $errors;
+            
+//            if ( JDEBUG ) 
+//            {
+//                $traces[] = $this->content->getFile().':'.$this->content->getLine();
+//                foreach($this->content->getTrace() as $trace) {
+//                    $traces[] = $trace['file'].':'.$trace['line'];
+//                }
+//                
+//                $data['trace'] = $traces;  
+//            }
+            
+           //Encode data
+            $this->output = json_encode($data);            
         }
         
         return $this->output;
