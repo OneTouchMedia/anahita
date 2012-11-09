@@ -70,7 +70,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             $operation = 'AND';   
         }
         foreach($keywords as $keyword) {
-            $query->where('CONCAT(name,body) LIKE "%'.$keyword.'%"',$operation);
+            $query->where('CONCAT(IF(name IS NULL,"",name), IF(body IS NULL,"",body)) LIKE "%'.$keyword.'%"',$operation);
         }
         
         $query->limit(20);
