@@ -129,7 +129,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
                 ;
                 
         if ( $person->validate() === false ) {
-            $context->setError(new AnErrorSet($person->getErrors(), KHttpResponse::BAD_REQUEST));
+            $context->setError(new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST));
             return false;
         }
              
@@ -149,11 +149,24 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $user->set('registerDate', $date->toMySQL());
         if ( get_config_value('users.useractivation', false) ) {
             jimport('joomla.user.helper');
-            $user->set('activation', JUtility::getHash( JUserHelper::genRandomPassword()) );
-            $user->set('block', '1');
+            //$user->set('activation', JUtility::getHash( JUserHelper::genRandomPassword()) );
+            //$user->set('block', '1');
         }
-        $user->save();
         
+        $user->save();
+        $person = $this->getRepository()->fetch(array('userId'=>$user->id));
+        
+        //if person is null then user has not been saved
+        if ( !$person ) {
+            $context->setError(new KControllerException('Unexpected error when saving user'));
+            return false;   
+        }
+        
+        //set the portrait image
+        if ( $file = KRequest::get('files.portrait', 'raw') ) {
+            $person->setPortraitImage(array('url'=>$file['tmp_name'], 'mimetype'=>$file['type']));
+        }
+                            
         //set the status
         $context->status  = KHttpResponse::CREATED;
         //return a custom tag for user activiation required
@@ -161,6 +174,8 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
             'headers' => array(
               'User-Activation-Required' => get_config_value('users.useractivation')
         )));
+                        
+        return $person;
         
     }
     
