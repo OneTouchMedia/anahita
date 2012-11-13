@@ -105,7 +105,7 @@ class JFilterInput extends JObject
 	 * @since	1.5
 	 * @static
 	 */
-	static public function clean($source, $type='string')
+	public function clean($source, $type='string')
 	{
 		// Handle the type constraint
 		switch (strtoupper($type))
