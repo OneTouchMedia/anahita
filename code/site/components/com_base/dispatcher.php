@@ -156,9 +156,18 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 	public function _actionForward(KCommandContext $context)
 	{
         //If content is reset then return the content of the controller
-        if ( ($this->format == 'json' || KRequest::type() == 'AJAX' ) && 
-             $context->status == KHttpResponse::RESET_CONTENT ) {
-            $context->result = $this->getController()->execute('get', $context);
+        if ( ($this->format == 'json' || KRequest::type() == 'AJAX' )
+            && ( $context->status == KHttpResponse::RESET_CONTENT ||
+                 $context->status == KHttpResponse::CREATED)
+        ) 
+        {
+            if (  $this->getController()->isIdentifiable() &&
+                  $context->result instanceof KObject)
+            {
+                $context->result = $this->getController()->setItem($context->result)
+                    ->execute('get', $context);
+                ;
+            }
         }
         
 		return parent::_actionForward($context);
