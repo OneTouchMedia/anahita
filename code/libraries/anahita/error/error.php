@@ -14,8 +14,7 @@
  */
 
 /**
- * Error objects allows to detail out a error. It used with conjuction with
- * AnErrorSet.
+ * Key based error object
  *
  * @category   Anahita
  * @package    Anahita_Exception
@@ -50,18 +49,18 @@ class AnError extends KObject implements KObjectHandlable
     protected $_message;
     
     /**
-     * A data key
+     * A key key
      * 
      * @string 
      */
-    protected $_data;
+    protected $_key;
     
     /**
      * Extra information regarding the error
      * 
      * @var array
      */
-    protected $_userinfo = array();
+    protected $_data = array();
     
     /** 
      * Constructor.
@@ -76,23 +75,23 @@ class AnError extends KObject implements KObjectHandlable
        
        $this->_message = $config->message; 
        $this->_code    = $config->code;
-       $this->_data    = $config->data;
+       $this->_key     = $config->key;
        
        unset($config['message']);
        unset($config['code']);
-       unset($config['data']);
+       unset($config['key']);
        
-       $this->_userinfo = $config->toArray();
+       $this->_data = $config->toArray();
     }
     
     /**
-     * Return the data
+     * Return the key
      * 
      * @return string
      */
-    public function getData()
+    public function getKey()
     {
-        return $this->_data;
+        return $this->_key;
     }
     
     /**
@@ -116,13 +115,13 @@ class AnError extends KObject implements KObjectHandlable
     }
     
     /**
-     * Return the user info
+     * Return the exception
      * 
      * @return array
      */
-    public function getUserInfo()
+    public function getData()
     {
-        return $this->_userinfo;
+        return $this->_data;
     }
     
     /**
@@ -132,18 +131,18 @@ class AnError extends KObject implements KObjectHandlable
      */
     public function toArray()
     {
-        $data            = $this->_userinfo;
+        $data            = $this->_data;
         $data['message'] = $this->getMessage();
         $data['code']    = $this->getCode();
-        $data['data']    = $this->getData();
+        $data['key']     = $this->getkey();
         $data = array_reverse($data);
         return $data;
     }
     
     /**
-     * Gets the userinfo data
+     * Gets the userinfo key
      * 
-     * @param string $key Arbituary key data
+     * @param string $key Arbituary key key
      * 
      * @return void
      */
@@ -151,8 +150,8 @@ class AnError extends KObject implements KObjectHandlable
     {
         $result = null;
         
-        if ( isset($this->_userinfo[$key]) ) {
-            $result = $this->_userinfo[$key];
+        if ( isset($this->_data[$key]) ) {
+            $result = $this->_data[$key];
         }
         
         return $result;

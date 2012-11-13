@@ -46,18 +46,12 @@ class LibApplicationViewJson extends LibBaseViewJson
         //handle               
         if ( $this->content instanceof Exception )
         {
-            $data = array();
-            
-            $errors[] = array(
-                'message' => $this->content->getMessage(),
-                'code'    => $this->content->getCode()
-            );
-                        
-            if ( $this->content instanceof AnErrorSet ) {
-                $errors  = $this->_renderErrorSet($this->content);
-            }            
-            
-            $data['errors'] = $errors;
+            $data   = array();          
+            $errors = array($this->content);
+            if ( $this->content instanceof AnErrorException ) {
+                $errors  = $this->content->getErrors();
+            }
+            $data['errors'] = $this->_toData($errors);
             
 //            if ( JDEBUG ) 
 //            {
@@ -77,18 +71,23 @@ class LibApplicationViewJson extends LibBaseViewJson
     }
     
     /**
-     * Render error set
+     * Converts an array of error into an array of serializable data
      * 
-     * @param AnErrorSet $errors A set of errors to render
+     * @param array $error An array of errors
      * 
      * @return array
      */
-    protected function _renderErrorSet($errors)
+    protected function _toData($errors)
     {
         $data = array();
         
-        foreach($errors as $error) {
-            $data[] = $error->toArray();
+        foreach($errors as $error) 
+        {
+            if ( $error instanceof KExceptionInterface ) {
+                $data[] = array('code'=>$error->getCode(),'message'=>$error->getMessage());   
+            } elseif ( $error instanceof AnError ) {
+                $data[] = $error->toArray();
+            }
         }
         
         return $data;
