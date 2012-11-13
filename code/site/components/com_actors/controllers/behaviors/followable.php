@@ -61,7 +61,8 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
     {
         $context->status = KHttpResponse::RESET_CONTENT;
         $this->getItem()->addRequester($this->actor);
-        $this->createNotification(array('subject'=>$this->actor,'target'=>$this->getItem(),'name'=>'actor_request'));        
+        $this->createNotification(array('subject'=>$this->actor,'target'=>$this->getItem(),'name'=>'actor_request'));
+        return $this->getItem();        
     }
     
     /**
@@ -75,7 +76,8 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
     {
         $context->status = KHttpResponse::RESET_CONTENT;
         
-        $this->getItem()->removeRequester($this->actor);        
+        $this->getItem()->removeRequester($this->actor); 
+               
     }    
             
 	/**
@@ -104,6 +106,8 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
 		    //if the entity is not an adiminstrable actor (person)
 		    $this->createNotification(array('subject'=>$this->actor, 'target'=>$this->getItem(),'name'=>'actor_follow'));
 		}
+        
+        return $this->getItem();
 	}
 		
 	/**
@@ -117,6 +121,7 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
 	{
         $context->status = KHttpResponse::RESET_CONTENT;
 		$this->getItem()->removeFollower( $this->actor );
+        return $this->getItem();
 	}
     
     
@@ -131,6 +136,7 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
     {
         $context->status = KHttpResponse::RESET_CONTENT;
         $this->getItem()->addBlocked($this->actor);
+        return $this->getItem();
     }
     
     /**
@@ -144,6 +150,7 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
     {
         $context->status = KHttpResponse::RESET_CONTENT;
         $this->getItem()->removeBlocked($this->actor);    
+        return $this->getItem();
     }        
     
     /**
