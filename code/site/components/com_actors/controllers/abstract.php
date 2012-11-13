@@ -136,6 +136,25 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
     }
     
     /**
+     * Add an actor
+     * 
+     * @param KCommandContext $context Context parameter
+     * 
+     * @return AnDomainEntityAbstract
+     */
+    protected function _actionAdd(KCommandContext $context)
+    {
+        $entity = parent::_actionAdd($context);
+        
+        if ( $entity->isPortraitable() && KRequest::has('files.portrait') ) {
+            $file = KRequest::get('files.portrait', 'raw'); 
+            $entity->setPortraitImage(array('url'=>$file['tmp_name'], 'mimetype'=>$file['type']));             
+        }
+        
+        return $entity;
+    }
+    
+    /**
      * Edit's an actor data
      * 
      * @param KCommandContext $context Context parameter
