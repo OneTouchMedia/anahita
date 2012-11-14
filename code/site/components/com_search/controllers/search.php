@@ -73,6 +73,9 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             $query->where('CONCAT(IF(name IS NULL,"",name), IF(body IS NULL,"",body)) LIKE "%'.$keyword.'%"',$operation);
         }
         
+        //this is becuase we still have the board records in some systems. 
+        $query->where('type', '<>', 'ComMediumDomainEntityMedium,ComTopicsDomainEntityBoard,com:topics.domain.entity.board');
+        
         $query->limit(20);
         $entities = $repos->fetchSet($query);
         $this->_state->setList($entities);
