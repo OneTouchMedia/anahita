@@ -109,7 +109,7 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
             unset($query['view']);
         }
         
-        if ( isset($query['id']) ) {
+        if ( isset($query['id']) && !is_array($query['id']) ) {
             $segments[] = $query['id'];
             unset($query['id']);
         }
