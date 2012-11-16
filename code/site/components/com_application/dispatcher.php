@@ -237,7 +237,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         $this->_request->append(array(
             'format' => KRequest::format() ? KRequest::format() : 'html',
-            'tmpl'   => 'default',
+            'tmpl'   => KRequest::type() == 'AJAX' ? 'raw' : 'default',
         ));
     }
     
