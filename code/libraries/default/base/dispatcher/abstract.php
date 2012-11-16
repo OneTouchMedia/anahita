@@ -43,10 +43,13 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 			unset($config->request->layout);
         }
         
-        //Force the controller to the information found in the request
-        if($config->request->view) {
-            $config->controller = $config->request->view;
+        //by default set the view to the package name
+        if ( !$config->request->view ) {
+            $config->request->view = $this->getIdentifier()->package;
         }
+        
+        //set the controller to whatever the view is 
+        $config->controller = $config->request->view;
     }
         
     /**
@@ -54,20 +57,8 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
      */
     protected function _actionDispatch(KCommandContext $context)
     {
-        //Set the controller to the view passed in
-        $data = KConfig::unbox($context->data);
-        
-        if ( !empty($data) ) {
-            $this->setController($data);    
-        }
-        
-        //if no view is passed then pluralize the identifier name
-        if ( !$this->view ) {
-            $this->getController()->view = KInflector::pluralize($this->getController()->getIdentifier()->name);                                  
-        }
-                 
-	    $action = KRequest::get('post.action', 'cmd', strtolower(KRequest::method()));
-	    
+	    $action        = KRequest::get('post.action', 'cmd', strtolower(KRequest::method()));
+        	    
 	    $context->data = new KConfig();
 	    	    
 	    if(KRequest::method() != KHttpRequest::GET) {
