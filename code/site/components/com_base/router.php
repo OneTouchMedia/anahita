@@ -101,6 +101,20 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
     public function build(&$query)
     {
         $segments = array();
+        
+        if ( isset($query['view']) ) {
+            //prevent duplicate name
+            if ( $query['view'] != $this->getIdentifier()->package )
+                $segments[] = $query['view'];
+            unset($query['view']);
+        }
+        
+        if ( isset($query['id']) ) {
+            $segments[] = $query['id'];
+            unset($query['id']);
+        }
+        
+        
         return $segments;
     }
 
@@ -110,10 +124,21 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
      * @param   array   The segments of the URL to parse.
      * @return  array   The URL attributes to be used by the application.
      */
-    public function parse($segments)
+    public function parse(&$segments)
     {
         $vars = array();
+        
+        if ( empty($segments) ) {
+            $vars['view'] = $this->getIdentifier()->package;
+        }
+        elseif ( !is_numeric(current($segments)) ) {
+            $vars['view'] = array_shift($segments);
+            if ( current($segments) ) {
+                $vars['id'] = array_shift($segments);
+            }
+        }
+        
         return $vars;
-    }    
+    }   
     
 }

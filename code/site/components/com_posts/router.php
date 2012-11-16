@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Stories
+ * @package    Com_Posts
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -13,4 +13,4 @@
  * @link       http://www.anahitapolis.com
  */
 
-print ComBaseDispatcher::getInstance()->dispatch(KRequest::get('get.view','cmd', 'stories'));
+class ComPostsRouter extends ComMediumRouter {}
