@@ -58,6 +58,10 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 	    $config->auto_asset_import = $config->auto_asset_import && (KRequest::method() == 'GET' && KRequest::type() == 'HTTP');
 	
 	    parent::_initialize($config);
+        
+        if ( $config->request->view ) {
+            $config->controller = $config->request->view;    
+        }
 	}	
 		
     /**
@@ -106,7 +110,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	} 
         catch(KException $exception) 
     	{
-	    	$context = $this->getCommandContext();            
+	    	$context = $this->getCommandContext();
             $context['exception'] = $exception;
             $result = $this->execute('dispatcherexception', $context);
     	}
