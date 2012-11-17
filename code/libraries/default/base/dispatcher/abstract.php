@@ -42,14 +42,6 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
         if ( strpos($config->request->layout, '_') === 0 ) {
 			unset($config->request->layout);
         }
-        
-        //by default set the view to the package name
-        if ( !$config->request->view ) {
-            $config->request->view = $this->getIdentifier()->package;
-        }
-        
-        //set the controller to whatever the view is 
-        $config->controller = $config->request->view;
     }
         
     /**
