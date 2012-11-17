@@ -53,6 +53,25 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
             register_default($default);
 		}
 	}
+    
+    /**
+     * Initializes the default configuration for the object
+     *
+     * Called from {@link __construct()} as a first step of object instantiation.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    protected function _initialize(KConfig $config)
+    {
+        parent::_initialize($config);
+        
+        //if there's a view then set the conroller to view        
+        if ( $config->request->view ) {
+            $config->controller = $config->request->view;    
+        }
+    }    
 
 	/**
 	 * Draw the toolbar
