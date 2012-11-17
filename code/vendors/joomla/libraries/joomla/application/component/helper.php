@@ -119,6 +119,9 @@ class JComponentHelper
         if ( !JComponentHelper::isEnabled( $name ) ) {
             JError::raiseError( 404, JText::_( 'Component Not Found' ) );
         }
+        
+        //load aliases
+        KLoader::loadIdentifier('com://site/'.$file.'.aliases');
                 
         //new way of doing it
         if ( file_exists(JPATH_COMPONENT) && !file_exists($path) ) {
