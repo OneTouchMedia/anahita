@@ -13,5 +13,6 @@
  * @link       http://www.anahitapolis.com
  */
 
-print ComBaseDispatcher::getInstance()
-	->dispatch('configurations');
+print ComBaseDispatcher::getInstance(
+    array('request'=>array('view'=>'configurations'))    
+)->dispatch();
