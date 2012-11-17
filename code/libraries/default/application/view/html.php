@@ -104,7 +104,17 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
                 $traces[] = '<h4>Exception '.get_class($error).' with message "'.$error->getMessage().'"</h4>';
                 $traces[] = $error->getFile().':'.$error->getLine();
                 foreach($error->getTrace() as $trace) {
-                    $traces[] = $trace['file'].':'.$trace['line'];
+                    $str = '';
+                    
+                    if ( isset($trace['file']) ) 
+                       $str = $trace['file'].':'; 
+                    
+                    if ( isset($trace['line']) ) 
+                       $str .= $trace['line']; 
+                    
+                    if ( empty($str) ) continue;
+                    
+                    $traces[] = $str;
                 }
                 
                 $this->content .= '<pre>'.implode('<br />', $traces).'</pre>';    
