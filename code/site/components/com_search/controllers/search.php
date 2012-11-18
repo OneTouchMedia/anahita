@@ -42,6 +42,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
      */
     protected function _actionGet(KCommandContext $context)
     {        
+        $this->setView('searches');
         
     	JFactory::getLanguage()->load('com_actors');
     	
