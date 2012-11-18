@@ -36,6 +36,19 @@ class ComSearchRouter extends ComBaseRouter
     public function build(&$query)
     {
         $segments = array();
+        //we don't need the view
+        unset($query['view']);
+        
+        if ( isset($query['type']) ) {
+            $segments = array_merge($segments, explode('.',$query['type']));
+            unset($query['type']);
+        }
+        
+        if ( isset($query['q']) ) {
+            $segments[] = $query['q'];
+            unset($query['q']);
+        }
+        
         return $segments;
     }
 
