@@ -26,11 +26,6 @@
 class JRouterSite extends KObject
 {
     /**
-     * SEF component prefix
-     */
-    static public $SEF_COM_PREFIX = 'component/';
-    
-    /**
      * cloneable url
      * 
      * @var KHttpUrl
