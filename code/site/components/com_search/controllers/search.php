@@ -46,6 +46,8 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     	
     	$this->setView('searches');
         
+        $this->_state->insert('q')->insert('type');
+        
     	JFactory::getLanguage()->load('com_actors');
     	
     	if ( $this->type )
@@ -87,7 +89,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             $query->limit(20);
             $entities = $repos->fetchSet($query);
             $this->_state->setList($entities);
-            $this->keywords = $keywords;            
+            $this->keywords = $keywords;
         }
         
         return $this->getView()->display();        
