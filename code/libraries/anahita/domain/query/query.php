@@ -380,8 +380,14 @@ class AnDomainQuery
 		{
 			if ( strpos($query,'.') === false ) 
 			{
-				AnDomainQueryHelper::addRelationship($this, $query);
-				$link    = $this->getLink($query);
+                $name = $query;
+                
+                if ( $property = $this->_repository->getDescription()->getProperty($name) ) {
+                    $name = $property->getName();
+                }
+                
+				AnDomainQueryHelper::addRelationship($this, $name);
+				$link    = $this->getLink($name);
 				$config  = new KConfig($condition);
 				$config->append(array(
 				        'type'         => $link->type,
