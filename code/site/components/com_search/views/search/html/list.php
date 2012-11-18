@@ -2,6 +2,13 @@
 
 <?php if($item->isDescribable()): ?>
 <div class="an-entity">
+
+	<?php if($item->isPortraitable() && !$item->inherits('ComActorsDomainEntityActor')): ?>
+	<div class="clearfix">
+		<img src="<?= $item->getPortraitURL('medium') ?>" />
+	</div>
+	<?php endif; ?>
+
 	<div class="entity-thumbnail">
 		<?php if($item->inherits('ComActorsDomainEntityActor')): ?>
 		<?= @avatar($item) ?>
@@ -11,11 +18,13 @@
 	</div>
 	
 	<div class="entity-container">
+		<?php if(!empty($item->title)): ?>
 		<h3 class="medium-title">
 			<a href="<?= @route($item->getURL()) ?>">
 				<?= @escape($item->title) ?>
 			</a>
 		</h3>
+		<?php endif; ?>
 		
 		<div class="entity-description">
 			<?php $preview = @helper('text.truncate', strip_tags($item->body), array('length'=>400, 'read_more'=>true))?>
