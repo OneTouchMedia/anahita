@@ -91,6 +91,10 @@ class ComSearchControllerSearch extends ComBaseControllerResource
                     ->where('tag.type','=','com:tags.domain.entity.text')
                     ->fetchValues('taggable.id');
                     
+            if ( empty($tag_ids) && empty($operation) ) {
+                $query->where('false');
+            }
+            
             if ( !empty($tag_ids) ) {
                 $query->clause()->id($tag_ids);
             }
