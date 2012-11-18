@@ -42,7 +42,9 @@ class ComSearchControllerSearch extends ComBaseControllerResource
      */
     protected function _actionGet(KCommandContext $context)
     {        
-        $this->setView('searches');
+        $this->getToolbar('menubar')->setTitle(JText::_('COM-SEARCH-HEADER'));
+    	
+    	$this->setView('searches');
         
     	JFactory::getLanguage()->load('com_actors');
     	
