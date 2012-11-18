@@ -104,8 +104,8 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
         
         if ( isset($query['view']) ) {
             //prevent duplicate name
-            if ( $query['view'] != $this->getIdentifier()->package )
-                $segments[] = $query['view'];
+//            if ( $query['view'] != $this->getIdentifier()->package )
+            $segments[] = $query['view'];
             unset($query['view']);
         }
         
