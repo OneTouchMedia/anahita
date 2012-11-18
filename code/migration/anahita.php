@@ -433,3 +433,11 @@ function anahita_18()
     dbexec("DELETE from jos_modules WHERE client_id = 1 AND module IN ('mod_rokquicklinks','mod_popular','mod_latest','mod_unread','mod_online','mod_logged','mod_footer','mod_status','mod_quickicon','mod_feed','mod_title','mod_toolbar')");
     
 }
+
+//tag migration
+function anahita_19()
+{
+    dbexec('ALTER TABLE jos_anahita_nodes             
+                ADD tag_count INT(11) UNSIGNED NULL AFTER blocked_ids,
+                ADD tag_ids TEXT NULL AFTER tag_count');    
+}

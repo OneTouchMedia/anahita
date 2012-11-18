@@ -37,17 +37,18 @@ class ComSearchRouter extends ComBaseRouter
     {
         $segments = array();
         //we don't need the view
-        unset($query['view']);
-        
-        if ( isset($query['type']) ) {
-            $segments = array_merge($segments, explode('.',$query['type']));
-            unset($query['type']);
+                
+        if ( !empty($query['type']) ) {
+            $segments = array_merge($segments, explode('.',$query['type']));           
         }
         
         if ( isset($query['q']) ) {
-            $segments[] = $query['q'];
-            unset($query['q']);
+            $segments[] = $query['q'];        
         }
+        
+        unset($query['view']);
+        unset($query['q']);        
+        unset($query['type']);        
         
         return $segments;
     }
@@ -60,8 +61,14 @@ class ComSearchRouter extends ComBaseRouter
      */
     public function parse($segments)
     {
-        $vars = array();        
+        $vars = array();   
+        //check if we are searching for tags     
         $vars['q'] = array_pop($segments);
+        //if the next is tags
+        if ( key($segments) == 'tags' ) {
+            $vars['q'] = '#'.$vars['q'];
+            array_pop($segments);
+        }
         $vars['type'] = implode('.', $segments);
         return $vars;
     }    

@@ -68,24 +68,42 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             $query->instanceOf((string)$description->getEntityIdentifier());
         }
         
-        $keywords  = $this->q;
+        $keywords  = urldecode($this->q);
         
         if ( $keywords )
-        {        
-            if ( strpos($keywords,' OR ') ) {
+        {
+            if ( strpos($keywords,'#') === 0 ) {
+                $keywords  = explode(',', substr($keywords,1));
+            }
+            elseif ( strpos($keywords,' OR ') ) {
                 $keywords  = explode(' OR ',$keywords);
                 $operation = 'OR';
             } else {
                 $keywords = explode(' ', $keywords);
                 $operation = 'AND';   
             }
-            foreach($keywords as $keyword) {
-                $query->where('CONCAT(IF(name IS NULL,"",name), IF(body IS NULL,"",body)) LIKE "%'.$keyword.'%"',$operation);
+            
+            //always search tags
+            $tag_ids   = $this->getService('repos://site/tags.association')
+                    ->getQuery()
+                    ->link('tag')
+                    ->where('name','IN',$keywords)                    
+                    ->where('tag.type','=','com:tags.domain.entity.text')
+                    ->fetchValues('taggable.id');
+                    
+            if ( !empty($tag_ids) ) {
+                $query->clause()->id($tag_ids);
+            }
+            
+            if ( !empty($operation) ) {
+                $clause = $query->clause('OR'); 
+                foreach($keywords as $keyword) {
+                    $clause->where('CONCAT(IF(name IS NULL,"",name), IF(body IS NULL,"",body)) LIKE "%'.$keyword.'%"',$operation);
+                }
             }
             
             //this is becuase we still have the board records in some systems. 
             $query->where('type', '<>', 'ComMediumDomainEntityMedium,ComTopicsDomainEntityBoard,com:topics.domain.entity.board');
-            
             $query->limit(20);
             $entities = $repos->fetchSet($query);
             $this->_state->setList($entities);

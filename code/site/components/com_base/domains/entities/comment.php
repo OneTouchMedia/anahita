@@ -43,8 +43,9 @@ class ComBaseDomainEntityComment extends ComBaseDomainEntityNode
 			'attributes' => array(
 				'body'			=> array('required'=>true)
 			),
-			'behaviors'		=> array(
+			'behaviors'		=> array(                
 				'parentable' => array('parent'=>'node'),
+                'taggable',
 				'modifiable',
 				'authorizer',
 				'locatable' ,

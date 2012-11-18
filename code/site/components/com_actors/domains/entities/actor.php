@@ -60,6 +60,10 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 			    'enableable'                
 			)
 		));
+        
+        $config->behaviors->append(array(
+            'taggable'    => array('parse_hashtag'=>true)
+        ));
 		
 		parent::_initialize($config);
 	}
