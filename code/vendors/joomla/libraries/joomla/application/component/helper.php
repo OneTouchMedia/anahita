@@ -121,8 +121,12 @@ class JComponentHelper
         }
         
         //load aliases        
-        if ( file_exists(JPATH_COMPONENT)  )
+        if ( file_exists(JPATH_COMPONENT)  ) {
+            // Load common language files
+            $lang =& JFactory::getLanguage();
+            $lang->load($name);            
             KLoader::loadIdentifier('com://site/'.$file.'.aliases');
+        }
                 
         //new way of doing it
         if ( file_exists(JPATH_COMPONENT) && !file_exists($path) ) {
@@ -133,10 +137,6 @@ class JComponentHelper
 		elseif ( !file_exists($path) ) {
 			JError::raiseError( 404, JText::_( 'Component Not Found' ) );
 		}
-		
-		// Load common language files
-		$lang =& JFactory::getLanguage();
-		$lang->load($name);
 
 		// Handle template preview outlining
 		$contents = null;
