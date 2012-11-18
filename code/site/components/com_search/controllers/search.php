@@ -42,7 +42,10 @@ class ComSearchControllerSearch extends ComBaseControllerResource
      */
     protected function _actionGet(KCommandContext $context)
     {        
-        if ( $this->type )
+        
+    	JFactory::getLanguage()->load('com_actors');
+    	
+    	if ( $this->type )
         {
             $identifier = 'repos://site/'.$this->type;
             
@@ -79,6 +82,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
         $query->limit(20);
         $entities = $repos->fetchSet($query);
         $this->_state->setList($entities);
+        $this->keywords = $keywords;
         
         return $this->getView()->display();        
     }

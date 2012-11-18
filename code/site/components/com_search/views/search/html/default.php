@@ -1,1 +1,3 @@
-asd
+<?php defined('KOOWA') or die; ?>
+
+asdf
