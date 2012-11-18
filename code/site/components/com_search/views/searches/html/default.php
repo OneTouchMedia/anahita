@@ -4,4 +4,8 @@
 
 <?= @helper('ui.searchbox', @route('layout=list'))?>
 
-<div id="an-entities-wrapper"></div>
+<div id="an-entities-wrapper">
+<?php if(count($items)) : ?>
+<?= @template('list') ?>
+<?php endif; ?>
+</div>
