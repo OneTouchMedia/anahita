@@ -71,20 +71,21 @@ class JRouterSite extends KObject
      * 
      * @return void
      */
-	public function parse(&$uri)
+	public function parse($url)
 	{
         // Get the path
-        $path = $uri->getPath();
+        $uri  = clone $this->__url;
+        $uri->setUrl(str_replace('index.php','',$url));
+        
+        $path = $uri->path;
         $path = substr_replace($path, '', 0, strlen(JURI::base(true)));
         $path = str_replace('index.php', '', $path);
-        $path = trim($path , '/');
-       
+        $path = trim($path , '/');        
         $vars = new KConfig($uri->getQuery(true));
         
         //set the format
-        if ( $format = pathinfo($path, PATHINFO_EXTENSION) ) {
-            $path = str_replace('.'.$format, '', $path);
-            $vars->append(array('format'=>$format));
+        if ( $uri->format ) {            
+            $vars->append(array('format'=>$uri->format));
         }
         
         if ( empty($path) && count($vars) == 0 ) {
