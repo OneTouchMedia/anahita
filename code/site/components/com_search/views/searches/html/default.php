@@ -5,7 +5,7 @@
 <?= @helper('ui.searchbox', @route('layout=list'))?>
 
 <div id="an-entities-wrapper">
-<?php if(count($items)) : ?>
+<?php if ( !empty($keywords) ) : ?>
 <?= @template('list') ?>
 <?php endif; ?>
 </div>
