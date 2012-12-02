@@ -85,7 +85,8 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
             } 
             catch(Exception $e)
             {
-                $default    = array('default'=>array('ComBaseControllerResource'));               
+                $default = 'Com'.ucfirst($this->getIdentifier()->package).'ControllerDefault';
+                $default = array('default'=>array($default, 'ComBaseControllerResource'));               
             }
             
             $default['identifier'] = $this->_controller;
