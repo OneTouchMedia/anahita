@@ -140,7 +140,7 @@ class LibBaseViewJson extends LibBaseViewAbstract
             }
             
             $data = array(
-                $this->getName() => $data                
+                'data' => $data                
             );
             
             if ( is($items, 'AnDomainEntitysetAbstract') )
@@ -149,7 +149,7 @@ class LibBaseViewJson extends LibBaseViewAbstract
                         'offset' => (int) $items->getOffset(),
                         'limit'  => (int) $items->getLimit(),
                         'total'  => (int) $items->getTotal(),                
-                );                
+                );
             }
         }
         
