@@ -187,15 +187,56 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      * @return AnDomainEntityAbstract
      */
     protected function _actionEdit(KCommandContext $context)
-    {
+    {        
+        //add the validations here
+        $this->getRepository()->getValidator()
+                ->addValidation('username','uniqueness')
+                ->addValidation('email',   'uniqueness')
+                ;
+                        
+        $data   = $context->data;
+        
         $person = parent::_actionEdit($context);
               
-        if ( $person->modifications()->name )
-        {
-            $user = JFactory::getUser($person->userId);
-            $user->name = $person->name;
-            $user->save();           
+        //manually set the password to make sure there's a password
+        if ( $data->password ) {
+            $person->setPassword($data->password);
         }
+                
+        if ( $person->validate() === false ) {
+            $context->setError(new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST));
+            return false;
+        }
+        
+        $user = JFactory::getUser($person->userId);
+        
+        if ( $person->modifications()->name ) {
+            $user->set('name', $person->name);
+        }
+        
+        if ( $person->modifications()->username ) {
+            $user->set('username', $person->username);   
+        }
+        
+        if ( $person->modifications()->email ) {
+            $user->set('email', $person->email);               
+        }
+        
+        if ( $data->password ) {
+            $user->set('password', $person->getPassword(true));
+        }
+        
+        if ( !$user->save() ) {
+            $context->setError(new KControllerException('Unexpected error when saving user'));
+            return false;               
+        }
+        
+        if ( !$person->save() ) {
+            $context->setError(new KControllerException('Unexpected error when saving user'));
+            return false;            
+        }
+        
+        $context->status = KHttpResponse::RESET_CONTENT;
          
         return $person;      
     }
