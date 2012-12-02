@@ -184,7 +184,7 @@ class AnDomainEntitysetManytomany extends AnDomainEntitysetOnetomany
             $this->extract($target);
         }
         
-        return $this->_repository->getSpace()->commit();   
+        return $this->getRepository()->getSpace()->commitEntities();   
     }
         
     /**

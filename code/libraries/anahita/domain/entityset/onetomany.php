@@ -15,7 +15,7 @@
  */
 
 /**
- * One to many aggregated entityset
+ * Onetomany set decorator decorates an entityset with one to many aggregated relationship
  * 
  * @category   Anahita
  * @package    Anahita_Domain
@@ -25,8 +25,28 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class AnDomainEntitysetOnetomany extends AnDomainEntitysetDefault
+class AnDomainEntitysetOnetomany extends AnObjectDecorator
 {	
+    /**
+     * Force creation of a singleton
+     *
+     * @param KConfigInterface  $config    An optional KConfig object with configuration options
+     * @param KServiceInterface $container A KServiceInterface object
+     *
+     * @return KServiceInstantiatable
+     */
+    public static function getInstance(KConfigInterface $config, KServiceInterface $container)
+    {
+        if (!$container->has($config->service_identifier))
+        {
+            $classname = $config->service_identifier->classname;
+            $instance  = new $classname($config);
+            $container->set($config->service_identifier, $instance);
+        }
+    
+        return $container->get($config->service_identifier);
+    }
+    
 	/**
 	 * The aggregate root
 	 * 
@@ -51,7 +71,10 @@ class AnDomainEntitysetOnetomany extends AnDomainEntitysetDefault
 		$this->_root 	 = $config->root;
 		
 		$this->_property = $config->property;
-		
+        
+	   	$config->object  = $config->service_container
+            ->get($config->repository->getEntityset(), $config->toArray()); 
+         
 		parent::__construct($config);
 	}
 		
@@ -116,7 +139,7 @@ class AnDomainEntitysetOnetomany extends AnDomainEntitysetDefault
 	public function insert($entity)
 	{
 		$entity->set($this->_property,$this->getRoot());
-    	return parent::insert($entity);
+    	return $this->getObject()->insert($entity);
 	}
 
 	/**
@@ -145,5 +168,104 @@ class AnDomainEntitysetOnetomany extends AnDomainEntitysetDefault
 	public function getRoot()
 	{
 		return $this->_root;
-	}    
+	}
+    
+    /**
+     * Overloaded call function to handle behaviors and forward all 
+     * calls to to the object regardless
+     *
+     * @param  string   The function name
+     * @param  array    The function arguments
+     * @return mixed The result of the function
+     */
+    public function __call($method, array $arguments)
+    {
+        $object = $this->getObject();        
+        $parts  = KInflector::explode($method);
+        
+        if ( $parts[0] == 'is' && isset($parts[1]) ) 
+        {
+            $behavior = lcfirst(substr($method, 2));
+            return !is_null($this->getRepository()->getBehavior($behavior));
+        } 
+        
+        else {
+            return call_object_method($object, $method, $arguments);
+        }
+    }    
+    
+    /**
+     * Check if the object exists in the queue
+     *
+     * Required by interface ArrayAccess
+     *
+     * @param   KObjectHandlable $object
+     * @return  bool Returns TRUE if the object exists in the storage, and FALSE otherwise
+     * @throws  InvalidArgumentException if the object doesn't implement KObjectHandlable
+     */
+    public function offsetExists($object)
+    {
+        if(!$object instanceof KObjectHandlable) {
+            throw new InvalidArgumentException('Object needs to implement KObjectHandlable');
+        }
+
+        return $this->contains($object);
+    }
+
+    /**
+     * Returns the object from the set
+     *
+     * Required by interface ArrayAccess
+     *
+     * @param   KObjectHandlable $object
+     * @return  KObjectHandlable
+     * @throws  InvalidArgumentException if the object doesn't implement KObjectHandlable
+     */
+    public function offsetGet($object)
+    {
+        if(!$object instanceof KObjectHandlable) {
+            throw new InvalidArgumentException('Object needs to implement KObjectHandlable');
+        }
+
+        return $this->getObject()->offsetGet($object);
+    }
+
+    /**
+     * Store an object in the set
+     *
+     * Required by interface ArrayAccess
+     *
+     * @param   KObjectHandlable  $object
+     * @param   mixed             $data The data to associate with the object [UNUSED]
+     * @return  \KObjectSet
+     * @throws  InvalidArgumentException if the object doesn't implement KObjectHandlable
+     */
+    public function offsetSet($object, $data)
+    {
+        if(!$object instanceof KObjectHandlable) {
+            throw new InvalidArgumentException('Object needs to implement KObjectHandlable');
+        }
+
+        $this->insert($object);
+        return $this;
+    }
+
+    /**
+     * Removes an object from the set
+     *
+     * Required by interface ArrayAccess
+     *
+     * @param   KObjectHandlable  $object
+     * @return  \KObjectSet
+     * @throws  InvalidArgumentException if the object doesn't implement the KObjectHandlable interface
+     */
+    public function offsetUnset($object)
+    {
+        if(!$object instanceof KObjectHandlable) {
+            throw new InvalidArgumentException('Object needs to implement KObjectHandlable');
+        }
+
+        $this->extract($object);
+        return $this;
+    }               
 }

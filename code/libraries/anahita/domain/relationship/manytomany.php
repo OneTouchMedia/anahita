@@ -220,9 +220,9 @@ class AnDomainRelationshipManytomany extends AnDomainRelationshipOnetomany
 			'target_property'	=> $this->getTargetChildKey(), 
 			'child'		=> $this->getChildRepository()
 		);
-
-		$set =  new AnDomainEntitysetManytomany(new KConfig($options));
 		
+		$set = KService::get('anahita:domain.entityset.manytomany', $options);
+        
 		return $set;							
 	}
 }
