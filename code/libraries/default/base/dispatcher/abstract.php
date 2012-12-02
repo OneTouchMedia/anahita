@@ -72,7 +72,8 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 		parent::setController($controller);
 		
 		if ( !$this->_controller instanceof KControllerAbstract ) {
-			register_default(array('identifier'=>$this->_controller, 'default'=>'LibBaseControllerService'));
+            $default = 'Com'.ucfirst($this->getIdentifier()->package).'ControllerDefault';
+			register_default(array('identifier'=>$this->_controller, 'default'=>array($default,'LibBaseControllerService')));
 		}
 	}
 		
@@ -93,9 +94,12 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 		$redirect = $this->getController()->getRedirect();
         
         $redirect->append(array(
-            'type' => 'success',
-            'url'  => (string)KRequest::referrer()
+            'type' => 'success'            
         ));
+        
+        if ( empty($redirect->url) ) {
+            $redirect['url'] = (string)KRequest::referrer();
+        }
 		
 		//if a the result of disatched is string then
 		//dispaly the returned value	
