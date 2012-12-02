@@ -312,7 +312,7 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 	public function destroy()
 	{
 		$this->delete();
-		return $this->_repository->getSpace()->commit();
+		return $this->_repository->getSpace()->commitEntities();
 	}
 	
 	/**
