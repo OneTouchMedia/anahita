@@ -71,6 +71,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         //if there's not a valid user then return unathorized
         if ( JFactory::getUser()->id == 0 ) {
              $context->status = KHttpResponse::UNAUTHORIZED;
+        } else {
+            $this->_state->setItem(array('personId'=> get_viewer()->id ));
+            return $this->getView()->display();   
         }
     }
     
@@ -88,14 +91,11 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     protected function _actionAuthenticate(KCommandContext $context)
     {
         $data     = $context->data;
-        $filter   = $this->getService('koowa:filter.string');
-        $username = $filter->sanitize($data->username);
-        $password = $filter->sanitize($data->password);
         
         jimport( 'joomla.user.authentication');
        
         $authenticate = & JAuthentication::getInstance();
-        $credentials  = array('username'=>$username,'password'=>$password);
+        $credentials  = KConfig::unbox($data);
         $options      = array();
         $response     = $authenticate->authenticate($credentials, $options);
         if ($response->status === JAUTHENTICATE_STATUS_SUCCESS)
@@ -140,8 +140,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
                     $lifetime = time() + AnHelperDate::yearToSeconds();
                     setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
                 }
-                
-                return true;
+                $person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
+                $this->_state->setItem(array('personId'=> $person->id ));
+                return $this->getView()->display();
                 
             } else {
                 
