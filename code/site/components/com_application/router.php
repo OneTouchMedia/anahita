@@ -138,7 +138,7 @@ class JRouterSite extends KObject
             return $url;
         }
         
-        $component = $query['option'];        
+        $component = str_replace('com_','',$query['option']);        
         unset($query['option']);
                 
         if ( isset($query['format']) ) {
