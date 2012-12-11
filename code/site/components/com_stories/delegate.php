@@ -71,5 +71,20 @@ class ComStoriesDelegate extends ComAppsDomainDelegateDefault
                     'content'       => $content
             ));
         }
-    }	
+    }
+
+	/**
+     * @{inheritdoc}
+     */
+    protected function _setComposers($actor, $composers, $mode)
+    {
+        if ( $actor->authorize('action','com_stories:story:add') )
+        {
+            $composers->insert('stories',array(
+                'title'	       => JText::_('COM-STORIES-COMPOSER-STORY'),
+                'placeholder'  => JText::_('COM-STORIES-COMPOSER-PLACEHOLDER'),
+                'url'      => 'option=com_stories&layout=composer&view=story&oid='.$actor->id
+            ));
+        }
+    }
 }
