@@ -130,7 +130,8 @@ class JComponentHelper
                 
         //new way of doing it
         if ( file_exists(JPATH_COMPONENT) && !file_exists($path) ) {
-            return ComBaseDispatcher::getInstance()->dispatch();
+            $dispatcher = ComBaseDispatcher::getInstance();
+            return $dispatcher->dispatch();
         }
         
 		// If component disabled throw error
