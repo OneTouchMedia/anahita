@@ -708,4 +708,56 @@ function print_query($query)
     print str_replace('#__','jos_', $query)."\G";
 }
 
+function trace_mark($message)
+{
+    global $_checkpoints;
+    
+    if ( !$_checkpoints ) {
+        $_checkpoints = array();
+    }
+    
+    $traces = debug_backtrace();
+    array_shift($traces);
+    $trace = array_shift($traces);
+    $called_method = '';
+    if ( isset($trace['class']) ) {
+        $called_method = $trace['class'].'::';
+    }
+    if ( isset($trace['function']))
+        $called_method .= $trace['function'].'()';
+
+    $trace = array_shift($traces);
+
+    $calling_method = '';
+    
+    if ( isset($trace['object']) ) {
+        $calling_method = get_class($trace['object']).'::';
+    }
+    elseif ( isset($trace['class']) ) {
+        $calling_method = $trace['class'].'::';
+    }
+
+    if ( isset($trace['function']) && $trace['function'] != 'include') {
+        $calling_method .= $trace['function'].'()';
+    }
+    if ( empty($calling_method) && isset($trace['file']) ) {
+        if ( isset($trace['function']) && $trace['function'] == 'include') {
+            $calling_method = $trace['args'][0];
+        } else
+            $calling_method = $trace['file'];
+    }
+
+    if ( isset($trace['line']) )
+        $calling_method = $calling_method.' line:'.$trace['line'];
+    $index = count($_checkpoints) + 1;
+    $message =  $index.' - '.$calling_method.' '.$message;     
+    array_push($_checkpoints,$message);
+}
+
+function get_marked_traces()
+{
+    global $_checkpoints;
+    return pick($_checkpoints, array());
+}
+
 ?>
