@@ -58,6 +58,19 @@ class LibBaseTemplateObject extends KConfig implements LibBaseTemplateObjectInte
     }
     
     /**
+     * Sets the name of the command
+     * 
+     * @param string $name
+     * 
+     * @return void
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+    
+    /**
      * Return a template object that uniquly identifieds a template object
      *
      * @return string
