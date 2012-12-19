@@ -36,6 +36,9 @@ class ComBaseDomainSerializerDefault extends AnDomainSerializerDefault
         
         $data[$entity->getIdentityProperty()] = $entity->getIdentityId();
         
+        $data['objectType'] = 
+            'com.'.$entity->getIdentifier()->package.'.'.$entity->getIdentifier()->name;
+        
         if ( $entity->isDescribable() ) {
             $data['name']  = $entity->name;
             $data['body']  = $entity->body;
