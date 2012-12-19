@@ -53,6 +53,8 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
+            //by default the format is json
+            'request'   => array('format'=>'json'),
             'readonly'  => false
         ));
 
@@ -72,8 +74,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         if ( JFactory::getUser()->id == 0 ) {
              $context->status = KHttpResponse::UNAUTHORIZED;
         } else {
-            $this->_state->setItem(array('personId'=> get_viewer()->id ));
-            return $this->getView()->display();   
+            $person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
+            $this->_state->setItem(array('personId'=> $person->id ));
+            return $this->getView()->display();  
         }
     }
     
@@ -92,6 +95,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {
         $data     = $context->data;
         
+        if ( JFactory::getUser()->id > 0 ) {            
+            return $this->display();    
+        }
         jimport( 'joomla.user.authentication');
        
         $authenticate = & JAuthentication::getInstance();
@@ -140,9 +146,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
                     $lifetime = time() + AnHelperDate::yearToSeconds();
                     setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
                 }
-                $person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
-                $this->_state->setItem(array('personId'=> $person->id ));
-                return $this->getView()->display();
+                return $this->display();
                 
             } else {
                 
