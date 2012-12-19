@@ -59,8 +59,9 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
     {
         $query = $context->query;
         
-        if ( $query->aggregate_keys )
+        if ( $context->mode != AnDomain::FETCH_VALUE && $query->aggregate_keys ) {
             $this->_preloadData($context->data);
+        }
     }
         
     /**
@@ -285,6 +286,44 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
         return $this->_mixer->__ids[$key];
     }
 
+    /**
+     * Return an array of aggregated comments of the object
+     * 
+     * @return array
+     */
+    public function getComments()
+    {
+        //setup the comments
+        $comment_ids = $this->getIds('comment');
+        
+        $comments    = array();
+
+        //only shows comments if there are comment_ids in the story
+        //body or if the story has directly been commented on
+        if ( !empty($comment_ids) ) 
+        {
+            sort($comment_ids);
+            $size = 0;
+            foreach($comment_ids as $id)
+            {
+                if ( isset($this->_loaded_nodes[$id]) )
+                {
+                    $comment = $this->_loaded_nodes[$id];
+                    if ( $comment instanceof ComBaseDomainEntityComment )
+                    {
+                        $comments[$id] = $comment;
+                        $size++;
+                    }
+                }
+                if ( $size == 10 )
+                    break;
+            }
+        }        
+        
+        return $comments;     
+        
+    }
+    
     /**
      * Return if a story is an aggregation of multiple stories
      * 
