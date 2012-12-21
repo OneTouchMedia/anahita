@@ -598,21 +598,3 @@ Joomla = {
        }    
     }
 }
-
-Class.refactor(Tips,{
-    initialize : function(els, options) 
-    {
-        options = options || {};
-        Object.set(options, {
-            title : function(el) {
-               var title = (el.get('title') || "").split('::');
-               return '<strong>' + title[0] + '</strong>'  
-            },
-            text  : function(el) {
-                return (el.get('title') || "").split('::')[1]
-            }
-        });
-        return this.previous(els,options);
-    }
-    
-})

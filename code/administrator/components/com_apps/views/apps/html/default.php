@@ -1,5 +1,4 @@
 <?php defined('KOOWA') or die('Restricted access'); ?>
-<script	src="lib_koowa/js/koowa.js" />
 
 <form id="" action="<?= @route()?>" method="post" class="-koowa-grid " data-token-name="_token" data-token-value="<?=JUtility::getToken()?>">
 	<table class="adminlist" style="clear: both;">

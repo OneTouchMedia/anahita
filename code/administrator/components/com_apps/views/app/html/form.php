@@ -1,7 +1,5 @@
 <?php defined('KOOWA') or die('Restricted access'); ?>
 
-<script	src="lib_koowa/js/koowa.js" />
-
 <form id="" action="<?= @route(array('id'=>$app->id))?>" method="post" class="-koowa-form" data-token-name="_token" data-token-value="<?=JUtility::getToken()?>">
 	<input type="hidden" name="action" value="assign" />
 	<div class="col width-50">

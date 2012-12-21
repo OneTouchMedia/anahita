@@ -156,7 +156,7 @@ class ComBaseControllerService extends LibBaseControllerService
 	protected function _actionCancel(KCommandContext $context)
 	{
 		//Create the redirect
-		$this->setRedirect(array('view'=>KInflector::pluralize($this->getIdentifier()->name)));	
+		$this->setRedirect('index.php?option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));	
 	}	
 	
 	/**

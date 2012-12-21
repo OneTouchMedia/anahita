@@ -7,5 +7,6 @@
 * @link 		http://www.anahitapolis.com
 */
 
-print ComBaseDispatcher::getInstance()
-	->dispatch();
+print ComBaseDispatcher::getInstance(
+	array('request'=>array('view'=> KRequest::get('get.view','cmd','apps'))) 
+)->dispatch();
