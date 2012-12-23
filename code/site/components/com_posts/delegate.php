@@ -48,8 +48,8 @@ class ComPostsDelegate extends ComAppsDomainDelegateDefault
      * @{inheritdoc}
      */
     protected function _setComposers($actor, $composers, $mode)
-    {
-        if ( $actor->authorize('action','com_posts:post:add') )
+	{
+		if ( $actor->authorize('action','com_posts:post:add') )
         {
             $composers->insert('posts',array(
                 'title'        => JText::_('COM-POSTS-COMPOSER-POST'),
