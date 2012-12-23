@@ -1,6 +1,8 @@
 <?php defined('KOOWA') or die ?>
+
 <?php @commands('toolbar') ?>
-<module position="sidebar-b" style="basic"></module>
+
+<module position="sidebar-b" style="simple"></module>
 
 <div class="an-story an-entity an-record an-removable">
     <div class="story-avatar">
@@ -8,10 +10,10 @@
     </div>      
     <div class="story-container">
         <div class="story-body">
-            <?= $post->body ?>
+            <?= @content($post->body) ?>
         </div>
         <div class="story-comments">
             <?= @helper('ui.comments', $post) ?>  
-        </div>   
+        </div> 
     </div>
 </div>

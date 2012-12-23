@@ -39,5 +39,3 @@ class ComPostsDomainAuthorizerPost extends ComMediumDomainAuthorizerDefault
         return false;
     }
 }
-
-?>
