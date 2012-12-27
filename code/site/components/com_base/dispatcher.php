@@ -169,7 +169,12 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
             if (  $this->getController()->isIdentifiable() &&
                   $context->result instanceof KObject)
             {
-                $context->result = $this->getController()->setItem($context->result)
+                $context->result = $this->getController()
+                    //set the view to single
+                    ->view($this->getController()->getIdentifier()->name)
+                    //set the item
+                    ->setItem($context->result)
+                    //render the item
                     ->execute('get', $context);
                 ;
             }
