@@ -73,8 +73,8 @@ class ComPeopleDomainValidatorPerson extends AnDomainValidatorAbstract
             {
                 $person->addError(array(
                     'message'  => 'Invalid password format',
-                    'reason'   => 'PropertyValue.InvalidFormat',
-                    'property' => 'password',
+                    'code'     => AnError::INVALID_FORMAT,
+                    'key'      => 'password',
                 ));                
             }
         }
