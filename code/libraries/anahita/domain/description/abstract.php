@@ -209,6 +209,16 @@ abstract class AnDomainDescriptionAbstract
 	{
 	    return is_null($this->getInheritanceColumnValue()->getIdentifier());
 	}
+    
+    /**
+     * Return if the entity is inheritable
+     * 
+     * @return boolean
+     */
+    public function isInheritable()
+    {
+       return !is_null($this->getInheritanceColumnValue()); 
+    }
 	
 	/**
 	 * Set a property description
