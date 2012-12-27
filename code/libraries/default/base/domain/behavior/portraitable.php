@@ -187,7 +187,7 @@ class LibBaseDomainBehaviorPortraitable extends LibBaseDomainBehaviorStorable
 	 */
 	public function removePortraitImage()
 	{
-		$sizes   = $this->_mixer->getPortraitSizes();
+		$sizes   = $this->_mixer->getValue('sizes');
         
 		if ( empty($sizes) ) {
 			$sizes = explode(' ','original large medium small thumbnail square');
@@ -231,7 +231,13 @@ class LibBaseDomainBehaviorPortraitable extends LibBaseDomainBehaviorStorable
 	 */
 	public function getPortraitSizes()
 	{
-		return $this->getValue('sizes', array());
+        $sizes = $this->getValue('sizes');        
+        
+        if ( empty($sizes) ) {
+            $sizes = self::getDefaultSizes();
+        }
+        
+		return $sizes;
 	}
 		
 	/**
