@@ -120,10 +120,11 @@ class ComBaseControllerService extends LibBaseControllerService
 	 */
 	protected function _actionPost($context)
 	{
-		if ( $context->action == 'save' ) {
-			$this->setRedirect(array('view'=>KInflector::pluralize($this->getIdentifier()->name)));			
-		}
+		if ( $context->action == 'save' )
+			$this->setRedirect('index.php?option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
 		
+		$data = $context->data;
+
 		//searches for any \w+_id pattern and then set a relationship
 		//accordingly
 		//Should be moved to a behavior 

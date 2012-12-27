@@ -49,7 +49,7 @@ class ComMediumRouter extends ComBaseRouter
     public function parse(&$segments)
     {
         $vars = array();        
-        
+       
         //if the first segment is numeric then it's oid
         if ( is_numeric(current($segments)) ) {
             $vars['oid'] = array_shift($segments);

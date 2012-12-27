@@ -92,7 +92,7 @@ class AnHelperDate extends KObject
 	 * @param int year
 	 * @return int 
 	 */
-	static function yearToSeconds($year = 2)
+	static function yearToSeconds($year = 1)
 	{
         return self::YEAR_IN_SECONDS * $year;
 	}
