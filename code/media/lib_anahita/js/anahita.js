@@ -358,9 +358,12 @@ Element.implement(
 				url	   : this.get('href')
 			});
 			if ( options.method != 'get' ) {
-				Object.set(options, {
-					data : this.get('href').toURI().getData()
-				});
+				//legacy
+				var data = this.get('href').toURI().getData();
+				if ( this.get('data') ) {
+					data = JSON.decode(this.get('data'));
+				}
+				Object.set(options, {data : data});
 			}
 		} else 
 		{
