@@ -43,6 +43,15 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
             return $this->getView()
                 ->getTemplate()
                 ->renderHelper('ui.voters', $this->getItem(), array('avatars'=>$this->avatars));			
+        } else {
+            
+            $voters     = $this->getItem()->voteups->voter;
+            $controller = $this->getService('com://site/actors.controller.actor')
+                 ->view('actors')
+                 ->format($this->format); 
+                       
+            $controller->getState()->setList($voters);
+            return $controller->getView()->display();            
         }
 	}
 		
