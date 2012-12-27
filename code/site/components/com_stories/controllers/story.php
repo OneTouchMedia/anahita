@@ -29,7 +29,21 @@ define('STORY_MAX_LIMIT', 5000);
  * @link       http://www.anahitapolis.com
  */
 class ComStoriesControllerStory extends ComBaseControllerService
-{		
+{	
+    /** 
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     * 
+     * @return void
+     */ 
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+        
+        $this->_state->insert('name');                  
+    }
+        	
     
     /**
      * Initializes the options for the object
@@ -49,7 +63,19 @@ class ComStoriesControllerStory extends ComBaseControllerService
         
 		parent::_initialize($config);
 	}
-		
+
+    /**
+     * Checks if _actionBrowse
+     * 
+     * @return boolean
+     */
+    public function canBrowse()
+    {
+        if ( !$this->actor ) {
+            return false;   
+        }
+    }
+    
     /**
      * Browse action
      * 
@@ -58,7 +84,7 @@ class ComStoriesControllerStory extends ComBaseControllerService
      * @return void
      */
 	protected function _actionBrowse($context)
-	{		
+	{		        
 		$query 	  = $this->getRepository()->getQuery()			
 					->limit( $this->start == 0 ?  20 : 20, $this->start );
 
@@ -72,7 +98,7 @@ class ComStoriesControllerStory extends ComBaseControllerService
 		else {
 			$query->owner($this->actor);
 		}
-	
+	   
 		$apps 		  =	 $this->getService('repos:apps.app')->fetchSet();		
         $keys         =  new KConfig();
 		
@@ -87,6 +113,18 @@ class ComStoriesControllerStory extends ComBaseControllerService
     			));
     		}
         }
+        
+        if ( $this->component ) {
+            $query->clause()->component( (array)KConfig::unbox($this->component) );
+        }
+        
+        if ( $this->name ) {
+            $query->clause()->name( (array)KConfig::unbox($this->name) );
+        }    
+        
+        if ( $this->subject ) {    
+            $query->clause()->where('subject.id','IN', (array)KConfig::unbox($this->subject));   
+        }        
         
         $query->aggregateKeys($keys);
         
