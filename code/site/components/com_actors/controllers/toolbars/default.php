@@ -266,7 +266,7 @@ class ComActorsControllerToolbarDefault extends ComBaseControllerToolbarDefault
         $command->data(array('action'=>$command->action,'actor'=>$command->actor->id));
         
         if ( !$this->_use_post && $this->getController()->format != 'json')
-            $url .= 'layout=list';
+            $url .= '&layout=list';
                 
         $command->href($url);
         
