@@ -82,7 +82,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-            'request'=> array('layout'=>'default')
+            'request'=> array('tmpl'=>'default')
         ));   
 
         parent::_initialize($config);
@@ -355,6 +355,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             exit(0);
         }
                 
+        $this->tmpl = 'error';
+        
         header(KHttpResponse::getHeader($error->getCode(), KRequest::protocol()));
                                
         return $error;
