@@ -100,6 +100,7 @@ function get_paths($src,$target)
     $paths[] = 'site/modules';
     $paths[] = 'site/includes';
     $paths[] = 'site/language/en-GB';
+    $paths[] = 'site/templates';
     //$paths[] = 'cli';
     $paths[] = 'components';
     $paths[] = 'includes';
