@@ -174,9 +174,13 @@ class LibApplicationTemplateHelperRender extends KTemplateHelperAbstract
         if ( !isset($config->content) ) {
             $config['content'] = $modules->render('toolbar').$this->_template->getView()->content;             
         }
-                
-        $sb_a_modules = JModuleHelper::getModules('sidebar-a');
-        $sb_b_modules = JModuleHelper::getModules('sidebar-b');
+
+        $sb_a_modules = array(); $sb_b_modules = array();
+
+        if ( $config['render_sides'] !== false ) {
+        	$sb_a_modules = JModuleHelper::getModules('sidebar-a');
+        	$sb_b_modules = JModuleHelper::getModules('sidebar-b');
+        }
         
         if ( !empty($sb_a_modules) ) 
         {
