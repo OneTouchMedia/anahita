@@ -146,7 +146,10 @@ class ComPeopleControllerSession extends ComBaseControllerResource
                     $lifetime = time() + AnHelperDate::yearToSeconds();
                     setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
                 }
-                return $this->display();
+                if ( $this->isDispatched() ) {
+                	return $this->display();
+                }
+                return true;
                 
             } else {
                 
