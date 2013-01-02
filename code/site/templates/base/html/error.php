@@ -8,7 +8,7 @@
         <script src="media://lib_anahita/js/min/site.js"></script>
         <?= @template('tmpl/navbar') ?>
       
-        <?= @render('component') ?>
+        <?= @render('component', array('render_sides'=>false,'main'=>10)) ?>
         
         <div class="container">
             <?= @render('copyright') ?>
