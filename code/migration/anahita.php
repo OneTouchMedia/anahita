@@ -369,8 +369,14 @@ function anahita_17()
     dbexec("UPDATE jos_anahita_nodes SET mimetype = NULL, filename = IF(filename NOT LIKE '%.jpg%',CONCAT(filename,'.jpg'), filename) WHERE type LIKE 'ComActorsDomainEntityActor%'AND filename <> ''");
 }
 
-//story migration
 function anahita_18()
+{
+	dbexec("DELETE FROM jos_components WHERE `option`='com_media'");
+	dbexec("DELETE FROM jos_plugins WHERE `folder`='editors-xtd' AND `element`='image'");
+}
+
+//story migration
+function anahita_19()
 {
     //bug fix. delete any edge associated with stories that are not story_add, private_message
     dbexec("delete e.* from jos_anahita_edges as e inner join jos_anahita_nodes as n on n.id = e.node_b_id where node_b_type like 'com:stories.domain.entity.story' and (n.name != 'story_add' and n.name != 'private_message') ");
@@ -435,9 +441,10 @@ function anahita_18()
 }
 
 //tag migration
-function anahita_19()
+function anahita_20()
 {
     dbexec('ALTER TABLE jos_anahita_nodes             
                 ADD tag_count INT(11) UNSIGNED NULL AFTER blocked_ids,
                 ADD tag_ids TEXT NULL AFTER tag_count');    
+
 }

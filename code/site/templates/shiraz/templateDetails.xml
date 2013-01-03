@@ -59,6 +59,7 @@
             <position>maintop-d</position>
             <position>navigation</position>
             <position>viewer</position>
+            <position>mobile</position>
             <position>sidebar-a</position>
             <position>sidebar-b</position>
             <position>mainbottom-a</position>
@@ -77,9 +78,8 @@
      
         <params addpath="/templates/shiraz/elements">
             <param name="cssStyle" type="list" default="style1" label="Style">
-                <option value="style1">Light</option>
-                <option value="style2">Dark</option>
-                <option value="style3">Custom</option>
+                <option value="style1">Style 1</option>
+                <option value="style2">Custom</option>
             </param>
             <param name="compilestyle" type="list" default="0" description="Flag to when compile the less style file" label="Compile Style">
                 <option value="0">Never (good for production)</option>
@@ -88,7 +88,8 @@
             <param name="compresstyle" type="list" default="0" description="Compress the output style" label="Compress Style">
                 <option value="0">No</option>
                 <option value="1">Yes</option>
-            </param>                        
+            </param>
+            <param name="favicon" type="text" default="favicon.ico" label="Favicon" description="Favicon file name" />                        
             <param name="navbarInverse" type="list" default="0" label="Navbar Theme">
                 <option value="0">Light</option>
                 <option value="1">Dark</option>
