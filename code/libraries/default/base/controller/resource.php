@@ -295,6 +295,6 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
             }
         }       
         
-        return parent::__call('getToolbar', array($toolbar, $config));      
+        return parent::getToolbar($toolbar, $config);      
     }     
 }
