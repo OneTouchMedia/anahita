@@ -70,12 +70,16 @@ class JRouterSite extends KObject
 	{
         // Get the path
         $uri  = clone $this->__url;
-        $uri->setUrl(str_replace('index.php','',$url));
-        
+        //clean up the url
+        //remove the index.php
+        $url  = preg_replace('/index\/?.php/','',$url);
+        $uri->setUrl($url);        
         $path = $uri->path;
+        //remove the base
         $path = substr_replace($path, '', 0, strlen(JURI::base(true)));
-        $path = str_replace('index.php', '', $path);
-        $path = trim($path , '/');        
+        //remove trailing /
+        $path = trim($path , '/');
+                        
         $vars = new KConfig($uri->getQuery(true));
         
         //set the format
@@ -115,8 +119,10 @@ class JRouterSite extends KObject
         if ( $router = $this->getComponentRouter($vars->option) ) {
             $vars->append($router->parse($segments));
         } else {
-            $func     = substr($vars->option, 4).'ParseRoute';            
-            $vars->append(@$func($segments));
+            $func     = substr($vars->option, 4).'ParseRoute';
+            if ( function_exists($func) ) {
+            	$vars->append(@$func($segments));
+            }
         }
         
         return KConfig::unbox($vars);     
@@ -149,8 +155,14 @@ class JRouterSite extends KObject
         if ( $router = $this->getComponentRouter($component) ) {
             $parts    = $router->build($query);
         } else {
-            $func     = substr($component, 4).'BuildRoute';                        
-            $parts    = $func($query);
+            $func     = substr($component, 4).'BuildRoute';     
+            if ( function_exists($func) ) {                   
+            	$parts    = $func($query);
+            }
+        }
+        
+        if ( empty($parts) ) {
+        	$parts = array();
         }
         
         array_unshift($parts, $component);
@@ -175,14 +187,14 @@ class JRouterSite extends KObject
      * @return ComBaseRouter
      */
     public function getComponentRouter($component)
-    {
-        $identifier = KService::getIdentifier('com://site/'.substr($component,4).'.router');
-        $router     = false;            
-        if ( file_exists($identifier->filepath) && !class_exists($identifier->classname) ) {
-            require_once $identifier->filepath;            
+    {    	
+        $identifier = KService::getIdentifier('com://site/'.str_replace('com_','',$component).'.router');        
+        $router     = false;
+        if ( file_exists($identifier->filepath) && !class_exists($identifier->classname) ) {        	
+            require_once $identifier->filepath;
         } else {
-            register_default(array('identifier'=>$identifier, 'default'=>'ComBaseRouter'));
-            $router = KService::get($identifier);   
+            register_default(array('identifier'=>$identifier, 'default'=>'ComBaseRouterDefault'));
+            $router = KService::get($identifier);
         }
         
         return $router;

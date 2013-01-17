@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Medium
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -12,5 +12,13 @@
  * @version    SVN: $Id: resource.php 11985 2012-01-12 10:53:20Z asanieyan $
  * @link       http://www.anahitapolis.com
  */
-
-class ComPostsRouter extends ComMediumRouterDefault {}
+/**
+ * Default Medium Router
+ *
+ * @category   Anahita
+ * @package    Com_Medium
+ */
+class ComActorsRouterDefault extends ComActorsRouterAbstract
+{
+    
+}

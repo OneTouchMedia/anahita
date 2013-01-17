@@ -13,7 +13,7 @@
  * @link       http://www.anahitapolis.com
  */
 
-class ComPeopleRouter extends ComBaseRouter
+class ComPeopleRouter extends ComActorsRouterDefault
 {
     /**
      * Build the route
@@ -21,7 +21,7 @@ class ComPeopleRouter extends ComBaseRouter
      * @param   array   An array of URL arguments
      * @return  array   The URL arguments to use to assemble the subsequent URL.
      */
-    public function build(&$query)
+    public function _build(&$query)
     {
         $segments = array();
         
@@ -54,7 +54,7 @@ class ComPeopleRouter extends ComBaseRouter
      * @param   array   The segments of the URL to parse.
      * @return  array   The URL attributes to be used by the application.
      */    
-    public function parse($segments)
+    public function _parse($segments)
     {
         $vars = array();
         

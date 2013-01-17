@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComBaseRouter extends KObject implements KServiceInstantiatable
+class ComBaseRouterDefault extends KObject implements KServiceInstantiatable
 {
     /**
      * Force creation of a singleton
@@ -104,12 +104,17 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
         
         if ( isset($query['view']) ) {
             //prevent duplicate name
-            if ( $query['view'] != $this->getIdentifier()->package )
+            if ( $query['view'] != $this->getIdentifier()->package ) {
                 $segments[] = $query['view'];
+        	}
             unset($query['view']);
         }
         
         if ( isset($query['id']) && !is_array($query['id']) ) {
+        	//remove the singularize view
+        	if ( count($segments) ) {
+        		array_pop($segments);
+        	}
             $segments[] = $query['id'];
             unset($query['id']);
         }
@@ -131,12 +136,20 @@ class ComBaseRouter extends KObject implements KServiceInstantiatable
         if ( empty($segments) ) {
             $vars['view'] = $this->getIdentifier()->package;
         }
-        elseif ( !is_numeric(current($segments)) ) {
-            $vars['view'] = array_shift($segments);
-            if ( current($segments) ) {
-                $vars['id'] = array_shift($segments);
-            }
-        }
+        else {			
+        	//it's an id
+			if ( is_numeric(current($segments)) ) {
+				$vars['id'] 	= array_shift($segments);
+				$vars['view']   = KInflector::singularize($this->getIdentifier()->package);
+			}
+			else {
+				$vars['view'] = array_shift($segments);
+				if ( current($segments) ) {
+					$vars['id'] = array_shift($segments);
+				}
+			}
+        	
+        }        
         
         return $vars;
     }   

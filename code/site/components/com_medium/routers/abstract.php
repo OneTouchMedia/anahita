@@ -13,7 +13,13 @@
  * @link       http://www.anahitapolis.com
  */
 
-class ComMediumRouter extends ComBaseRouter
+/**
+ * Abstract Medium Router
+ * 
+ * @category   Anahita
+ * @package    Com_Medium
+ */
+abstract class ComMediumRouterAbstract extends ComBaseRouterDefault
 {
     /**
      * Build the route
@@ -26,7 +32,7 @@ class ComMediumRouter extends ComBaseRouter
         $segments = array();
         
         if ( isset($query['oid']) ) {            
-            $segments[] = $query['oid'];
+            $segments[] = '@'.$query['oid'];
             unset($query['oid']);
         }
         
@@ -48,11 +54,11 @@ class ComMediumRouter extends ComBaseRouter
      */
     public function parse(&$segments)
     {
-        $vars = array();        
+        $vars = array();
        
         //if the first segment is numeric then it's oid
-        if ( is_numeric(current($segments)) ) {
-            $vars['oid'] = array_shift($segments);
+        if ( preg_match('/@\w+/', current($segments)) ) {
+            $vars['oid'] = str_replace('@','',array_shift($segments));
         }
         
         $vars = array_merge($vars, parent::parse($segments));
