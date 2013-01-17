@@ -137,7 +137,7 @@ class ComBaseControllerComment extends ComBaseControllerService
 			return false;	
 		}
         
-        return $this->__call('canExecute', array($context));
+		return parent::canExecute($context);
 	}
     
 	/**
