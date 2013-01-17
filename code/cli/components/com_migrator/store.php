@@ -117,22 +117,25 @@ class ComMigratorStore extends KObject
      */
     protected function _loadVersions()
     {
-        /*
        $db  = KService::get('koowa:database.adapter.mysqli');
+       //convert the migration
+       try {
+       		$db->execute('RENAME TABLE  #__migrator_migraitons TO #__migrator_migrations');
+       } catch(Exception $e) {}
+       	
        $sql = <<<EOF
-        CREATE TABLE IF NOT EXISTS `#__migrator_migraitons` (
+        CREATE TABLE IF NOT EXISTS `#__migrator_migrations` (
           `id` INT(11) NOT NULL AUTO_INCREMENT,
           `migrations` TEXT NULL DEFAULT '',
           PRIMARY KEY  (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=0;
 EOF;
         $db->execute($sql);
-       */
         $db = KService::get('koowa:database.adapter.mysqli');
-        $entity = $db->select("SELECT * FROM #__migrator_migraitons", KDatabase::FETCH_OBJECT);
+        $entity = $db->select("SELECT * FROM #__migrator_migrations", KDatabase::FETCH_OBJECT);
         if ( !$entity ) {
-            $db->insert('migrator_migraitons', array('migrations'=>''));
-            $entity = $db->select("SELECT * FROM #__migrator_migraitons", KDatabase::FETCH_OBJECT);
+            $db->insert('migrator_migrations', array('migrations'=>''));
+            $entity = $db->select("SELECT * FROM #__migrator_migrations", KDatabase::FETCH_OBJECT);
         }
         $this->_entity = $entity;
         $reg = new JRegistry();
@@ -151,6 +154,6 @@ EOF;
         $reg = new JRegistry();
         $reg->loadArray((array)KConfig::unbox($this->_versions));
         $this->_entity->migrations = $reg->toString();
-        $db->update('migrator_migraitons', (array)$this->_entity,' WHERE id = '.$this->_entity->id);
+        $db->update('migrator_migrations', (array)$this->_entity,' WHERE id = '.$this->_entity->id);
     }
 }
