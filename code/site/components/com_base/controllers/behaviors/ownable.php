@@ -113,7 +113,6 @@ class ComBaseControllerBehaviorOwnable extends KControllerBehaviorAbstract
        return $this;
     }
     
-    
     /**
      * Return the actor context
      * 
