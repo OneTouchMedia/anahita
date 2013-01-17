@@ -170,7 +170,7 @@ class LibBaseControllerAbstract extends KControllerAbstract
                 $behavior = $identifier;
             }
         }
-       
-        return parent::__call('getBehavior', array($behavior, $config));
+        
+        return parent::getBehavior($behavior, $config);        
     }
 }
