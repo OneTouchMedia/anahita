@@ -63,7 +63,7 @@ class ComBaseControllerService extends LibBaseControllerService
                 'limit'     => 20,
                 'offset'    => 0                
             )            
-		));       		
+		));
 	}
     
     /** 
@@ -116,11 +116,11 @@ class ComBaseControllerService extends LibBaseControllerService
 	 */
 	protected function _actionPost(KCommandContext $context)
 	{
-	   	$action = $this->getItem() && $this->getItem()->persisted() ? 'edit' : 'add';
+	   	$action = $this->getState()->isUnique() ? 'edit' : 'add';
 		$result = $this->execute($action, $context);
 		return $result;
 	}	
-    
+	
     /**
      * Get a toolbar by identifier
      *
