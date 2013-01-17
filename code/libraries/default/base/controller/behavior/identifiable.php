@@ -141,10 +141,25 @@ class LibBaseControllerBehaviorIdentifiable extends KControllerBehaviorAbstract
     /**
      * Return the controller identifiable item
      * 
+     * @param boolean $create Return an entity if there's none  
+     * 
      * @return mixed
      */
-    public function getItem()
+    public function getItem($create = false)
     {
+    	$item = $this->_mixer->getState()->getItem();
+    	
+    	if ( $item  == null && $this->_mixer->getState()->isUnique()	
+    			) {
+    		
+    		$item = $this->fetchEntity(new KCommandContext()); 
+    	}
+    	
+    	//create an new entity
+    	if ( $item == null && $create ) {
+    		$this->_mixer->getState()->setItem( $this->getRepository()->getEntity() );
+    	}
+    	
         return $this->_mixer->getState()->getItem();
     }
     
