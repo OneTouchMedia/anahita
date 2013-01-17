@@ -36,12 +36,9 @@ class ComStoriesControllerToolbarStory extends ComBaseControllerToolbarDefault
     {
         $story = $this->getController()->getItem();
                 
-        if ( $story->authorize('vote') )
-        {
-            $this->getController()->setItem($story->object);
-            
-            $this->addCommand('vote');
-            
+        if ( $story->authorize('vote') ) {
+            $this->getController()->setItem($story->object);            
+            $this->addCommand('vote');            
             $this->getController()->setItem($story);
         }
         

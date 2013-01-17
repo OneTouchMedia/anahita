@@ -17,11 +17,8 @@
             
             <?php
                $votable_item = null;               
-               if ( $item->hasObject() && !is_array($item->object) ) { 
+               if ( !$item->aggregated() && $item->object ) { 
                     $votable_item = $item->object;
-               }
-               elseif ( !$item->hasObject() ) {
-                    $votable_item = $item;
                }
             ?>
             <?php if ( $votable_item && $votable_item->isVotable() ) : ?> 
@@ -39,7 +36,7 @@
     
     <div id="<?= 'story-comments-'.$item->id?>" class="story-comments an-comments">
 		<?php if ( !empty($comments) || $can_comment ) : ?>
-	    <?= @helper('ui.comments', $item, array('comments'=>$comments, 'can_comment'=>$can_comment, 'pagination'=>false, 'show_guest_prompt'=>false, 'truncate_body'=>array('consider_html'=>true, 'read_more'=>true))) ?>
+	    <?= @helper('ui.comments', $item->object, array('comments'=>$comments, 'can_comment'=>$can_comment, 'pagination'=>false, 'show_guest_prompt'=>false, 'truncate_body'=>array('consider_html'=>true, 'read_more'=>true))) ?>
 	    <?php endif;?>
 	    
 	    <?php if( !empty($comments) && $can_comment ): ?>
