@@ -36,12 +36,7 @@ abstract class ComMediumRouterAbstract extends ComBaseRouterDefault
             unset($query['oid']);
         }
         
-        $segments = array_merge($segments, parent::build($query));
-        
-        if ( isset($query['alias']) ) {
-              $segments[] = $query['alias'];
-              unset($query['alias']);
-        }
+        $segments = array_merge($segments, parent::build($query));        
         
         return $segments;
     }

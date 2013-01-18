@@ -136,19 +136,21 @@ class ComBaseRouterDefault extends KObject implements KServiceInstantiatable
         if ( empty($segments) ) {
             $vars['view'] = $this->getIdentifier()->package;
         }
-        else {			
-        	//it's an id
-			if ( is_numeric(current($segments)) ) {
-				$vars['id'] 	= array_shift($segments);
-				$vars['view']   = KInflector::singularize($this->getIdentifier()->package);
-			}
-			else {
-				$vars['view'] = array_shift($segments);
-				if ( current($segments) ) {
-					$vars['id'] = array_shift($segments);
-				}
-			}
-        	
+        else {
+        	//get the last if it's an id
+        	$last_value = array_pop($segments);        	
+        	if ( is_numeric($last_value) ) {
+        		//the view before that is the resource
+        		if ( count($segments) ) {
+        			$view = array_pop($segments);
+        		} else {
+        			$view = $this->getIdentifier()->package;
+        		}
+        		$vars['id']   = $last_value;
+        		$vars['view'] = KInflector::singularize($view);        		
+        	} else {
+        		$vars['view'] = $last_value;
+        	}
         }        
         
         return $vars;
