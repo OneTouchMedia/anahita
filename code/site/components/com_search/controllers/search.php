@@ -134,7 +134,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             	$query->where('owner_id','IN', (array)KConfig::unbox($this->_request->oid ));	
             }
             
-            $query->order($this->sort, $this->direction)->limit($this->limit, $this->start);
+            $query->limit($this->limit, $this->start);
             
             $entities = $repos->fetchSet($query);
             $this->_state->setList($entities);
