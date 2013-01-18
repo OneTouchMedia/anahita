@@ -65,7 +65,7 @@ class ComSearchRouter extends ComBaseRouterDefault
         //check if we are searching for tags     
         $vars['q'] = array_pop($segments);
         //if the next is tags
-        if ( key($segments) == 'tags' ) {
+        if ( current($segments) == 'tags' ) {
             $vars['q'] = '#'.$vars['q'];
             array_pop($segments);
         }
