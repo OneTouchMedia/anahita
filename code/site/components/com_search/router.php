@@ -62,6 +62,11 @@ class ComSearchRouter extends ComBaseRouterDefault
     public function parse($segments)
     {
         $vars = array();   
+        
+        if ( preg_match('/@\w+/', current($segments)) ) {
+        	$vars['oid'] = str_replace('@','',array_shift($segments));
+        }
+        
         //check if we are searching for tags     
         $vars['q'] = array_pop($segments);
         //if the next is tags
@@ -69,7 +74,7 @@ class ComSearchRouter extends ComBaseRouterDefault
             $vars['q'] = '#'.$vars['q'];
             array_pop($segments);
         }
-        $vars['type'] = implode('.', $segments);
+        $vars['type'] = implode('.', $segments);        
         return $vars;
     }    
     

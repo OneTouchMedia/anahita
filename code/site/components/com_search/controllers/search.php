@@ -108,6 +108,11 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             
             //this is becuase we still have the board records in some systems. 
             $query->where('type', '<>', 'ComMediumDomainEntityMedium,ComTopicsDomainEntityBoard,com:topics.domain.entity.board');
+            
+            if ( $this->_request->oid ) {
+            	$query->where('owner_id','IN', (array)KConfig::unbox($this->_request->oid ));	
+            }
+            
             $query->limit(20);
             $entities = $repos->fetchSet($query);
             $this->_state->setList($entities);
