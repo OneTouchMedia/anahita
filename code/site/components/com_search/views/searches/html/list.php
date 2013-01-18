@@ -1,14 +1,15 @@
 <?php defined('KOOWA') or die; ?>
 
-<?php if(count($items)) :?>
-<div class="an-entities">
+<div class="an-entities" id="an-entities-main">
+<?php if(isset($keywords) && count($items)) :?>
 	<?php foreach($items as $item ) : ?>
 		<?= @view('search')->layout('list')->item($item)->keywords($keywords)?>
 	<?php endforeach; ?>
+<?php else : ?>
+	<?= @message(@text('LIB-AN-PROMPT-NO-MORE-RECORDS-AVAILABLE')) ?>
+<?php endif; ?>
 </div>
 
-<?php else : ?>
-<?= @message(@text('LIB-AN-PROMPT-NO-MORE-RECORDS-AVAILABLE')) ?>
+<?php if(isset($keywords)): ?>
+<?= @pagination($items, array('url'=>@route('layout=list&q='.$q))) ?>
 <?php endif; ?>
-
-<?= @pagination($items, array('url'=>@route('layout=list&q='.$q),'paginate'=>true)) ?>

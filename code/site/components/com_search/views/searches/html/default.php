@@ -4,8 +4,6 @@
 
 <?= @helper('ui.searchbox', @route('layout=list'), array('value'=>$q))?>
 
-<div id="an-entities-wrapper">
-<?php if ( !empty($keywords) ) : ?>
+<div class="an-entities-wrapper">
 <?= @template('list') ?>
-<?php endif; ?>
 </div>
