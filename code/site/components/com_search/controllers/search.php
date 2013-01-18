@@ -33,6 +33,27 @@
  */
 class ComSearchControllerSearch extends ComBaseControllerResource
 {
+	/**
+     * Initializes the options for the object
+     *
+     * Called from {@link __construct()} as a first step of object instantiation.
+     *
+     * @param 	object 	An optional KConfig object with configuration options.
+     * @return 	void
+     */
+	protected function _initialize(KConfig $config)
+	{
+		$config->append(array(
+            'request'       => array(
+                'limit'     => 20,
+				'sort'		=> 'id',
+				'direction' => 'ASC'                
+            )            
+		));
+		
+		parent::_initialize($config);
+	}
+    
     /**
      * Search and return the result 
      * 
@@ -113,7 +134,8 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             	$query->where('owner_id','IN', (array)KConfig::unbox($this->_request->oid ));	
             }
             
-            $query->limit(20);
+            $query->order($this->sort, $this->direction)->limit($this->limit, $this->start);
+            
             $entities = $repos->fetchSet($query);
             $this->_state->setList($entities);
             $this->keywords = $keywords;
