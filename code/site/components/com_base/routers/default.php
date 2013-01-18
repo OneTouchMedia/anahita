@@ -113,7 +113,7 @@ class ComBaseRouterDefault extends KObject implements KServiceInstantiatable
         if ( isset($query['id']) && !is_array($query['id']) ) {
         	//remove the singularize view
         	if ( count($segments) ) {
-        		array_pop($segments);
+        		$segments[key($segments)] = KInflector::pluralize(current($segments));
         	}
             $segments[] = $query['id'];
             unset($query['id']);
