@@ -318,6 +318,7 @@ DELETE FROM `jos_plugins` WHERE
     (`folder` LIKE 'xmlrpc') OR
     (`folder` LIKE 'roknavmenu') OR
     (`folder` LIKE 'socialshare') OR
+    (`element` LIKE 'tagmeta') OR
     (`folder` LIKE 'content' AND `element` IN ('vote','geshi', 'jw_allvideos', 'slideshare15')) OR
     (`folder` LIKE 'search' AND `element` IN ('contacts','newsfeeds', 'weblinks')) OR
     (`folder` LIKE 'system'  AND `element` IN ('mtupgrade','roktracking', 'backlink', 'rokbox')) OR
@@ -327,7 +328,8 @@ DELETE FROM `jos_plugins` WHERE
 DELETE FROM `jos_components` WHERE `option` IN ( 
    'com_socialengine', 'com_banners', 'com_roknavmenubundle', 'com_massmail', 
    'com_messages', 'com_banners', 'com_weblinks', 'com_contact', 'com_poll', 'com_newsfeeds',
-   'com_wrapper', 'com_massmail', 'com_messages', 'com_rokmodule', 'com_media'
+   'com_wrapper', 'com_massmail', 'com_messages', 'com_rokmodule', 'com_media', 'com_tagmeta',
+   'com_invites'
 );  
   
 DELETE FROM `jos_modules` WHERE 
@@ -366,9 +368,18 @@ DROP TABLE IF EXISTS jos_poll_menu;
 DROP TABLE IF EXISTS jos_polls;
 
 DROP TABLE IF EXISTS jos_rokadminaudit;
+DROP TABLE IF EXISTS jos_rokuserstats;
 
 DROP TABLE IF EXISTS jos_weblinks;
 
 DROP TABLE IF EXISTS jos_newsfeeds;
 DROP TABLE IF EXISTS jos_contact_details;
 DROP TABLE IF EXISTS jos_content_rating;
+
+DROP TABLE IF EXISTS jos_tagmeta;
+
+UPDATE `jos_modules` SET `position` = REPLACE(`position`, 'content-bottom', 'maintop') WHERE `position` LIKE '%content-bottom%';
+
+UPDATE `jos_modules` SET `params` = 'title-1=Bazaar\nlink-1=index.php?option=com_bazaar\nicon-1=anahita.png\ntitle-2=Social Apps\nlink-2=index.php?option=com_apps\nicon-2=application_view_icons.png\ntitle-3=Plugins\nlink-3=index.php?option=com_plugins\nicon-3=brick.png\ntitle-4=Modules\nlink-4=index.php?option=com_modules\nicon-4=brick.png\ntitle-5=Templates\nlink-5=index.php?option=com_templates\nicon-5=color_management.png\ntitle-6=Extend\nlink-6=index.php?option=com_installer\nicon-6=package.png\ntitle-7=Configuration\nlink-7=index.php?option=com_config\nicon-7=cog.png\nquickfields=[{"icon":"anahita.png","link":"index.php?option=com_bazaar","title":"Bazaar"},{"icon":"application_view_icons.png","link":"index.php?option=com_apps","title":"Social Apps"},{"icon":"brick.png","link":"index.php?option=com_plugins","title":"Plugins"},{"icon":"brick.png","link":"index.php?option=com_modules","title":"Modules"},{"icon":"color_management.png","link":"index.php?option=com_templates","title":"Templates"},{"icon":"package.png","link":"index.php?option=com_installer","title":"Extend"},{"icon":"cog.png","link":"index.php?option=com_config","title":"Configuration"}]\n\n' WHERE `module` LIKE 'mod_rokquicklinks';
+
+INSERT INTO `jos_plugins` VALUES (NULL, 'Installer - Core', 'core', 'installer', 0, 1, 1, 1, 0, 0, '0000-00-00 00:00:00', '');
