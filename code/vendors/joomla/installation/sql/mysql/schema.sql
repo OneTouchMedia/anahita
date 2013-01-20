@@ -2,13 +2,13 @@ DROP TABLE IF EXISTS `#__anahita_nodes`;
 DROP TABLE IF EXISTS `#__anahita_edges`;
 DROP TABLE IF EXISTS `#__migrator_migraitons`;
 
-CREATE TABLE `#__migrator_migraitons` (
+CREATE TABLE `#__migrator_migrations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `migrations` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `#__migrator_migraitons` VALUES(1,'anahita=18');
+INSERT INTO `#__migrator_migraitons` VALUES(1,'anahita=19');
 
 CREATE TABLE `#__anahita_nodes` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
