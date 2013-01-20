@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `#__anahita_nodes`;
 DROP TABLE IF EXISTS `#__anahita_edges`;
-DROP TABLE IF EXISTS `#__migrator_migraitons`;
+DROP TABLE IF EXISTS `#__migrator_migrations`;
 
 CREATE TABLE `#__migrator_migrations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
