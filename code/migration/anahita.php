@@ -483,3 +483,8 @@ function anahita_21()
                 ADD tag_ids TEXT NULL AFTER tag_count');    
 
 }
+
+function anahita_22()
+{	
+	dbexec('UPDATE jos_modules SET module = "mod_menu" WHERE module LIKE "mod_mainmenu"')
+}
