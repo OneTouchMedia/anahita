@@ -211,10 +211,11 @@ abstract class LibBaseViewTemplate extends LibBaseViewAbstract
 	 * 
 	 * @return void
 	 */
-	final public function load($template, array $data = array())
+	public function load($template, array $data = array())
 	{
-		if ( method_exists($this, '_beforeLayout') )
+		if ( method_exists($this, '_beforeLayout') ) {
 			$this->_beforeLayout($template);
+		}
 					
 		$method = '_layout'.KInflector::camelize($template);
 		
