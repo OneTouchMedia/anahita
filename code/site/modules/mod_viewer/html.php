@@ -34,12 +34,13 @@ class ModViewerHtml extends ModBaseView
     {
         $this->getService('koowa:loader')->loadIdentifier('mod://site/mainmenu.helper');
         $menus = JSite::getMenu()->getItems('menutype', $this->params->get('menutype'));
-        $xml = modMainMenuHelper::getXML($this->params->get('menutype'), $this->params, 'mod_viewer_menu_decorator');
-        $this->menus = $xml->children();
+//         $xml = modMainMenuHelper::getXML($this->params->get('menutype'), $this->params, 'mod_viewer_menu_decorator');
+//         $this->menus = $xml->children();
         
         //$this->getService('koowa:loader')->loadIdentifier('mod://site/login.helper');
         //$this->return = modLoginHelper::getReturnURL($this->params,'logout');
         //$uri = JFactory::getURI();
+        $this->menus = array();
         $this->return   = base64_encode(JURI::base());
     }
 }

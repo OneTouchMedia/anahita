@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Mod_Navigation
+ * @package    Mod_Menu
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -17,13 +17,13 @@
  * Navigation Module
  *
  * @category   Anahita
- * @package    Mod_Navigation
+ * @package    Mod_Menu
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ModNavigationViewHtml extends ModBaseView
+class ModMenuHtml extends ModBaseView
 {	
 	/**
 	 * Set an array of menu item
@@ -66,30 +66,39 @@ class ModNavigationViewHtml extends ModBaseView
 	}
 	
 	/**
+	 * Loads the template
+	 * 
+	 * (non-PHPdoc)
+	 * @see LibBaseViewTemplate::load()
+	 */
+	public function load($template, $data = array())
+	{
+		if ( strpos($template,'type_') === 0 ) {
+			if ( !$this->getTemplate()->findFile($template) ) {
+				$template = 'type_default';
+			}
+		}
+		
+		return parent::load($template, $data);
+	}
+	
+	/**
 	 * Cleanup the menu route
 	 * 
 	 * (non-PHPdoc)
 	 * @see LibBaseViewAbstract::getRoute()
 	 */
-	public function getRoute($item, $option = '')
-	{
-		if ( is_object($item) ) {
-			$option = 'Itemid='.$item->id;
-			if ( strpos($item->link,'com_content') ) {
-				$option .= '&alias='.$item->alias;
-			}
-			return $this->getRoute($item->link, $option);
-		}
-		else {
-			$route = $item;
-			$route = str_replace('index.php?', '', $route);
-			if ( strpos($route, 'option=') === 0) {
-				if ( $option ) {
-					$route .= '&'.$option;
-				}
-				$route  = parent::getRoute($route);				
-			}			
-			return $route;					
+	public function getRoute($route)
+	{				
+		if ( is_object($route) ) {
+			$route = $route->link.'&Itemid='.$route->id;
 		}		
+				
+		if ( strpos($route, 'index.php?') === 0) {
+			$route = str_replace('index.php?', '', $route);
+			$route  = parent::getRoute($route);
+		}
+		
+		return $route;				
 	}
 }

@@ -8,16 +8,14 @@
 				<?= $item->name?>
 				<b class="caret"></b>				
 			</a>
-			<ul class="dropdown-menu">
+			<ul class="dropdown-menu">			
 			<?php foreach($item->subitems as $subitem) : ?>			
-				<li><a href="<?= @route($subitem)?>"><?= $subitem->name?></a></li>
+				<?= @template('type_'.$subitem->type, array('item'=>$subitem)) ?>
 			<?php endforeach;?>
 			</ul>			
 		</li>
-	<?php else : ?>
-		<li>
-			<a href="<?= @route($item)?>"><?= $item->name?></a>			
-		</li>
+	<?php else : ?>		
+		<?= @template('type_'.$item->type, array('item'=>$item)) ?>
 	<?php endif;?>
 <?php endforeach?>
 </ul>
