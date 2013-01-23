@@ -197,24 +197,60 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
      * 
      * @return void
      */
-    public function setRedirect($redirect = array())
-    {
-        if ( is_string($redirect) ) {
-            $redirect = array('url'=>$redirect);
-        }
-        
+    public function setRedirect($redirect)
+    {        
+    	if ( is_string($redirect) ) {
+    		$redirect = array('url'=>$redirect);
+    	}
+    	
         $redirect = new KConfig($redirect);
         
         $redirect->append(array(
             'message'  => '',
             'type'     => null
         ));
-            
-        $redirect->url = LibBaseHelperUrl::getRoute($redirect->url);
 
+        $route = $redirect->url;
+        
+        if ( !is_array($route) ) {
+        	$parts = array();
+        	parse_str(trim($route), $parts);
+        	$route = $parts;
+        }        
+        
+        $parts = $route;    	
+        $route = array();
+	    
+	    //Check to see if there is component information in the route if not add it
+	    if(!isset($parts['option'])) {
+	        $route['option'] = 'com_'.$this->getIdentifier()->package;
+	    }
+
+	    //Add the view information to the route if it's not set
+	    if(!isset($parts['view'])) {
+	    	$route['view'] = $this->_request->view ? $this->_request->view : $this->getIdentifier()->name;
+	    }	    
+
+	    //Add the format information to the route only if it's not 'html'
+	    if(!isset($parts['format']) && $this->_request->format ) {
+	    	$route['format'] = $this->_request->format;
+	    }	    
+	    
+	    if ( $route['format'] == 'html' ) {
+	    	unset($route['format']);
+	    }
+
+	    $parts = array_merge($route, $parts);
+	    
+        $redirect->url = $this->getService('application')
+        					->getRouter()
+        					->build('index.php?'.http_build_query($parts));
+        
         $this->_redirect = $redirect;
             
         if ( KRequest::method() == 'GET' ) {
+        	//@TOOD remove this
+        	_die('deprecated');
             JFactory::getApplication()->redirect($redirect->url, $redirect->message, $redirect->type);
         }
         

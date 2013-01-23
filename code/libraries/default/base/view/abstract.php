@@ -317,13 +317,13 @@ abstract class LibBaseViewAbstract extends KObject
 	 */
 	public function getRoute( $route = '', $fqr = true)
 	{
-	    if ( is_array($route) ) {
-	        $parts = $route;
-	    } else {
-	        //Parse route
-	        $parts = array();
-	        parse_str(trim($route), $parts);
-	    }
+		if ( !is_array($route) ) {
+			$parts = array();
+			parse_str(trim($route), $parts);
+			$route = $parts;
+		}
+				
+	    $parts = $route;
 	    
 	    $route = array();
 	    
@@ -354,9 +354,14 @@ abstract class LibBaseViewAbstract extends KObject
 	        $route['format'] = $this->getIdentifier()->name;
 	    }
 	    
-	    $parts = array_merge($route, $parts);
+	    if ( $route['format'] == 'html')
+	    		unset($route['format']);
 	    
-	    return LibBaseHelperUrl::getRoute($parts);
+	    $parts = array_merge($route, $parts);
+	    	    
+	    return $this->getService('application')
+	    		->getRouter()
+	    		->build('index.php?'.http_build_query($parts));	    	    
 	}
     
     /**
