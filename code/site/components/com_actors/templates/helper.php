@@ -60,7 +60,8 @@ class ComActorsTemplateHelper extends KTemplateHelperAbstract implements KServic
 	 */
 	public function getActorURL($actor)
 	{
-		return LibBaseHelperUrl::getRoute($actor->getURL());
+		$this->getService('application')
+			->getRouter()->build('index.php?'.$actor->getURL());
 	}
 	
 	/**
