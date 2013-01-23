@@ -23,21 +23,29 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ModMenuHtml extends ModBaseView
+class ModMenuHtml extends ModBaseHtml
 {	
 	/**
-	 * Set an array of menu item
-	 * 
-	 * @param array $items
-	 * 
-	 * @return void
+	 * (non-PHPdoc)
+	 * @see LibBaseViewHtml::display()
 	 */
-	public function setItems($items)
+	public function display()
 	{
+		$items	  = pick($this->_state->getList(), array());
+		
 		$array    = array();
+		
 		$children = array();
+		
+		$user = JFactory::getUser();
+		
 		foreach($items as $item)
 		{
+			//don't show the menu items that are set to registered/special
+			if ( $item->access >= 1 && 
+						!$user->id)
+				continue;
+						
 			//check if it has any children. then claim them
 			if ( isset($children[$item->id]) ) {
 				$item->subitems = $children[$item->id];
@@ -63,6 +71,8 @@ class ModMenuHtml extends ModBaseView
 		}
 		
 		$this->items = $array;
+		
+		return parent::display();
 	}
 	
 	/**
@@ -92,10 +102,9 @@ class ModMenuHtml extends ModBaseView
 	{				
 		if ( is_object($route) ) {
 			$route = $route->link.'&Itemid='.$route->id;
-		}		
+		}
 				
-		if ( strpos($route, 'index.php?') === 0) {
-			$route = str_replace('index.php?', '', $route);
+		if ( strpos($route, 'index.php?') === 0) {			
 			$route  = parent::getRoute($route);
 		}
 		

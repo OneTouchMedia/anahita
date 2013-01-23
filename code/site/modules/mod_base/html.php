@@ -23,25 +23,8 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ModBaseView extends ComBaseViewHtml
-{
-    /**
-     * Returns a module view or the default module view
-     *
-     * @param string $identifier The module identifier
-     * @param array  $config     Configuration values
-     * 
-     * @return ModAppView
-     */
-    static public function getInstance($identifier, $config = array())
-    {
-        $identifier = KService::getIdentifier($identifier);
-        if ( !$identifier->application )
-            $identifier->application = 'site';
-        register_default(array('identifier'=>$identifier, 'default'=>'ModBaseView'));
-        return KService::get($identifier, $config);
-    }
-    
+class ModBaseHtml extends ComBaseViewHtml
+{    
     /** 
      * Constructor.
      *
@@ -76,7 +59,7 @@ class ModBaseView extends ComBaseViewHtml
         register_default(array('identifier'=>$template, 'default'=>'ComBaseTemplateDefault'));
        
         $config->append(array(
-                'viewer' 		 => get_viewer(),
+                'viewer' 	  => get_viewer(),
                 'template'    => $template,
                 'params'      => null,
                 'module'      => null,
@@ -87,12 +70,21 @@ class ModBaseView extends ComBaseViewHtml
     }
 
     /**
+     * (non-PHPdoc)
+     * @see LibBaseViewAbstract::getRoute()
+     */
+    public function getRoute($route)
+    {
+    	return LibBaseHelperUrl::getRoute($route);    	
+    }
+    
+    /**
      * Get the name
      *
      * @return 	string 	The name of the object
      */
     public function getName()
     {
-        return $this->getIdentifier()->package;
+        return $this->getIdentifier()->name;
     }    
 }

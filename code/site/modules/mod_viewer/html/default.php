@@ -16,9 +16,16 @@
          </a>
          <ul class="dropdown-menu">
             <li><a href="<?=@route(get_viewer()->getURL())?>"><?= @text('MOD-VIEWER-MENU-PROFILE') ?></a></li>
-            <?php foreach($menus as $menu) : ?>
-                <?= $menu->toString() ?>
-            <?php endforeach; ?>
+            
+            <?php if ( isset($menutype) ) : ?>
+            	<li class="divider"></li>
+            	<?=
+            		@service('mod://site/menu.module')
+            			->menutype($menutype)
+            			->layout('list')
+            	?>
+            <?php endif ?>
+            
              <li class="divider"></li> 
                  
              <li><a href="<?=@route(get_viewer()->getURL().'&get=settings')?>"><?=@text('MOD-VIEWER-MENU-EDIT-PROFILE')?></a></li>                     
