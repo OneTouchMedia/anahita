@@ -24,17 +24,7 @@
  * @link       http://www.anahitapolis.com
  */
 class ModMenuModule extends ModBaseModule
-{
-	/**
-	 * (non-PHPdoc)
-	 * @see ModBaseModule::_actionDisplay()
-	 */
-	protected function _actionDisplay()
-	{
-				
-		return parent::_actionDisplay();
-	}
-	
+{	
 	/**
 	 * (non-PHPdoc)
 	 * @see LibBaseControllerAbstract::__set()
