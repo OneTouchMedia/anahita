@@ -303,6 +303,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         $this->_application = JFactory::getApplication('site', array('session'=>PHP_SAPI !== 'cli'));
         
+        $this->getService()->set('application', $this->_application);        
+        
         //set the session handler to none for
         if ( PHP_SAPI == 'cli' ) {
             JFactory::getConfig()->setValue('config.session_handler','none');
