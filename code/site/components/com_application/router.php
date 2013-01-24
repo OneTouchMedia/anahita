@@ -98,7 +98,7 @@ class JRouterSite extends KObject
         
         //if there's an ItemId and no option set 
         //the use the ItemId values
-        if ( $vars->Itemid && !$vars->option ) {
+        if ( false && $vars->Itemid && !$vars->option ) {
             $menu = JSite::getMenu(true)->getItem($vars->Itemid);
             if ( $menu ) {
                 $url  = clone $this->__url;
@@ -107,7 +107,7 @@ class JRouterSite extends KObject
                 JSite::getMenu(true)->setActive($menu->id);                
             }
         }
-
+        
         $segments = explode('/', $path);
 
         if ( $component = array_shift($segments) ) {
@@ -115,6 +115,10 @@ class JRouterSite extends KObject
                 'option' => 'com_'.str_replace('com_','',$component)
             ));
         }
+        
+        $vars->append(array(
+			'option' => 'com_application'
+        ));        
         
         if ( $router = $this->getComponentRouter($vars->option) ) {
             $vars->append($router->parse($segments));
