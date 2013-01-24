@@ -54,7 +54,8 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 			}
 			unset($query['permalink']);							
 			$url->setQuery($query);
-			$this->setRedirect($url.'#scroll='.$this->permalink);
+			$this->getService('application')
+				->redirect($url.'#scroll='.$this->permalink);			
 			return;
 		} 
 	}
