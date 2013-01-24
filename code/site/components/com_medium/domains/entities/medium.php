@@ -61,7 +61,7 @@ class ComMediumDomainEntityMedium extends ComBaseDomainEntityNode
         $behaviors = $config->behaviors;
         
         $behaviors->append(array(
-            'taggable'    => array('parse_hashtag'=>true) ,
+//            'taggable'    => array('parse_hashtag'=>true) ,
             'modifiable'  => array(
                 'modifiable_properties' => array('name','body')
             ),
