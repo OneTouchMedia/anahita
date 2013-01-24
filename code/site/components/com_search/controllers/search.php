@@ -105,6 +105,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             }
             
             //always search tags
+            /*
             $tag_ids   = $this->getService('repos://site/tags.association')
                     ->getQuery()
                     ->link('tag')
@@ -118,7 +119,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
             
             if ( !empty($tag_ids) ) {
                 $query->clause()->id($tag_ids);
-            }
+            }*/
             
             if ( !empty($operation) ) {
                 $clause = $query->clause('OR'); 
