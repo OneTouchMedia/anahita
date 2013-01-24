@@ -75,7 +75,11 @@ class ModBaseHtml extends ComBaseViewHtml
      */
     public function getRoute($route)
     {
-    	return LibBaseHelperUrl::getRoute($route);    	
+    	if ( strpos($route, 'index.php?') === false ) {
+    		$route .= 'index.php?'.$route;
+    	}
+    	return $this->getService('application')
+    		->getRouter()->build($route);    	    
     }
     
     /**
