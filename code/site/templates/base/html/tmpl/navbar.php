@@ -16,13 +16,13 @@
             <?= @render('logo') ?>
             <div id="desktop-main-menu" class="nav-collapse collapse">
 	            <?= @helper('modules.render','navigation', array('style'=>'none')) ?>
-	            <span class="search">
-					<form action="<?=@route('option=com_search')?>" class="navbar-search">
-  						<input type="text" name="q" class="input-medium search-query" placeholder="Search">  
-					</form>
-	            </span>
+	            
+	            <form action="<?=@route('option=com_search')?>" class="navbar-search pull-left">
+  					<input type="text" name="q" class="search-query" placeholder="<?= @text('TMPL-SEARCH-PLACEHOLDER') ?>">  
+				</form>
+	            
 	            <?php if( $viewer_module = @helper('modules.render','viewer', array('style'=>'none'))): ?>
-	            <span class="viewer"><?= $viewer_module ?></span>
+	            <span class="viewer pull-right"><?= $viewer_module ?></span>
 	            <?php endif; ?>
             </div>
             
