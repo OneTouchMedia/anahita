@@ -29,6 +29,11 @@ abstract class ComMediumRouterAbstract extends ComBaseRouterDefault
      */
     public function build(&$query)
     {
+    	if ( isset($query['alias']) && isset($query['id']) ) {
+    		$query['id'] = $query['id'].'-'.$query['alias'];
+    		unset($query['alias']);
+    	}
+    	    	
         $segments = array();
         
         if ( isset($query['oid']) ) {            
@@ -49,15 +54,31 @@ abstract class ComMediumRouterAbstract extends ComBaseRouterDefault
      */
     public function parse(&$segments)
     {
-        $vars = array();
-       
-        //if the first segment is numeric then it's oid
-        if ( preg_match('/@\w+/', current($segments)) ) {
-            $vars['oid'] = str_replace('@','',array_shift($segments));
-        }
-        
+    	$path = implode('/', $segments);
+    	$vars = array();
+    	 
+    	$matches = array();
+    	if ( preg_match('/(\d+)-([^\/]+)/', $path, $matches) ) {
+    		$vars['alias'] = $matches[2];
+    		$path = str_replace($matches[0], $matches[1], $path);
+    		$segments = array_filter(explode('/', $path));
+    	}
+    	    	
+    	$path = implode('/',$segments);
+    	    	
+    	$matches = array();
+        	
+    	if ( preg_match('/@(\w+)/', $path, $matches) ) {
+    		$vars['oid'] = $matches[1];
+    		if ( isset($matches[2]) ) {
+    			$vars['view'] = $matches[2];
+    		}
+    		$path = ltrim(str_replace($matches[0], '', $path),'/');
+    		$segments = array_filter(explode('/', $path));    		
+    	}
+               
         $vars = array_merge($vars, parent::parse($segments));
-        
+		
         if ( isset($vars['id']) && current($segments) ) {
             $vars['alias'] = array_shift($segments);
         }
