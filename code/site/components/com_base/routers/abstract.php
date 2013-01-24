@@ -143,20 +143,21 @@ abstract class ComBaseRouterAbstract extends KObject implements KServiceInstanti
             $vars['view'] = $this->getIdentifier()->package;
         }
         else {
-        	//get the last if it's an id
-        	$last_value = array_pop($segments);        	
-        	if ( is_numeric($last_value) ) {
-        		//the view before that is the resource
-        		if ( count($segments) ) {
-        			$view = array_pop($segments);
-        		} else {
+        	
+        	$path    = implode('/', $segments);
+        	$matches = array();
+        	
+        	if ( preg_match('/(\d+)\/(\w+)/', $path, $matches) ) {
+        		$vars['id']  = $matches[1];
+        		$vars['get'] = $matches[2];
+        		$segments	 = array_filter(explode('/', str_replace($matches[0], '', $path)));
+        		if ( empty($segments) ) {
         			$view = $this->getIdentifier()->package;
+        		} else {
+        			$view = array_pop($segments);
         		}
-        		$vars['id']   = $last_value;
-        		$vars['view'] = KInflector::singularize($view);        		
-        	} else {
-        		$vars['view'] = $last_value;
-        	}
+        		$vars['view'] = KInflector::singularize($view);
+        	}        	
         }        
         
         return $vars;
