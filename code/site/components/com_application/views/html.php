@@ -46,4 +46,17 @@ class ComApplicationViewHtml extends LibApplicationViewHtml
                
         parent::_initialize($config);
     }
+
+    /**
+     * (non-PHPdoc)
+     * @see LibBaseViewAbstract::getRoute()
+     */
+    public function getRoute($route)
+    {
+    	if ( strpos($route, 'index.php?') === false ) {
+    		$route .= 'index.php?'.$route;
+    	}
+    	return $this->getService('application')
+    	->getRouter()->build($route);
+    }
 }
