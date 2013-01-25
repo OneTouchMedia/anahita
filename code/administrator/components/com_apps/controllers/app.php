@@ -120,7 +120,7 @@ class ComAppsControllerApp extends ComBaseControllerService
         }
         
 		//$components
-		$this->getToolbar('app')->setTitle('App Assignments');
+		$this->getToolbar('app')->setTitle(JText::_('AN-APPS-ACTOR-ASSIGNMENT'));
 		
         return $entities;
 	}	
