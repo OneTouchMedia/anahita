@@ -1,6 +1,6 @@
 <?php defined('KOOWA') or die('Restricted access'); ?>
 
-<form id="" action="<?= @route()?>" method="post" class="-koowa-grid " data-token-name="_token" data-token-value="<?=JUtility::getToken()?>">
+<form id="" action="<?= @route() ?>" method="post" class="-koowa-grid " data-token-name="_token" data-token-value="<?=JUtility::getToken()?>">
 	<table class="adminlist" style="clear: both;">
 		<thead>
 			<tr>
@@ -35,7 +35,7 @@
 			<?php endforeach;?>
 		<?php if (!$apps->getTotal()) : ?>
 			<tr>
-				<td colspan="4" align="center">
+				<td colspan="6" align="center">
 					<?= @text('No Apss Found'); ?>
 				</td>
 			</tr>
