@@ -28,45 +28,13 @@
  * @link       http://www.anahitapolis.com
  */
 class AnDomainEntitysetDefault extends AnDomainEntityset
-{
-	/**
-	 * Check if data has been loaded into the set
-	 *  
-	 * @var boolean
-	 */
-	protected $_loaded = false;
-	
+{	
 	/**
 	 * The query that represents this entity set
 	 * 
 	 * @var AnDomainQuery
 	 */
-	protected $_set_query;
-	
-	/**
-	 * Query Object
-	 * 
-	 * @var AnDomainQuery
-	 */
-	protected $_query;
-	
-	/**
-	 * Constructor.
-	 *
-	 * @param 	object 	An optional KConfig object with configuration options
-	 */
-	public function __construct(KConfig $config)
-	{
-		$this->_query = $config->query;
-				
-		parent::__construct($config);
-		
-        //if config->data has been set
-        //then it has been loaded
-        if ( $config->data != null ) {
-            $this->_loaded = true;
-        }
-	}
+	protected $_set_query;	
 	
     /**
      * Initializes the options for the object
@@ -187,178 +155,17 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
     	    $result = parent::__call($method, $arguments);
     	}
     	return $result;
-    }
-    
-	/**
-	 * Get an aggregated set of values from the entityset
-	 * 
-	 * @param  string $column 
-	 * @param  mixed  $value
-	 * @return mixed
-	 */
-	public function __get($column)
-	{			
-		$this->_load();
-		return parent::__get($column);
-	}
-	
-	/**
-	 * Set a property for each individual entity
-	 * 
-	 * @param  string $column 
-	 * @param  mixed  $value
-	 * @return AnDomainEntitysetDefault
-	 */
-	public function __set($column, $value)
-	{
-		$this->_load();
-		return parent::__set($column, $value);	
-	}
-	
-	/**
-	 * Count Data
-	 * 
-	 * @return int
-	 */
-    public function count()
-    {
-    	$this->_load();		
-    	return parent::count();
-    }
-    
- 	/**
-     * Rewind the Iterator to the first element
-     *
-     * @return	void
-     */
-	public function rewind() 
-	{
-		$this->_load();
-		return parent::rewind();
-	} 
-	
-	/**
-     * Checks if current position is valid
-     *
-     * @return	boolean
-     */
-	public function valid() 
-	{
-		$this->_load();
-		return parent::valid();
-	} 
-	
-	/**
-     * Return the key of the current element
-     *
-     * @return	scalar
-     */
-	public function key() 
-	{
-		$this->_load();
-		return parent::key();
-	} 
-	
-	/**
-     * Return the current element
-     *
-     * @return	mixed
-     */
-	public function current() 
-	{
-		$this->_load();
-		return parent::current();
-	} 
-	
-	/**
-     * Move forward to next element
-     *
-     * @return	void
-     */
-	public function next() 
-	{
-		$this->_load();
-		return parent::next();
-	}	
-	
-	/**
-	 * Load the entities before getting an entity of offset
-	 * @return 
-	 * @param $offset Object
-	 */
-	public function offsetGet($offset)
-	{
-        $this->_load();
-        return parent::offsetGet($offset);
-	}	
-	
-	
-	/**
-	 * Returns the iterator
-	 * 
-	 * @return ArrayIterator
-	 */
-	public function getIterator()
-	{	
-		$this->_load();
-		return parent::getIterator();
-	}  
-	
-	/**
-	 * Destroy a collection of entities
-	 * 
-	 * @return void
-	 */
-	public function destroy()
-	{
-		$this->delete();
-		return $this->_repository->getSpace()->commitEntities();
-	}
-	
-	/**
-	 * Deletes all the entities
-	 * 
-	 * @return void
-	 */
-	public function delete()
-	{
-		return parent::__call('delete');
-	}	
+    }    	 	
 
-	/**
-     * Return an associative array of the data.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-		$this->_load();
-		return parent::toArray();
-    }
-    		
+    
 	/**
 	 * Loads the data into the object set using the query if not already loaded
 	 * 
 	 * @return void
 	 */
-	protected function _load()
+	protected function _getData()
 	{
-		if ( $this->_loaded )
-			return;
-			
-		if ( isset($this->_object_set) && $this->_object_set->count() > 0 ) {
-			$this->_loaded = true;
-			return;
-		}
-		
-		$this->_loaded = true;
-		
-		$repository = $this->_repository;
-		
-		//get an array list instead of another entityset
-		$data		= $repository->fetch($this->getQuery(), AnDomain::FETCH_ENTITY_LIST);
-		if ( !$data ) 
-			$data = array();
-		$this->_object_set = new ArrayObject($data);		
+		$data = $this->getRepository()->fetch($this->getQuery(), AnDomain::FETCH_ENTITY_LIST);		
+		return $data;			
 	}
 }
