@@ -120,7 +120,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         require_once(JPATH_BASE.'/includes/toolbar.php');
         
         $this->_application = JFactory::getApplication('administrator');
-       
+       	
+        $this->getService()->set('application', $this->_application);
+       	
         global $mainframe;
         
         $mainframe = $this->_application; 
@@ -278,10 +280,13 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _actionError($context)
     {
         $error = $context->data;
-                
+           
         //if JException then conver it to KException
         if ( $context->data instanceof KException ) {
             $error = new JException($context->data->getMessage(),$context->data->getCode());
+        }
+        if ( $error instanceof Exception ) {
+        	$error = new JException($error->getMessage(),$error->getCode());
         }
         JError::customErrorPage($error);
         exit(0);
