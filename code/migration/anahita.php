@@ -486,5 +486,21 @@ function anahita_21()
 
 function anahita_22()
 {	
-	dbexec('UPDATE jos_modules SET module = "mod_menu" WHERE module LIKE "mod_mainmenu"')
+	dbexec('UPDATE jos_modules SET module = "mod_menu" WHERE module LIKE "mod_mainmenu"');
+}
+
+function anahita_23()
+{
+	dbexec("insert into jos_anahita_nodes (component,type,owner_id,owner_type)
+select app.component,'ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment',enable.node_a_id,enable.node_a_type from jos_anahita_edges as enable 
+inner join jos_anahita_nodes as app on app.id = enable.node_b_id
+where enable.type like 'ComAppsDomainEntityEnable,com:apps.domain.entity.enable'");
+	dbexec("insert into jos_anahita_nodes (component,type,name,access)
+select app.component,'ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment',actortype.name,enable.meta from jos_anahita_edges as enable 
+inner join jos_anahita_nodes as app on app.id = enable.node_b_id
+inner join jos_anahita_nodes as actortype on actortype.id = enable.node_a_id
+where enable.type like 'ComAppsDomainEntityAssignment,com:apps.domain.entity.assignment'
+");
+	dbexec("delete from jos_anahita_nodes where type like 'ComApps%'");
+	dbexec("delete from jos_anahita_edges where type like 'ComApps%'");
 }
