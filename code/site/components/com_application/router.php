@@ -117,18 +117,15 @@ class JRouterSite extends KObject
         }
         
         $vars->append(array(
-			'option' => 'com_application'
+			'option' => 'com_frontpage'
         ));        
         
-        if ( $router = $this->getComponentRouter($vars->option) ) {
-            $vars->append($router->parse($segments));
-        } else {
-            $func     = substr($vars->option, 4).'ParseRoute';
-            if ( function_exists($func) ) {
-            	$vars->append(@$func($segments));
-            }
+        if ( $vars->option != 'com_frontpage' ) 
+        {
+        	$router = $this->getComponentRouter($vars->option);
+        	$vars->append($router->parse($segments));        	
         }
-        
+                
         return KConfig::unbox($vars);     
 	}
 
@@ -156,15 +153,9 @@ class JRouterSite extends KObject
             unset($query['format']);  
         }
         
-        if ( $router = $this->getComponentRouter($component) ) {
-            $parts    = $router->build($query);
-        } else {
-            $func     = substr($component, 4).'BuildRoute';     
-            if ( function_exists($func) ) {                   
-            	$parts    = $func($query);
-            }
-        }
-        
+        $router = $this->getComponentRouter($component);
+        $parts    = $router->build($query);
+                
         if ( empty($parts) ) {
         	$parts = array();
         }
@@ -191,16 +182,10 @@ class JRouterSite extends KObject
      * @return ComBaseRouter
      */
     public function getComponentRouter($component)
-    {    	
-        $identifier = KService::getIdentifier('com://site/'.str_replace('com_','',$component).'.router');        
-        $router     = false;
-        if ( file_exists($identifier->filepath) && !class_exists($identifier->classname) ) {        	
-            require_once $identifier->filepath;
-        } else {
-            register_default(array('identifier'=>$identifier, 'default'=>'ComBaseRouterDefault'));
-            $router = KService::get($identifier);
-        }
-        
+    {
+        $identifier = 'com://site/'.str_replace('com_','',$component).'.router';        
+        register_default(array('identifier'=>$identifier, 'default'=>'ComBaseRouterDefault'));
+        $router = KService::get($identifier);
         return $router;
     }
 }
