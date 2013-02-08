@@ -634,6 +634,16 @@ class AnDomainQueryBuilder extends KObject
 		$string = implode(' ', $parts);		
 		$string = $this->parseMethods($query, $string);
 		$string = str_replace('@MYSQL_JOIN_PLACEHOLDER', $this->join($query), $string);
+		$string = $this->parseMethods($query, $string);
+
+		if ( count($query->binds) ) {
+			foreach($query->binds as $key => $value) {
+				$key    = ':'.$key;
+				$value  = $this->_store->quoteValue($value);
+				$string = str_replace($key, $value, $string);
+			}
+		}
+		
         $string = str_replace('@DISTINCT', $query->distinct ? 'DISTINCT' : '', $string);
 				
 		return 	$string;
@@ -779,15 +789,7 @@ class AnDomainQueryBuilder extends KObject
                 $string = str_replace($matches[0],$replaces,$string);
             }
         }        
-                
-        if ( count($query->binds) ) {
-            foreach($query->binds as $key => $value) {
-                $key    = ':'.$key;
-                $value  = $this->_store->quoteValue($value);
-                $string = str_replace($key, $value, $string);                               
-            }
-        }
-        
+                        
 	    return $string;	    
 	}
 }
