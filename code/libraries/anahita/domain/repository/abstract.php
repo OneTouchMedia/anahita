@@ -115,9 +115,9 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 		//now set the attributes and relationships
 		$this->_description->setAttribute( KConfig::unbox($config->attributes) );
 		$this->_description->setRelationship( KConfig::unbox($config->relationships) );
-				
-		$this->_query  = new AnDomainQuery($config);
-				
+						
+		$this->_query = $this->getService($config->query, $config->toArray());
+		
 		// Mixin the behavior interface
 		$config->mixer = $this;
 		
@@ -157,7 +157,12 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 		$description->path = array('domain','description');
 		register_default(array('identifier'=>$description, 'prefix'=>$config->prototype));
 
+		$query     = clone $this->getIdentifier();
+		$query->path = array('domain','query');
+		register_default(array('identifier'=>$query, 'prefix'=>$config->prototype));
+		
 		$config->append(array(
+			'query'		   => $query,
 		    'space'        => $this->getService('anahita:domain.space'),
 		    'store'        => $this->getService('anahita:domain.store.database'),
 			'entityset'	        => $entityset ,
@@ -587,11 +592,11 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  	public function getEntities()
  	{
 	 	$entities = $this->_space->getEntities();
-	 	$data	  = new AnDomainEntityset(new KConfig(array('repository'=>$this)));
-	 	foreach($entities as $entity)
-	 	{
-	 		if ( $entity->getRepository() === $this )
+	 	$data	  = $this->getService('anahita:domain.entityset', array('repository'=>$this));
+	 	foreach($entities as $entity) {
+	 		if ( $entity->getRepository() === $this ) {
 	 			$data->insert($entity);
+	 		}
 	 	}
 	 	return $data;
  	}
