@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class AnDomainQuery
+class AnDomainQuery extends KObject
 {
     /**
      * Query Operation
@@ -198,7 +198,7 @@ class AnDomainQuery
 	        
 	    $this->_repository = $config->repository;
 	    
-		$this->_initialize($config);
+	    parent::__construct($config);
 		
 		$this->operation = array('type'=>AnDomainQuery::QUERY_SELECT_DEFAULT, 'value'=>'');
 
@@ -411,7 +411,7 @@ class AnDomainQuery
 			}
 			else
 			{
-			    $qurey = AnDomain::getRepository($query)->getQuery();
+			    $query = AnDomain::getRepository($query)->getQuery();
 			}
 		} 
 		elseif ($query instanceof AnDomainRepositoryAbstract )
@@ -489,11 +489,12 @@ class AnDomainQuery
 		if ( count($this->where) == 1 ) 
 		{
 			$where 	  = array_pop(array_values($this->where));
-			$property = $where['property'];
-			$keys 	  = $this->_repository->getDescription()->getKeys();
-			if ( isset($keys[$property]) && isset($where['constraint']) && $where['constraint'] == '=' && !is_array($where['value']))
-			{
-				$key[$property] = $where['value'];
+			if ( isset($where['property']) ) {
+				$property = $where['property'];
+				$keys 	  = $this->_repository->getDescription()->getKeys();
+				if ( isset($keys[$property]) && isset($where['constraint']) && $where['constraint'] == '=' && !is_array($where['value'])) {
+					$key[$property] = $where['value'];
+				}				
 			}
 		}
 		
@@ -633,6 +634,7 @@ class AnDomainQuery
 	   foreach($data as $key => $value) {
 	       $this->binds[$key] = $value;	 
 	   }  
+	   return $this;
 	}
 	
 	/**
