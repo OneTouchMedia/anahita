@@ -139,7 +139,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             {
                 //don't render if home menu or front page                            
                 case isset($item) && $item->alias == 'home' && KRequest::method() == 'GET' :
-                case $component   == 'com_content' && $this->view == 'frontpage' :
+                case $component  == 'com_frontpage' :                
                     $result = '';
                     break;
                 default :
@@ -294,8 +294,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         set_exception_handler(array($this, 'error')); 
                 
         //load the JSite
-        KLoader::loadIdentifier('com://site/application.application');
-        KLoader::loadIdentifier('com://site/application.router');
+        $this->getService('koowa:loader')->loadIdentifier('com://site/application.application');
+        $this->getService('koowa:loader')->loadIdentifier('com://site/application.router');
                       
         jimport('joomla.application.component.helper');
         
