@@ -86,7 +86,7 @@ abstract class LibBaseViewTemplate extends LibBaseViewAbstract
         }
         
         // Add default template paths
-        $this->getTemplate()->addPath(KConfig::unbox($config->template_paths));        
+        $this->getTemplate()->addSearchPath(KConfig::unbox($config->template_paths));        
          
         //Add alias filter for media:// namespace
         $this->getTemplate()->getFilter('alias')->append(
