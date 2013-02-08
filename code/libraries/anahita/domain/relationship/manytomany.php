@@ -221,7 +221,7 @@ class AnDomainRelationshipManytomany extends AnDomainRelationshipOnetomany
 			'child'		=> $this->getChildRepository()
 		);
 		
-		$set = KService::get('anahita:domain.entityset.manytomany', $options);
+		$set = KService::get('anahita:domain.decorator.manytomany', $options);
         
 		return $set;							
 	}
