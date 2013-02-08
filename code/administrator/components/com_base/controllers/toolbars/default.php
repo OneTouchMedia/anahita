@@ -68,7 +68,7 @@ class ComBaseControllerToolbarDefault extends ComDefaultControllerToolbarDefault
     {
         $name = ucfirst($this->getController()->getIdentifier()->name);
         
-        if( $this->getController()->getItem() )
+        if( $this->getController()->getState()->isUnique() )
         {
             $saveable = $this->getController()->canEdit();
             $title    = 'Edit '.$name;
