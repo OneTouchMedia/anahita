@@ -15,6 +15,8 @@ defined( 'JPATH_BASE' ) or die( 'Restricted access' );
 
 require_once ( JPATH_BASE.'/includes/framework.php' );
 
+KLoader::loadIdentifier('com://site/application.aliases');
+
 KService::get('com://admin/application.dispatcher')->run();
 
 exit(0);
