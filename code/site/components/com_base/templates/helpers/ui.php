@@ -36,7 +36,7 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
 	{
 		parent::__construct($config);		
 		
-		$this->_template->addPath(KConfig::unbox($config->paths), true);
+		$this->_template->addSearchPath(KConfig::unbox($config->paths), true);
 	}
 		
     /**
@@ -523,14 +523,8 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
 	{
 		$data['helper'] = $this;
 		$file   = '_ui_'.$ui.'.php';		
-		$path   = $this->_template->findPath($file);
-		
-		if ( $path ) 
-		{
-			$data = KConfig::unbox($data);
-			$file = $path.'/'.$file;
-			return (string) $this->_template->loadTemplate('_ui_'.$ui, $data);
-		}	
+		$data = KConfig::unbox($data);
+		return (string) $this->_template->loadTemplate('_ui_'.$ui, $data);
 	}
 }
 ?>
