@@ -133,20 +133,28 @@ class AnDomain
      * @return AnDomainRepositoryAbstract 
      */
 	static public function getRepository($identifier, $config = array())
-	{
-	    $strIdentifier = (string) $identifier;
-	    
-	    if ( !KService::has($identifier) )
-	    {
-	        $identifier = self::getEntityIdentifier($identifier);
+	{	    	    
+	    if ( strpos($identifier,'repos:') === 0 ) {
+	    	$repository = KService::get($identifier);
+	    } 
+	    else {
+	    	
+	    	$strIdentifier = (string) $identifier;
+	    	
+		    if ( !KService::has($identifier) )
+		    {
+		        $identifier = self::getEntityIdentifier($identifier);
+		    }
+		      
+		    if ( !KService::has($identifier) )
+		    {
+		        KService::set($strIdentifier, KService::get($identifier, $config));
+		    }	
+		    
+		    $repository = KService::get($identifier)->getRepository();    
 	    }
-	      
-	    if ( !KService::has($identifier) )
-	    {
-	        KService::set($strIdentifier, KService::get($identifier, $config));
-	    }	    
 	    
-	    return KService::get($identifier)->getRepository();
+	    return $repository;
 	}
 }
 
