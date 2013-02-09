@@ -26,7 +26,14 @@
  * @link       http://www.anahitapolis.com
  */
 class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
-{        
+{   
+	/**
+	 * Actor components
+	 * 
+	 * @var ComActorsDomainEntitysetComponent
+	 */   
+	protected $_components;
+	  
     /**
 	 * Initializes the default configuration for the object
 	 *
@@ -97,5 +104,23 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 		}
 
 		return $filename;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see AnDomainEntityAbstract::__get()
+	 */
+	public function __get($name)
+	{
+		if ( $name == 'components' ) {
+			if ( !isset($this->_components) ) {
+				$this->_components = $this->getService('com://site/actors.domain.entityset.component', array(
+        				'actor' 		=> $this        				
+				));
+			}
+			return $this->_components;
+		} else {
+			return parent::__get($name);
+		}
 	}
 }

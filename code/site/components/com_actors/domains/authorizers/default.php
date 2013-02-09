@@ -145,10 +145,19 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         //check if it's a social app then if it's enabled
         if ( $component ) 
         {
-            $app = $this->getService('repos:apps.app')->fetch(array('component'=>$component));
-            if ( $app && !$app->authorize('publish', array('actor'=>$this->_entity)))  {
-                return false;
-            }
+        	      
+        	$component = $this->getService('repos://site/components.component')
+        						->fetch(array('component'=>$component));
+
+        	$ret = $component->authorize('action', 
+        				array('actor'	 => $this->_entity,         					  
+        					  'action'	 => $parts[1],
+        					  'resource' => $parts[0],
+        				));
+        	
+        	if ( $component ) {
+        		
+        	}
         }
         
         return $this->_entity->allows($this->_viewer, $action, $context->default);
