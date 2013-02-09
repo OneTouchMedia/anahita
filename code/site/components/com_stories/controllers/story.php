@@ -84,7 +84,7 @@ class ComStoriesControllerStory extends ComBaseControllerService
      * @return void
      */
 	protected function _actionBrowse($context)
-	{		        
+	{				   
 		$query 	  = $this->getRepository()->getQuery()			
 					->limit( $this->start == 0 ?  20 : 20, $this->start );
 
@@ -99,10 +99,10 @@ class ComStoriesControllerStory extends ComBaseControllerService
 			$query->owner($this->actor);
 		}
 	   
-		$apps 		  =	 $this->getService('repos:apps.app')->fetchSet();		
+		$components   =	 $this->getService('repos:components.component')->fetchSet();		
         $keys         =  new KConfig();
 		
-        if ( count($apps ) ) 
+        if ( count($components) && false  ) 
         {
     		foreach($apps as $app) 
             {
