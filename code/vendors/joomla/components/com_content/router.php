@@ -132,7 +132,7 @@ class ComContentRouter extends ComBaseRouterDefault
 	public function parse(&$segments)
 	{
 		$vars = array();
-	
+		return;
 		//Get the active menu item
 		$menu =& JSite::getMenu();
 		$item =& $menu->getActive();
