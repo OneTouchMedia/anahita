@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class AnDomainQuery extends KObject
+class AnDomainQuery extends KObject implements KCommandInterface
 {
     /**
      * Query Operation
@@ -192,14 +192,11 @@ class AnDomainQuery extends KObject
 	 */
 	public function __construct(KConfig $config)
 	{
-	    if ( !$config->repository ) {
-	        throw new AnDomainQueryException("repository [AnDomainRepositoryAbstract] option is required");
-	    }
-	        
-	    $this->_repository = $config->repository;
 	    
 	    parent::__construct($config);
 		
+	    $this->_repository = $config->repository;
+	    
 		$this->operation = array('type'=>AnDomainQuery::QUERY_SELECT_DEFAULT, 'value'=>'');
 
 		$this->_prefix   = $config->resource_prefix;
@@ -217,6 +214,7 @@ class AnDomainQuery extends KObject
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
+			'repository'		 => $this->getIdentifier()->name,
 			'resource_prefix'    =>  '#__',
 			'state'		         => array(
 				'instance_of'	      => array(),
@@ -382,7 +380,7 @@ class AnDomainQuery extends KObject
 			{
                 $name = $query;
                 
-                if ( $property = $this->_repository->getDescription()->getProperty($name) ) {
+                if ( $property = $this->getRepository()->getDescription()->getProperty($name) ) {
                     $name = $property->getName();
                 }
                 
@@ -466,17 +464,52 @@ class AnDomainQuery extends KObject
 	{
 		return isset($this->link[$link]) ? $this->link[$link] : null;
 	}
-	    
+	
 	/**
-	 * Query Repository	  
+	 * Return the entityset repository
 	 * 
-	 * @return AnDomainRepositoryAbstract
+	 * @return AnDomainAbstractRepository
 	 */
 	public function getRepository()
 	{
+		if ( !$this->_repository instanceof AnDomainRepositoryAbstract ) 
+		{
+			if ( !$this->_repository instanceof KServiceIdentifier ) {
+				$this->setRepository($this->_repository);
+			}
+									
+			$this->_repository = $this->getService($this->_repository);
+		}
+		
 		return $this->_repository;
 	}
 	
+	/**
+	 * Set the repository using identifier or a repository object
+	 *
+	 * @param mixed $repository
+	 *
+	 * @return void
+	 */
+	public function setRepository($repository)
+	{
+		if ( !$this->_repository instanceof AnDomainRepositoryAbstract )
+		{
+			if(is_string($repository) && strpos($repository, '.') === false )
+			{
+				$identifier         = clone $this->getIdentifier();
+				$identifier->type   = 'repos';
+				$identifier->path   = array();
+				$identifier->name   = $repository;
+			}
+			else  $identifier = $this->getIdentifier($repository);
+	
+			$repository = $identifier;
+		}
+	
+		$this->_repository = $repository;
+	}
+		
 	/**
 	 * Return an identiable value for the query
 	 * 
@@ -491,7 +524,7 @@ class AnDomainQuery extends KObject
 			$where 	  = array_pop(array_values($this->where));
 			if ( isset($where['property']) ) {
 				$property = $where['property'];
-				$keys 	  = $this->_repository->getDescription()->getKeys();
+				$keys 	  = $this->getRepository()->getDescription()->getKeys();
 				if ( isset($keys[$property]) && isset($where['constraint']) && $where['constraint'] == '=' && !is_array($where['value'])) {
 					$key[$property] = $where['value'];
 				}				
@@ -665,7 +698,7 @@ class AnDomainQuery extends KObject
         
         //only do condition chaining if it's a real property
 		//don't check the parent property
-		if ( $this->_repository->getDescription()->getProperty($method) )
+		if ( $this->getRepository()->getDescription()->getProperty($method) )
 		{
 		     $constraint = isset($arguments[1]) ? $arguments[1] : '=';
 			 $condition  = isset($arguments[2]) ? $arguments[2] : 'AND';
@@ -675,9 +708,10 @@ class AnDomainQuery extends KObject
 		//fetch('{Function Name}(property)'). For example fetchCount => fetchValue('COUNT({property}')
 		elseif ( preg_match('/(fetch|select)(\w+)/',$method, $match) )
 		{
+			deprecated('use '.$match[1].'(FUNC) instead');
 		    $column   = isset($arguments[0]) ? $arguments[0] : '*';
 		    
-		    $property = $this->_repository->getDescription()->getProperty($column);
+		    $property = $this->getRepository()->getDescription()->getProperty($column);
 		    
 		    if ( $property ) {
 		        $column = '@col('.$column.')';
@@ -802,6 +836,28 @@ class AnDomainQuery extends KObject
 	    return $this->getRepository()->fetch($query, AnDomain::FETCH_VALUE_LIST);
 	}
 	
+	/**
+	 * Return the row data
+	 * 
+	 * @return array
+	 */
+	public function fetchRow($condition=array())
+	{
+		$query = self::getInstance($this, $condition);
+		return $this->getRepository()->fetch($query, AnDomain::FETCH_ROW);		
+	}
+	
+	/**
+	 * Return the row data
+	 *
+	 * @return array
+	 */
+	public function fetchRows($condition=array())
+	{
+		$query = self::getInstance($this, $condition);
+		return $this->getRepository()->fetch($query, AnDomain::FETCH_ROW_LIST);
+	}	
+	
     /**
      * Forwards the call to the repository destory. @see AnDomainRepositoryAbstract::destory()     
      * 
@@ -829,15 +885,42 @@ class AnDomainQuery extends KObject
 	 */
 	public function __toString()
 	{
-	    try
-	    {
-	        $query = AnDomainQueryBuilder::getInstance()->build($this);
-	        return $query;
-	    }catch(Exception $e) {
-	        print $e->getMessage().'<br />';
-	        print str_replace("\n",'<br />', $e->getTraceAsString());
-	        return '';
-	    }
+		$chain = clone $this->getRepository()->getCommandChain();			
+		$query = clone $this;
+		$chain->enqueue($query);
+		$context = $this->getRepository()->getCommandContext();
+		$context->caller = $this;
+		$context->query  = $query;
+		$chain->run('before.build', $context);
+		$context->result = AnDomainQueryBuilder::getInstance()->build($query);
+		$chain->run('after.after', $context);
+		return $context->result;
+	}
+		
+	/**
+	 * (non-PHPdoc)
+	 * @see KCommandInterface::execute()
+	 */
+	public function execute($command, KCommandContext $context)
+	{
+		$identifier = $context->caller->getIdentifier();
+		$type = $identifier->path;
+		$type = array_pop($type);		 
+		$parts  = explode('.', $command);
+		$method = '_'.($parts[0]).ucfirst($type).ucfirst($parts[1]);
+		if(method_exists($this, $method)) {
+            return $this->$method($context);
+        }
+	}
+	
+	/**
+	 * The priority of the query
+	 * 
+	 * @return number
+	 */
+	public function getPriority()
+	{
+		return -PHP_INT_MAX;
 	}
 		
 	/**
