@@ -104,7 +104,7 @@ class ComBaseDomainBehaviorCommentable extends AnDomainBehaviorAbstract
 	{
 		$this->getRepository()->getStore()->execute('set @i = 0');
 		$query = clone $this->comments->getQuery();
-        return $query->where('@col(id) < '.(int)$cid)->fetchMax('@i := @i + 1'); 
+		return $query->where('@col(id) < '.(int)$cid)->fetchValue('MAX(@i := @i + 1)');
 	}
 	
 	/**
