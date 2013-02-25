@@ -16,9 +16,10 @@ $direction = '';
 		</thead>
 		
 		<tbody>
-			<? foreach ($components as $i => $component) : ?>			
+			<?php $i = 0?>
+			<? foreach ($components as $component) : ?>			
 			<tr class="-koowa-grid-checkbox">
-				<td align="center"><?= $i + 1; ?></td>
+				<td align="center"><?= ++$i; ?></td>
 				<td align="center"><?= @helper('grid.checkbox', array('row'=>$component)); ?></td>
 				<td>
 					<span class="editlinktip hasTip" title="<?= @escape($component->option); ?>">
