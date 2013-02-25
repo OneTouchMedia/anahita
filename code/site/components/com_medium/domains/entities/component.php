@@ -39,7 +39,7 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-			'behaviors' => array('assignable'=>array())
+			'behaviors' => array('assignable'=>array(),'searchable'=>array())
 		));		
 		
 		parent::_initialize($config);
@@ -89,7 +89,7 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 		$this->_setGadgets($actor, $gadgets, 'profile');
 		$this->_setComposers($actor, $composers, 'profile');
 	}
-
+		
 	/**
 	 * Set the composers for a profile/dashboard. This method should be implemented by the subclasses
 	 *
@@ -131,34 +131,20 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 		 
 	}	
 	
-	
 	/**
-	 * Return an array of permissions by using the medium objects
-	 *
-	 * @return array()
-	 */	
-	protected static function _getMediumIdentifiers($component)
+	 * Return the medium search scopes
+	 * 
+	 * @return array
+	 */
+	public function getSearchScope()
 	{
-		$path     = JPATH_ROOT.DS.'components'.DS.'com_'.$component->getIdentifier()->package.DS.'domains'.DS.'entities';
-		$identifiers = array();
-		if ( file_exists($path) )
-		{
-			$files = JFolder::files($path);
-			foreach($files as $file) {
-				$name       = explode('.', basename($file));
-				$name       = $name[0];
-				$identifier = clone $component->getIdentifier();
-				$identifier->path = array('domain','entity');
-				$identifier->name = $name;
-				try {
-					if ( is($identifier->classname, 'ComMediumDomainEntityMedium') ) {
-						$identifiers[] = $identifier;
-					}
-				}
-				catch(Exception $e) {}
+		$searchables = array();
+		foreach($this->getEntityRepositories('ComMediumDomainEntityMedium') as $repository) {			
+			if ( $repository->isSearchable() ) {
+				$searchables[] = array('repository'=>$repository);
 			}
 		}
-		return $identifiers;
+		return $searchables;
 	}
 	
 	/**
@@ -168,7 +154,7 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 	 */
 	protected static function _getDefaultPermissions($component)
 	{		
-		$identifiers = self::_getMediumIdentifiers($component);
+		$identifiers = $component->getEntityIdentifiers('ComMediumDomainEntityMedium');
 		$permissions = array();
 		foreach($identifiers as $identifier) {
 			try {

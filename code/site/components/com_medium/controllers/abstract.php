@@ -69,6 +69,7 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
                 'order'     => null
             ),
 	        'behaviors' => array(
+	        	'com://site/search.controller.behavior.searchable',	        		
                 'composable',
                 'publisher',
                 'commentable',                

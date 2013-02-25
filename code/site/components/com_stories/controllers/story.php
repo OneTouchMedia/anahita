@@ -99,7 +99,7 @@ class ComStoriesControllerStory extends ComBaseControllerService
 			$query->owner($this->actor);
 		}
 	   
-		$components   =	 $this->getService('repos:components.component')->fetchSet();		
+		$components   =	 $this->getService('repos://site/components.component')->fetchSet();		
         $keys         =  new KConfig();
 		
         if ( count($components) && false  ) 

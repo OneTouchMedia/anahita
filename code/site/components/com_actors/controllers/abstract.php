@@ -62,6 +62,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         
         $config->append(array(
             'behaviors' => array(
+            	'com://site/search.controller.behavior.searchable',
                 'publisher',
                 'followable',
                 'administrable',

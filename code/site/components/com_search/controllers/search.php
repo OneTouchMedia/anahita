@@ -44,6 +44,8 @@ class ComSearchControllerSearch extends ComBaseControllerResource
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
+			'behaviors'		=> array('ownable'),
+			'toolbars'      => array($this->getIdentifier()->name,'menubar','actorbar'),				
             'request'       => array(
                 'limit'     => 20,
 				'sort'		=> 'id',
@@ -62,85 +64,33 @@ class ComSearchControllerSearch extends ComBaseControllerResource
      * @return string The result to render
      */
     protected function _actionGet(KCommandContext $context)
-    {        
-        $this->getToolbar('menubar')->setTitle(JText::_('COM-SEARCH-HEADER'));
-    	
+    {           
     	$this->setView('searches');
-        
-        $this->_state->insert('q')->insert('type');
+    	if ( $this->actor) {
+        	$this->getToolbar('actorbar')->setTitle($this->actor->name);
+    	}
+    	$this->_state->append(array(
+			'search_comments' => false
+    	));
+    	    	
+        $this->_state->insert('q')
+        	->insert('scope')
+        	->insert('search_comments');
         
     	JFactory::getLanguage()->load('com_actors');
-    	
-    	if ( $this->type )
-        {
-            $identifier = 'repos://site/'.$this->type;
-            
-            if ( strpos($identifier,'.') === false ) {
-                $identifier = $identifier.'.'.$this->type;
-            }
-          
-            $description = $this->getService(KInflector::singularize($identifier))->getDescription();                      
-        }
-                 
-        $repos = $this->getService('repos://site/base.node');
-        $query = $repos->getQuery();
-        
-        if ( !empty($description) ) {
-            $query->instanceOf((string)$description->getEntityIdentifier());
-        }
-        
-        $keywords  = urldecode($this->q);
-        
-        if ( $keywords )
-        {
-            if ( strpos($keywords,'#') === 0 ) {
-                $keywords  = explode(',', substr($keywords,1));
-            }
-            elseif ( strpos($keywords,' OR ') ) {
-                $keywords  = explode(' OR ',$keywords);
-                $operation = 'OR';
-            } else {
-                $keywords = explode(' ', $keywords);
-                $operation = 'AND';   
-            }
-            
-            //always search tags
-            /*
-            $tag_ids   = $this->getService('repos://site/tags.association')
-                    ->getQuery()
-                    ->link('tag')
-                    ->where('name','IN',$keywords)                    
-                    ->where('tag.type','=','com:tags.domain.entity.text')
-                    ->fetchValues('taggable.id');
-                    
-            if ( empty($tag_ids) && empty($operation) ) {
-                $query->where('false');
-            }
-            
-            if ( !empty($tag_ids) ) {
-                $query->clause()->id($tag_ids);
-            }*/
-            
-            if ( !empty($operation) ) {
-                $clause = $query->clause('OR'); 
-                foreach($keywords as $keyword) {
-                    $clause->where('CONCAT(IF(name IS NULL,"",name), IF(body IS NULL,"",body)) LIKE "%'.$keyword.'%"',$operation);
-                }
-            }
-            
-            //this is becuase we still have the board records in some systems. 
-            $query->where('type', '<>', 'ComMediumDomainEntityMedium,ComTopicsDomainEntityBoard,com:topics.domain.entity.board');
-            
-            if ( $this->_request->oid ) {
-            	$query->where('owner_id','IN', (array)KConfig::unbox($this->_request->oid ));	
-            }
-            
-            $query->limit($this->limit, $this->start);
-            
-            $entities = $repos->fetchSet($query);
-            $this->_state->setList($entities);
-            $this->keywords = $keywords;
-        }
+		
+    	$this->keywords 		= array_filter(explode(' ',urldecode($this->q)));
+    	$this->scopes			= $this->getService('com://site/search.domain.entityset.scope');
+		$this->current_scope	= $this->scopes->find($this->scope);
+    	$query = $this->getService('com://site/search.domain.query.search')
+    				->ownerContext($this->actor)
+    				->searchTerm(urldecode($this->q))
+    				->searchComments($this->search_comments)
+    				->scope($this->current_scope)
+    				->limit($this->limit, $this->start)
+    				;
+
+    	$this->_state->setList($query->toEntitySet());
         
         return $this->getView()->display();        
     }

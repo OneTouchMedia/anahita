@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Lib_Components
+ * @package    Com_Components
  * @subpackage Domain_Entity
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -18,7 +18,7 @@
  * Component object
  *
  * @category   Anahita
- * @package    Lib_Components
+ * @package    Com_Components
  * @subpackage Domain_Entity
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -46,7 +46,7 @@ class ComComponentsDomainEntityComponent extends LibComponentsDomainEntityCompon
 		
 		parent::_initialize($config);
 	}
-	
+		
 	/**
 	 * Registers event dispatcher
 	 *
@@ -95,5 +95,73 @@ class ComComponentsDomainEntityComponent extends LibComponentsDomainEntityCompon
 		}
 	
 		return $this->__subscriptions;
-	}	
+	}
+		
+	/**
+	 * Return an array of identifiers within the component
+	 *
+	 * @param string $class The class from which the entities are inherting
+	 *
+	 * @return array()
+	 */	
+	public function getEntityRepositories($class)
+	{
+		$identifiers = $this->getEntityIdentifiers($class);
+		foreach($identifiers as $i => $identifier) {
+			$identifiers[$i] = AnDomain::getRepository($identifier);
+		}
+		return $identifiers;
+	}
+	
+
+	/**
+	 * Cacthes the before search
+	 *
+	 * @param KEvent $event
+	 *
+	 * @return void
+	 */
+	public function onBeforeSearch(KEvent $event)
+	{
+		if ( $this->isSearchable() ) {
+			$event->scope->append($this->getSearchScope());
+		}
+	}
+		
+	/**
+	 * Return an array of identifiers within the component
+	 * 
+	 * @param string $class The class from which the entities are inherting 
+	 * 
+	 * @return array()
+	 */
+	public function getEntityIdentifiers($class)
+	{
+		$registry = $this->getService('application.registry', array('key'=>$this->getIdentifier()));		
+		if ( !$registry->offsetExists($class.'-identifiers') ) 
+		{
+			$path     = JPATH_ROOT.DS.'components'.DS.'com_'.$this->getIdentifier()->package.DS.'domains'.DS.'entities';
+			$identifiers = array();
+			if ( file_exists($path) )
+			{
+				$files = JFolder::files($path);
+				foreach($files as $file) {
+					$name       = explode('.', basename($file));
+					$name       = $name[0];
+					$identifier = clone $this->getIdentifier();
+					$identifier->path = array('domain','entity');
+					$identifier->name = $name;
+					try {
+						if ( is($identifier->classname, $class) ) {
+							$identifiers[] = $identifier;
+						}
+					}
+					catch(Exception $e) {}
+				}
+			}
+			$registry->offsetSet($class.'-identifiers', $identifiers);
+		}		
+		$identifiers = $registry->offsetGet($class.'-identifiers');
+		return $identifiers;
+	}
 }
