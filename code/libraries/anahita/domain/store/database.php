@@ -142,8 +142,8 @@ class AnDomainStoreDatabase extends KObject implements AnDomainStoreInterface
 		if($this->getCommandChain()->run('before.fetch', $context) !== false)
 		{
 		    $modes = array(
-		            AnDomain::FETCH_DATA 	    	=> KDatabase::FETCH_ARRAY,
-		            AnDomain::FETCH_DATA_LIST   	=> KDatabase::FETCH_ARRAY_LIST,
+		            AnDomain::FETCH_ROW 	    	=> KDatabase::FETCH_ARRAY,
+		            AnDomain::FETCH_ROW_LIST   		=> KDatabase::FETCH_ARRAY_LIST,
 		            AnDomain::FETCH_ENTITY			=> KDatabase::FETCH_ARRAY,
 		            AnDomain::FETCH_ENTITY_SET		=> KDatabase::FETCH_ARRAY_LIST,
 		            AnDomain::FETCH_ENTITY_LIST		=> KDatabase::FETCH_ARRAY_LIST,
