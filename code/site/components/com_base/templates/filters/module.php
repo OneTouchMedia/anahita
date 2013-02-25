@@ -54,7 +54,8 @@ class ComBaseTemplateFilterModule extends KTemplateFilterAbstract implements KTe
     public function write(&$text)
     {
         $matches = array();
-    
+    	if ( KRequest::type() == 'AJAX' ) 
+    		return;
         if(preg_match_all('#<module([^>]*)>(.*)</module>#siU', $text, $matches))
         {
             $modules = array();
