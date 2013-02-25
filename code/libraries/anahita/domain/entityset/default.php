@@ -105,7 +105,7 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 	{
         $query = clone $this->getQuery();
         $query->order = null;
-        return $query->fetchCount();
+        return $query->fetchValue('count(*)');
 	}
 	
 	/**
