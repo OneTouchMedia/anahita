@@ -340,6 +340,11 @@ abstract class LibBaseViewAbstract extends KObject
 	        //Add the layout information to the route if it's not set
 	        if(!isset($parts['layout'])) {
 	            $route['layout'] = $this->getLayout();
+	            
+	            //@TODO temporary. who are we to day what's the default la
+	            if ( $route['layout'] == 'default' ) {
+	            	unset($route['layout']);
+	            }	            
 	        }
             
             //since the view is missing then get the data from
