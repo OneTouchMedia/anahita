@@ -241,7 +241,8 @@ class AnDomainRelationshipManytoone extends AnDomainRelationshipProperty impleme
 		$config['relationship'] = $this;
 		$config['value']        = $parent_value;
 		$config['property']     = $this->_parent_key;
-		$config['service_identifier']   = AnDomain::getRepository($parent)->getDescription()->getEntityIdentifier();
+		$config['service_identifier']   = AnDomain::getRepository($parent)
+					->getDescription()->getEntityIdentifier();
 				
 		return new AnDomainEntityProxy(new KConfig($config));		
 	}		
