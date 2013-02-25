@@ -358,26 +358,24 @@ class AnDomainQueryBuilder extends KObject
 		$clauses	 = array();
 		if ( $description->getInheritanceColumn() && $type_check ) 
 		{
-			$array 		= array();
-			//get the main resource name
 			$resource 	= $description->getInheritanceColumn()->resource->getAlias();
-			$scope		= (array)KConfig::unbox($query->instance_of);
-			if ( !empty($scope) ) 
-			{
-				foreach($scope as $scope)
-					$array[] = $scope;
-			}
-			else $array[] = $description;
-            
-            //the table type column name
+			//the table type column name
 			$type_column_name = $resource.'.'.$description->getInheritanceColumn()->name;
+								
+			$scopes 	= KConfig::unbox($query->instance_of);
+			if ( empty($scopes) ) {
+				$scopes = array($description);
+			} else {
+				if ( !is_array($scopes) ) {
+					$scopes = array($scopes);
+				}
+			}
             
-			foreach($array as $index => $scope) 
-			{
-			    $array[$index] = $type_column_name.' LIKE \''.$this->_inheritanceTree($scope).'\'';;
+			foreach($scopes as $index => $scope) {
+			    $scopes[$index] = $type_column_name.' LIKE \''.$this->_inheritanceTree($scope).'\'';;
 			}
 						
-            $clauses[] = '('.implode(' OR ', $array).')';
+            $clauses[] = '('.implode(' OR ', $scopes).')';            
 		}
 		
 		if ( !empty($query->where) )
@@ -661,10 +659,16 @@ class AnDomainQueryBuilder extends KObject
 	{
         $inheritance = '';
         
-	    if ( is_string($description) && strpos($description, '.') ) {
+	    if ( $description instanceof KServiceIdentifier || 
+	    		(is_string($description) && strpos($description, '.') && !strpos($description, ',')) 	    		
+	    		) {
 	        $description = KService::get($description)->getRepository()->getDescription();
 	    }
-        	    
+	    
+        else if ( $description instanceof AnDomainRepositoryAbstract ) {
+        	$description = $description->getDescription();
+        }
+         	    
         if ( $description instanceof AnDomainDescriptionAbstract ) 
         {
             $inheritance = (string) $description->getInheritanceColumnValue();
@@ -676,7 +680,7 @@ class AnDomainQueryBuilder extends KObject
         } 
         
         elseif ( is_string($description) ) {
-            $inheritance = $description.'%';
+            $inheritance = strpos($description,'.') ? $description : $description.'%';
         }        
         
         return $inheritance;
