@@ -135,7 +135,7 @@ class AnDomainEntityData extends KObject implements ArrayAccess
 		$query = $this->_entity->getRepository()->getQuery()
 			->columns($properties)->where($condition);
 		
-		$data = $this->_entity->getRepository()->fetch($query, AnDomain::FETCH_DATA);
+		$data = $this->_entity->getRepository()->fetch($query, AnDomain::FETCH_ROW);
 
 		$this->_row = array_merge($this->_row, $data);
 		
@@ -262,23 +262,24 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     			//lazy load the value alogn with all the entities whose
     			//$key value is missing
 				$repository->getCommandChain()->disable();
+				$repository->getStore()->getCommandChain()->disable();
 				$entities = $repository->getEntities();
 				$ids	  = array();
 				foreach($entities as $entity) {
 					$ids[] = $entity->getIdentityId();
-				}
-				$result 	 = $repository->fetch($ids, AnDomain::FETCH_DATA_LIST);
+				}				
+				$result 	 = $repository->fetch($ids, AnDomain::FETCH_ROW_LIST);
 				$identity	 = $repository->getDescription()->getIdentityProperty();
 				foreach($result as $data) 
 				{
 					//find the idenitty. Don't try to fetch
-					if ( $entity = $repository->find($identity->materialize($data, null), false) ) 
-					{
+					if ( $entity = $repository->find($identity->materialize($data, null), false) ) {
 						$entity->setRowData($data);
 					}
 				}
 				$value	= $property->materialize($this->_row, $this->_entity);
 				$repository->getCommandChain()->enable();
+				$repository->getStore()->getCommandChain()->enable();
     		}
 			
     		$this->_setPropertyValue($key, $value);
