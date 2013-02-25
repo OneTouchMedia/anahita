@@ -64,11 +64,11 @@ class AnDomain
 	/**
 	 * Fetch Mode
 	 */
-	const FETCH_DATA        = 1;
+	const FETCH_ROW         = 1;
 	const FETCH_VALUE	    = 2;
 	const FETCH_ENTITY 		= 4;	
 	const FETCH_VALUE_LIST	= 8;	
-	const FETCH_DATA_LIST   = 16;	
+	const FETCH_ROW_LIST    = 16;	
 	const FETCH_ENTITY_SET  = 32;
 	const FETCH_ENTITY_LIST = 64;
 	
