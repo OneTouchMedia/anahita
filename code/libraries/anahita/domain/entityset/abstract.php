@@ -332,7 +332,7 @@ abstract class AnDomainEntitysetAbstract extends AnObjectSet
     	//lets use the query to get the count
     	if ( isset($this->_query) && !$this->isLoaded() && !$load) {
     		$query  = AnDomainQuery::getInstance($this->getRepository(), $this->_query);
-    		$result = $this->getRepository()->fetch($query->selectCount(), AnDomain::FETCH_VALUE);
+    		return $query->fetchValue('count(*)');
     	}
     	else {
     		$this->_loadData();
