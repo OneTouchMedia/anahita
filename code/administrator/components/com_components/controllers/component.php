@@ -23,7 +23,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComComponentsControllerComponent extends ComBaseControllerResource
+class ComComponentsControllerComponent extends ComBaseControllerService
 {	
 	/**
 	 * Constructor.
@@ -37,6 +37,7 @@ class ComComponentsControllerComponent extends ComBaseControllerResource
 		parent::__construct($config);
 		
 		$this->_action_map['save'] = 'post';
+		$this->_action_map['edit'] = 'order';
 		
 		$this->getToolbar('component')->setTitle('Assignable Components');
 	}
@@ -52,13 +53,19 @@ class ComComponentsControllerComponent extends ComBaseControllerResource
     */
     protected function _initialize(KConfig $config)
     {
-        $config->append(array(
-            'readonly' => false    
-        ));   
-
         parent::_initialize($config);
     }
 
+    /**
+     * orders
+     */    
+    protected function _actionOrder(KCommandContext $context)
+    {    	
+    	$components = $this->getRepository()->fetchSet(array('id'=>KConfig::unbox($this->id)));
+    	$components->setData(KConfig::unbox($context->data));    	
+    	$components->save();    	
+    }
+    
     /**
      * Sets the assignment
      */
@@ -77,19 +84,8 @@ class ComComponentsControllerComponent extends ComBaseControllerResource
      */
     protected function _actionRead(KCommandContext $context)
     {
-    	$this->_state->setItem($this->getService('com://admin/components.domain.set.assignablecomponent')
-    		->find(array('id'=>$this->id)));
-    	
+    	parent::_actionRead($context);    	
     	$this->actor_identifiers = $this->getService('com://admin/components.domain.set.actoridentifier');
-    }
-    
-    /**
-     * Show a list of actorypes
-     */
-    protected function _actionBrowse(KCommandContext $context)
-    {    	
-    	
-    	$this->_state->setList($this->getService('com://admin/components.domain.set.assignablecomponent'));    	
     }
 }
 
