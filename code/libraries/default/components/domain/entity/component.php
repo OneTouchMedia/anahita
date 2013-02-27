@@ -45,6 +45,7 @@ class LibComponentsDomainEntityComponent extends AnDomainEntityDefault
             	'enabled'                         
             ),
 			'behaviors' => array(
+				'orderable',
 				'authorizer'	
 			),
 			'aliases' => array(
