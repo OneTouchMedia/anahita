@@ -159,7 +159,7 @@ abstract class AnDomainValidatorAbstract extends KObject
     {
         $description = $entity->description();
         
-        if ( $entity->state() == AnDomain::STATE_NEW )
+        if ( $entity->getEntityState() == AnDomain::STATE_NEW )
             $properties = $description->getProperty();
         else
             $properties = array_intersect_key($description->getProperty(), KConfig::unbox($entity->modifications()));
@@ -423,14 +423,14 @@ abstract class AnDomainValidatorAbstract extends KObject
         $value    = KConfig::unbox($config['value']);
         $present  = true;
         
-        if ( $entity->state() & AnDomain::STATE_DELETED )
+        if ( $entity->getEntityState() & AnDomain::STATE_DELETED )
             return true;
         
         //if the serial id is missing for a new entity, then don't validate
         //@TODO this causes no-incremental primary keys
         //to pass the validation. Need a new serial type the represet 
         //incremental identity property
-        if ( $entity->state() == AnDomain::STATE_NEW && $property === $entity->description()->getIdentityProperty() )
+        if ( $entity->getEntityState() == AnDomain::STATE_NEW && $property === $entity->description()->getIdentityProperty() )
             return true;
         
         if ( $property->isAttribute() )
@@ -468,7 +468,7 @@ abstract class AnDomainValidatorAbstract extends KObject
             //i.e. not null or having an id = 0
             //is to prevent having non null mock objects. i.e. viewer as a guest
             //or an empty entity
-            if ( $present && $value->state() != AnDomain::STATE_NEW )
+            if ( $present && $value->getEntityState() != AnDomain::STATE_NEW )
             {
                 //check if the many to one object is null or not
                 $values  = $property->serialize($value);

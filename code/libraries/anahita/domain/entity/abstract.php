@@ -155,10 +155,50 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 * 
 	 * @return string
 	 */
-	final public function state()
+	final public function getEntityState()
 	{
-		return $this->__space->getEntityState($this);
+		return $this->getRepository()->getSpace()->getEntityState($this);
 	}
+	
+	/**
+	 * Return if the state of the entity is AnDomain::STATE_NEW
+	 * 
+	 * @return boolean
+	 */
+	public function isNew()
+	{
+		return $this->getEntityState() == AnDomain::STATE_NEW;
+	}
+	
+	/**
+	 * Return if the state of the entity is AnDomain::STATE_MODIFIED
+	 * 
+	 * @return boolean
+	 */
+	public function isModified
+	{
+		return $this->getEntityState() == AnDomain::STATE_MODIFIED;
+	}
+
+	/**
+	 * Return if the state of the entity is AnDomain::STATE_CLEAN
+	 *
+	 * @return boolean
+	 */	
+	public function isClean()
+	{
+		return $this->getEntityState() == AnDomain::STATE_CLEAN;
+	}
+	
+	/**
+	 * Return if the state of the entity is AnDomain::STATE_DELETED
+	 *
+	 * @return boolean
+	 */
+	public function isDeleted()
+	{
+		return $this->getEntityState() == AnDomain::STATE_DELETED;
+	}	
 	
 	/**
 	 * Forwards the call to the space validate entities. However only return
@@ -213,7 +253,8 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	public function reset()
 	{
-		$this->__space->setEntityState($this, AnDomain::STATE_CLEAN);
+		$this->getRepository()->getSpace()
+			->setEntityState($this, AnDomain::STATE_CLEAN);
 		$this->_modified = array();
 		return $this;
 	}
@@ -344,8 +385,8 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 				//example if $topic->author = new author
 				//then save the new author first before saving topic
 				//only set the dependency 
-				if ( $value->state() == AnDomain::STATE_NEW ) {
-					$this->__space->switchPriority($this, $value);
+				if ( $value->getEntityState() == AnDomain::STATE_NEW ) {
+					$this->getRepository()->getSpace()->switchPriority($this, $value);
                 }
 			}
 			//if value is not null do a composite type checking
@@ -407,7 +448,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 				settype($value, $property->getType());
 			}
 			
-			if ( $this->state() != AnDomain::STATE_NEW )
+			if ( $this->getEntityState() != AnDomain::STATE_NEW )
 			{
 				//store the original value for future checking
 				if ( !isset($this->_modified[$name]) ) 
@@ -426,10 +467,11 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 			}
 						
 			$this->_data[$property->getName()] 	   = $value;
-			$this->__space->setEntityState($this, AnDomain::STATE_MODIFIED);
+			$this->getRepository()->getSpace()
+				->setEntityState($this, AnDomain::STATE_MODIFIED);
 			
 			//only track modifications for the updated entities
-			if ( $this->state() !== AnDomain::STATE_MODIFIED) {
+			if ( $this->getEntityState() !== AnDomain::STATE_MODIFIED) {
 				$this->_modified = array();
 			}
 			
@@ -489,7 +531,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
     {
         $data        = array();
         $description = $this->description();
-        switch($this->state())
+        switch($this->getEntityState())
         {
             case AnDomain::STATE_NEW :
                 //get all the serializable property/value pairs
@@ -520,7 +562,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
         
         $data = $tmp;
         
-        if ( $description->getInheritanceColumn() && $this->state() == AnDomain::STATE_NEW ) {
+        if ( $description->getInheritanceColumn() && $this->getEntityState() == AnDomain::STATE_NEW ) {
             $data[(string)$description->getInheritanceColumn()] = (string)$description->getInheritanceColumnValue();
         }
         
@@ -695,18 +737,11 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */		
 	public function __get($property)
 	{
-	   if ( $property == '__space' )
-	   {
-	       return $this->getRepository()->getSpace();
-	   }	   		
-	   elseif ( $this->description()->getProperty($property) )
-	   {
-	       return $this->getData($property, null);
-	   }				   
-	   else 
-	   {	   		
-	   	   return null;
-	   }
+		$result = null;		
+		if ( $this->description()->getProperty($property) ) {		
+	       $result = $this->getData($property, null);
+		}				   
+		return $result;
 	}
 
 	/**
@@ -835,8 +870,9 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 * @return boolean
 	 */
 	public function delete()
-	{
-		return $this->__space->setEntityState($this, AnDomain::STATE_DELETED);
+	{		
+		return $this->getRepository()->getSpace()
+				->setEntityState($this, AnDomain::STATE_DELETED);
 	}
 	
 	/**
@@ -1010,7 +1046,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 		$data		= array();
 		$data = array('identifier'=>$identifier);
 		$data['hash']  = $this->getHandle();
-		$data['state'] = $this->state();;
+		$data['state'] = $this->getEntityState();;
 		$data['keys']  = implode(',', array_keys($this->description()->getKeys()));
 		$data['required']      = array();
 		foreach($properties as $name => $property)

@@ -331,7 +331,7 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
      */
     public function aggregated()
     {
-        if ( $this->state() & AnDomain::STATE_NEW ) {
+        if ( $this->getEntityState() & AnDomain::STATE_NEW ) {
             return false;    
         }
         

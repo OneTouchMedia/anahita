@@ -200,7 +200,7 @@ class AnDomainSpace extends KObject
 		
 		foreach($this->_entities as $entity)
 		{
-			if ( $entity->state() & AnDomain::STATE_COMMITABLE )
+			if ( $entity->getEntityState() & AnDomain::STATE_COMMITABLE )
 				$data[] = $entity;
 		}
 				

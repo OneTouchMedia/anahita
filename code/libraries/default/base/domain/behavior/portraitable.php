@@ -97,8 +97,8 @@ class LibBaseDomainBehaviorPortraitable extends LibBaseDomainBehaviorStorable
         //first remove the existing avatar. 
         //only remove exisitng if the entity hasn't been
         //just inserted
-        if ( $this->state() != AnDomain::STATE_INSERTED && 
-        	 $this->state() != AnDomain::STATE_NEW ) {            
+        if ( $this->getEntityState() != AnDomain::STATE_INSERTED && 
+        	 $this->getEntityState() != AnDomain::STATE_NEW ) {            
             //remove existing portrait image
             $this->removePortraitImage();            
         }
@@ -110,7 +110,7 @@ class LibBaseDomainBehaviorPortraitable extends LibBaseDomainBehaviorStorable
         	//if data is null or mimetype is invalid then
         	//existing avatar is deleted
         	if ( empty($data) ) {
-        		if ( $this->state() == AnDomain::STATE_NEW) {
+        		if ( $this->getEntityState() == AnDomain::STATE_NEW) {
         			$this->reset();
         		}
         		return false;
@@ -124,13 +124,13 @@ class LibBaseDomainBehaviorPortraitable extends LibBaseDomainBehaviorStorable
         $image = $config->image;
 				
 		if ( empty($image) ) {
-			if ( $this->state() == AnDomain::STATE_NEW) {
+			if ( $this->getEntityState() == AnDomain::STATE_NEW) {
 				$this->reset();
 			}
 			return false;	
 		}	
 		
-		if ( $this->state() == AnDomain::STATE_NEW ) {
+		if ( $this->getEntityState() == AnDomain::STATE_NEW ) {
 			$config['image'] = $image;
 			unset($config['data']);
 			unset($config['url']);

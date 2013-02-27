@@ -245,7 +245,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
      */
 	public function commit($entity)
 	{
-		switch($entity->state())
+		switch($entity->getEntityState())
 		{
 			case AnDomain::STATE_NEW :
 				$operation  = AnDomain::OPERATION_INSERT;
@@ -617,7 +617,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  		//if not found an entity
  		//or found one but it' either delete or destroyed
  		//create a new entity
- 		if ( !$entity || ($entity->state() & AnDomain::STATE_DELETED || $entity->state() &  AnDomain::STATE_DESTROYED )) {
+ 		if ( !$entity || ($entity->getEntityState() & AnDomain::STATE_DELETED || $entity->getEntityState() &  AnDomain::STATE_DESTROYED )) {
  			$config = new KConfig($config);
  			$config->append(array(
  				'data' => $data
