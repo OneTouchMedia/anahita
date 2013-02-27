@@ -1099,6 +1099,21 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	}	
 	
 	/**
+	 * Return an array of methods.  
+	 *  
+	 * (non-PHPdoc)
+	 * @see KObject::getMethods()
+	 */
+	public function getMethods()
+	{
+		$behaviors  = $this->getRepository()->getBehaviors();
+		foreach($behaviors as $behavior) {
+			$this->mixin($behavior);
+		}
+		return parent::getMethods();
+	}
+	
+	/**
 	 * Clones a model - this is for when creating a list of models and we don't want to instantiate them
 	 * 
 	 * @return 
