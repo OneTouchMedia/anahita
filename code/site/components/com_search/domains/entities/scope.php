@@ -74,6 +74,8 @@ class ComSearchDomainEntityScope extends KObject
 		$this->commentable = $config->commentable;
 		
 		$this->ownable 	   = $config->ownable;
+		
+		JFactory::getLanguage()->load('com_'.$this->identifier->package);
 	}
 	
 	/**
@@ -98,6 +100,14 @@ class ComSearchDomainEntityScope extends KObject
 		}
 			
 		parent::_initialize($config);
+	}
+	
+	/**
+	 * wakes up
+	 */
+	public function __wakeup()
+	{
+		JFactory::getLanguage()->load('com_'.$this->identifier->package);
 	}
 	
 	/**

@@ -45,7 +45,8 @@ class ComComponentsDomainBehaviorSearchable extends LibBaseDomainBehaviorEnablea
 	{
 		parent::__construct($config);
 		
-		$this->_search_scope = $config->search_scope;
+		$this->_search_scope = $config->class;
+		
 	}
 	
 	/**
@@ -60,19 +61,35 @@ class ComComponentsDomainBehaviorSearchable extends LibBaseDomainBehaviorEnablea
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-			'search_scope' => array()
+			'class' => null
 		));
 	
 		parent::_initialize($config);
 	}
+	
+	/**
+	 * Cacthes the before search
+	 *
+	 * @param KEvent $event
+	 *
+	 * @return void
+	 */
+	public function onBeforeSearch(KEvent $event)
+	{
+		$event->scope->append($this->_mixer->getSearchScope());
+	}	
 		
 	/**
-	 * Return the search scope
+	 * Return the medium search scopes
 	 * 
 	 * @return array
 	 */
 	public function getSearchScope()
 	{
-		return $this->_search_scope;
+		$searchables = array();
+		foreach($this->getEntityRepositories($this->_search_scope) as $repository) {			
+			$searchables[] = array('repository'=>$repository);
+		}
+		return $searchables;
 	}
 }

@@ -54,8 +54,7 @@ class ComMediumDomainEntityMedium extends ComBaseDomainEntityNode
 				'ownable',
 				'dictionariable', 
 				'subscribable',
-				'describable',
-				'searchable'
+				'describable'
 			)
 		));
 		

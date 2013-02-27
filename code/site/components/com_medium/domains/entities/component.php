@@ -39,7 +39,10 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-			'behaviors' => array('assignable'=>array(),'searchable'=>array())
+			'behaviors' => array(
+					'assignable'=>array(),
+					'searchable'=>array('class'=>'ComMediumDomainEntityMedium')
+			)
 		));		
 		
 		parent::_initialize($config);
@@ -130,22 +133,6 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 	{
 		 
 	}	
-	
-	/**
-	 * Return the medium search scopes
-	 * 
-	 * @return array
-	 */
-	public function getSearchScope()
-	{
-		$searchables = array();
-		foreach($this->getEntityRepositories('ComMediumDomainEntityMedium') as $repository) {			
-			if ( $repository->isSearchable() ) {
-				$searchables[] = array('repository'=>$repository);
-			}
-		}
-		return $searchables;
-	}
 	
 	/**
 	 * Return an array of permissions by using the medium objects

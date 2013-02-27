@@ -54,7 +54,6 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 				'statusUpdateTime',
 			),
 			'behaviors'  => array(
-				'searchable',
                 'subscribable',
 				'modifiable',
 				'followable',

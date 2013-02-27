@@ -54,7 +54,7 @@ class ComSearchDomainEntitysetScope extends KObjectArray implements KServiceInst
 					if ( is_array($scope) ) {
 						$scope = $container->get('com://site/search.domain.entity.scope', $scope);
 					}
-					$scopes[$scope->getKey()] = $scope;						
+					$scopes[$scope->getKey()] = $scope;
 				}
 				$registry->offsetSet('scopes', $scopes);
 			}

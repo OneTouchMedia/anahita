@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComComponentsDomainQueryComponent extends AnDomainQueryDefault
+class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponent
 {
 	/**
 	 * Adds a condition for list of components that are assigned to actor
@@ -45,4 +45,13 @@ class ComComponentsDomainQueryComponent extends AnDomainQueryDefault
 		;
 		return $this;
 	}
+	
+	/**
+	 * 
+	 */
+	protected function _beforeQueryBuild()
+	{
+		parent::_beforeQueryBuild();	
+	}
 }
+

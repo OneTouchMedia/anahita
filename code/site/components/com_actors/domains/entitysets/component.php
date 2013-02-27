@@ -64,16 +64,14 @@ class ComActorsDomainEntitysetComponent extends AnObjectDecorator
 							->bind('optional',  ComComponentsDomainBehaviorAssignable::ACCESS_OPTIONAL)
 							;
 	
-		$query->link('repos://site/components.assignment','@col(assignment.component) = @col(component)')
+		$query->link('repos://site/components.assignment','@col(assignment.component) = @col(component)',array('type'=>'weak'))
 				->enabled(true)
 				->where('@col(id) NOT IN (:components_set_to_never)')
 				;		
 		if ( $config->can_enable ) {									
 			$query->where('@col(assignment.actortype) = :actortype AND @col(access) = :optional');
-		} else {			
-			$query->where('(@col(assignment.actortype) = :actortype AND @col(access) = :always)')
-				  ->where('@col(assignment.actor.id)   = :actorid','OR')
-			;
+		} else {
+			$query->where('((@col(assignment.actortype) = :actortype AND @col(access) = :always) OR @col(assignment.actor.id)  = :actorid OR @col(option) = "com_stories")');
 		}
 		
 		$config['query'] = $query;

@@ -66,8 +66,10 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     protected function _actionGet(KCommandContext $context)
     {           
     	$this->setView('searches');
+    	
     	if ( $this->actor) {
         	$this->getToolbar('actorbar')->setTitle($this->actor->name);
+        	$this->getService()->set('mod://site/search.owner', $this->actor);
     	}
     	$this->_state->append(array(
 			'search_comments' => false
@@ -82,6 +84,9 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     	$this->keywords 		= array_filter(explode(' ',urldecode($this->q)));
     	$this->scopes			= $this->getService('com://site/search.domain.entityset.scope');
 		$this->current_scope	= $this->scopes->find($this->scope);
+		if ( $this->current_scope ) {
+			$this->getService()->set('mod://site/search.scope', $this->current_scope);
+		}
     	$query = $this->getService('com://site/search.domain.query.search')
     				->ownerContext($this->actor)
     				->searchTerm(urldecode($this->q))

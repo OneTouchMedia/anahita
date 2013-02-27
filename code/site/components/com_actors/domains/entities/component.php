@@ -39,25 +39,12 @@ class ComActorsDomainEntityComponent extends ComComponentsDomainEntityComponent
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-				'behaviors' => array('assignable'=>array(),'searchable'=>array())
+				'behaviors' => array(
+					'assignable'=>array(),
+					'searchable'=>array('class'=>'ComActorsDomainEntityActor')
+				)
 		));
 	
 		parent::_initialize($config);
-	}
-		
-	/**
-	 * Return the medium search scopes
-	 *
-	 * @return array
-	 */
-	public function getSearchScope()
-	{
-		$searchables = array();		
-		foreach($this->getEntityRepositories('ComActorsDomainEntityActor') as $repository) {
-			if ( $repository->isSearchable() ) {
-				$searchables[] = array('repository'=>$repository);
-			}
-		}
-		return $searchables;
 	}
 }

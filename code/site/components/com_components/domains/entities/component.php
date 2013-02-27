@@ -28,6 +28,13 @@
 class ComComponentsDomainEntityComponent extends LibComponentsDomainEntityComponent implements KEventSubscriberInterface
 {
 	/**
+	 * Subscriptions
+	 * 
+	 * @var array
+	 */
+	private $__subscriptions = array();
+	
+	/**
 	 * Initializes the default configuration for the object
 	 *
 	 * Called from {@link __construct()} as a first step of object instantiation.
@@ -55,18 +62,18 @@ class ComComponentsDomainEntityComponent extends LibComponentsDomainEntityCompon
 	 * @return void
 	 */
 	public function registerEventDispatcher(KEventDispatcher $dispatcher)
-	{
+	{						
 		$dispatcher->addEventSubscriber($this);
 	}	
-	
+		
 	/**
 	 * Get the priority of the handler
 	 *
 	 * @return	integer The event priority
 	 */
 	public function getPriority()
-	{
-		return $this->_priority;
+	{		
+		return $this->ordering;
 	}
 	
 	/**
@@ -83,11 +90,12 @@ class ComComponentsDomainEntityComponent extends LibComponentsDomainEntityCompon
 			$subscriptions  = array();
 	
 			//Get all the public methods
-			$reflection = new ReflectionClass($this);
-			foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
+            //$reflection = new ReflectionClass($this);
+            //foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
+            foreach($this->getMethods() as $method)
 			{
-				if(substr($method->name, 0, 2) == 'on') {
-					$subscriptions[] = $method->name;
+				if(substr($method, 0, 2) == 'on') {
+					$subscriptions[] = $method;
 				}
 			}
 	
@@ -111,21 +119,6 @@ class ComComponentsDomainEntityComponent extends LibComponentsDomainEntityCompon
 			$identifiers[$i] = AnDomain::getRepository($identifier);
 		}
 		return $identifiers;
-	}
-	
-
-	/**
-	 * Cacthes the before search
-	 *
-	 * @param KEvent $event
-	 *
-	 * @return void
-	 */
-	public function onBeforeSearch(KEvent $event)
-	{
-		if ( $this->isSearchable() ) {
-			$event->scope->append($this->getSearchScope());
-		}
 	}
 		
 	/**

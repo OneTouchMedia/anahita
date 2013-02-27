@@ -27,5 +27,74 @@
  */
 class ComStoriesDomainEntityComponent extends ComComponentsDomainEntityComponent
 {
+	/**
+	 * Initializes the options for the object
+	 *
+	 * Called from {@link __construct()} as a first step of object instantiation.
+	 *
+	 * @param 	object 	An optional KConfig object with configuration options.
+	 * @return 	void
+	 */
+	protected function _initialize(KConfig $config)
+	{
+		$config->append(array(				
+			//'assignment_option'   => self::ASSIGNMENT_OPTION_ALWAYS
+		));
 	
+		return parent::_initialize($config);
+	}
+	
+	/**
+	 * The stories always show first
+	 * 
+	 * @return int
+	 */
+	public function getPriority()
+	{
+		return  -PHP_INT_MAX;
+	}
+	
+	/**
+	 * On Dashboard event
+	 *
+	 * @param  KEvent $event The event parameter
+	 *
+	 * @return void
+	 */
+	public function onProfileDisplay(KEvent $event)
+	{
+		$actor       = $event->actor;
+		$gadgets     = $event->gadgets;
+		$composers   = $event->composers;
+		$this->_setGadgets($actor, $gadgets, 'profile');	
+	}
+	 
+	/**
+	 * @{inheritdoc}
+	 */
+	protected function _setGadgets($actor, $gadgets, $mode)
+	{
+		$controller = $this->getService('com://site/stories.controller.story');
+		$content    = $controller;
+	
+		if ( $mode == 'profile' )
+		{
+			$controller->oid($actor->id)->view('stories');
+	
+			$gadgets->insert('stories', array(
+					'title'      => JText::_('COM-STORIES-GADGET-TITLE-STORIES'),
+					'show_title' => get_viewer()->guest(),
+					'content'    => $content
+			));
+		} else
+		{
+			$controller->view('stories')->filter('leaders');
+	
+			$gadgets->insert('stories', array(
+					'title' 		=> JText::_('COM-STORIES-GADGET-TITLE-STORIES'),
+					'show_title'    => get_viewer()->guest(),
+					'content'       => $content
+			));
+		}
+	}	
 }
