@@ -225,23 +225,13 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	{
 		return $this->getRepository()->getSpace()->commitEntities($failed);
 	}
-
+	
 	/**
-	 * Set the properties/values have been modified 
+	 * Return an array of property => name that has been modified
 	 * 
 	 * @return array
 	 */
-	public function modified()
-	{
-		return array_keys($this->_modified);
-	}
-	
-	/**
-	 * Return an array of modifeid properties with their old and new values
-	 * 
-	 * @return KConfig
-	 */
-	public function modifications()
+	public function getModifiedData()
 	{
 		return new KConfig($this->_modified);
 	}
@@ -543,7 +533,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
                 break;
             case AnDomain::STATE_MODIFIED : 
                 //get all the updated serializable property/value pairs
-                $data            = $this->modified();
+                $data            = array_keys($this->_modified);
                 break;
             case  AnDomain::STATE_DELETED :
                 break;
@@ -1058,7 +1048,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 			$data['data'][$name] = 	count($value) < 2 ? array_pop($value) : $value;
 		}
 		if ( count($this->_modified) ) {
-			foreach($this->modifications() as $property => $changes) {
+			foreach($this->getModifiedData() as $property => $changes) {
 				$property = $this->getEntityDescription()->getProperty($property);
 				$old = $property->serialize($changes->old);
 				$new = $property->serialize($changes->new);	

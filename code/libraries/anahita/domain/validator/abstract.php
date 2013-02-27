@@ -162,7 +162,7 @@ abstract class AnDomainValidatorAbstract extends KObject
         if ( $entity->getEntityState() == AnDomain::STATE_NEW )
             $properties = $description->getProperty();
         else
-            $properties = array_intersect_key($description->getProperty(), KConfig::unbox($entity->modifications()));
+            $properties = array_intersect_key($description->getProperty(), KConfig::unbox($entity->getModifiedData()));
                     
         foreach($properties as $property)
         {

@@ -210,15 +210,15 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         
         $user = JFactory::getUser($person->userId);
         
-        if ( $person->modifications()->name ) {
+        if ( $person->getModifiedData()->name ) {
             $user->set('name', $person->name);
         }
         
-        if ( $person->modifications()->username ) {
+        if ( $person->getModifiedData()->username ) {
             $user->set('username', $person->username);   
         }
         
-        if ( $person->modifications()->email ) {
+        if ( $person->getModifiedData()->email ) {
             $user->set('email', $person->email);               
         }
         

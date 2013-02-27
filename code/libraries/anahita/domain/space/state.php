@@ -169,7 +169,7 @@ class AnDomainSpaceState extends KObject
 	 */
 	protected function _validateChange($entity)
 	{
-		return count($entity->modified()) > 0;
+		return count($entity->getModifiedData()) > 0;		
 	}
 
 	/**
