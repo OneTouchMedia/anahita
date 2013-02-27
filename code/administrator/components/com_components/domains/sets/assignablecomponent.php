@@ -47,8 +47,11 @@ class ComComponentsDomainSetAssignableComponent extends KObject implements KServ
 			}
 			
 			//check the cache
+			$container->get('repos://site/components.component')->getCommandChain()->disable();
 			$components = $container->get('repos://site/components.component')
 								->fetch($query, AnDomain::FETCH_ENTITY_LIST);
+			
+			$container->get('repos://site/components.component')->getCommandChain()->enable();
 			
 			if ( !$cached ) {
 				$assignables = array();
@@ -63,7 +66,7 @@ class ComComponentsDomainSetAssignableComponent extends KObject implements KServ
 				$registry['assignable-components'] = $names;
 			}
 			
-			$instance = $container->get('anahita:domain.entityset', array('data'=>$components));			
+			$instance = $container->get('anahita:domain.entityset', array('data'=>$components,'repository'=>'repos://site/components.component'));			
 			$container->set($config->service_identifier, $instance);			
 		}
 		
