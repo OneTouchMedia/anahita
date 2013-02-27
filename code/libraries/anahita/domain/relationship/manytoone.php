@@ -110,7 +110,7 @@ class AnDomainRelationshipManytoone extends AnDomainRelationshipProperty impleme
 			if  ( $entity instanceof KMixinAbstract )
 					$entity = $entity->getMixer();
 			
-			$data[(string)$this->_type_column] = $entity ? (string)$entity->description()->getInheritanceColumnValue()->getIdentifier() : null;
+			$data[(string)$this->_type_column] = $entity ? (string)$entity->getEntityDescription()->getInheritanceColumnValue()->getIdentifier() : null;
 		}
 
 		return $data;

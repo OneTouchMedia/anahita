@@ -58,7 +58,7 @@ class ComActorsDomainEntitysetComponent extends AnObjectDecorator
 							->getQuery()
 							->columns('id')
 							->where('@col(actortype) = :actortype AND @col(access) = :never'))
-							->bind('actortype', (string)$this->_actor->description()->getInheritanceColumnValue()->getIdentifier())
+							->bind('actortype', (string)$this->_actor->getEntityDescription()->getInheritanceColumnValue()->getIdentifier())
 							->bind('never',     ComComponentsDomainBehaviorAssignable::ACCESS_NEVER)
 							->bind('always',    ComComponentsDomainBehaviorAssignable::ACCESS_ALWAYS)
 							->bind('optional',  ComComponentsDomainBehaviorAssignable::ACCESS_OPTIONAL)

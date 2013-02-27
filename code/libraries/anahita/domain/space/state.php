@@ -134,7 +134,7 @@ class AnDomainSpaceState extends KObject
 		{
 			if ( $child->eql($entity) ) continue;
 			
-			$relationships = $child->description()->getRelationships();
+			$relationships = $child->getEntityDescription()->getRelationships();
 			
 			foreach($relationships as $relationship) 
 			{
@@ -179,7 +179,7 @@ class AnDomainSpaceState extends KObject
 	 */
 	protected function _validateDelete($entity)
 	{
-		$relationships = $entity->description()->getRelationships();
+		$relationships = $entity->getEntityDescription()->getRelationships();
 	
 		foreach($relationships as $name => $relationship) 
 		{

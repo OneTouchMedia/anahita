@@ -163,7 +163,7 @@ class ComComponentsDomainBehaviorAssignable extends LibBaseDomainBehaviorEnablea
 	 */
 	public function activeForActor($actor)
 	{
-		$actortype = $actor->description()->getInheritanceColumnValue()->getIdentifier();
+		$actortype = $actor->getEntityDescription()->getInheritanceColumnValue()->getIdentifier();
 		$access = $this->getAssignmentForIdentifier($actortype);
 		$return = false; 
 		if ( $access == self::ACCESS_ALWAYS ) {

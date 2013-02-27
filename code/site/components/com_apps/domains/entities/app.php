@@ -180,7 +180,7 @@ class ComAppsDomainEntityApp extends ComBaseDomainEntityNode
 	 */
 	public function getAssignment($actor)
 	{	    
-		$identifier = is($actor, 'KServiceIdentifier', 'string') ? (string) $actor : (string)$actor->description()->getInheritanceColumnValue()->getIdentifier();		
+		$identifier = is($actor, 'KServiceIdentifier', 'string') ? (string) $actor : (string)$actor->getEntityDescription()->getInheritanceColumnValue()->getIdentifier();		
 		$assignment = $this->assignments->find(array('actortype.name'=>$identifier));
 		$assignment = $assignment ? $assignment->access : self::ACCESS_OPTIONAL;
 		

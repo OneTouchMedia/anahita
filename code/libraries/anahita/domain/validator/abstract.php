@@ -157,7 +157,7 @@ abstract class AnDomainValidatorAbstract extends KObject
      */ 
     public function validateEntity($entity)
     {
-        $description = $entity->description();
+        $description = $entity->getEntityDescription();
         
         if ( $entity->getEntityState() == AnDomain::STATE_NEW )
             $properties = $description->getProperty();
@@ -430,7 +430,7 @@ abstract class AnDomainValidatorAbstract extends KObject
         //@TODO this causes no-incremental primary keys
         //to pass the validation. Need a new serial type the represet 
         //incremental identity property
-        if ( $entity->getEntityState() == AnDomain::STATE_NEW && $property === $entity->description()->getIdentityProperty() )
+        if ( $entity->getEntityState() == AnDomain::STATE_NEW && $property === $entity->getEntityDescription()->getIdentityProperty() )
             return true;
         
         if ( $property->isAttribute() )
@@ -585,7 +585,7 @@ abstract class AnDomainValidatorAbstract extends KObject
         $query		= $entity->getRepository()->getQuery();
         
         if ( $entity->persisted() )
-            $query->where($entity->description()->getIdentityProperty()->getName(),'<>',$entity->getIdentityId());
+            $query->where($entity->getEntityDescription()->getIdentityProperty()->getName(),'<>',$entity->getIdentityId());
         
         $conditions[$property->getName()] = $value;
         

@@ -102,7 +102,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 		$this->getService($config->repository, KConfig::unbox($config));
 		
 		//if there are no keys throws exception
-		if ( !count($this->description()->getKeys()) ) {
+		if ( !count($this->getEntityDescription()->getKeys()) ) {
 		    throw new AnDomainDescriptionException('Entity '.$this->getIdentifier().' needs at least one key');		        
 		}
 	}
@@ -288,7 +288,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
      */
     public function getIdentityProperty()
     {
-        return $this->description()->getIdentityProperty()->getName();
+        return $this->getEntityDescription()->getIdentityProperty()->getName();
     }
     
 	/**
@@ -311,7 +311,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	 public function get($name = null, $default = null)
 	 {
-	 	$description = $this->description();
+	 	$description = $this->getEntityDescription();
 	 	
 	 	//get the property
 		$property = $description->getProperty($name);
@@ -349,7 +349,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	public function set($name, $value = null)
 	{
-		$property = $this->description()->getProperty($name);
+		$property = $this->getEntityDescription()->getProperty($name);
 				
 		if ( !$property ) 
 			return parent::set($name, $value);
@@ -499,12 +499,12 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 			{
 			    //only load serializbale properties (i.e. attributes, many to one relationships)
 				$properties = array();
-				foreach($this->description()->getProperty() as $property)
+				foreach($this->getEntityDescription()->getProperty() as $property)
 				{
 				    if ( $property->isSerializable() )
 				        $properties[] = $property->getName();
 				}
-				$keys		= array_keys($this->description()->getKeys());
+				$keys		= array_keys($this->getEntityDescription()->getKeys());
 				$properties = array_diff($properties, $keys);
 			}
 			
@@ -530,7 +530,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
     public function getAffectedRowData()
     {
         $data        = array();
-        $description = $this->description();
+        $description = $this->getEntityDescription();
         switch($this->getEntityState())
         {
             case AnDomain::STATE_NEW :
@@ -614,7 +614,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
     	
     	if(is_array($property)) 
     	{
-    		$description	= $this->description();
+    		$description	= $this->getEntityDescription();
     		$properties	 	= $property;
     		$access  		= pick($value, AnDomain::ACCESS_PUBLIC);        	
         	foreach ($properties as $key => $value)
@@ -636,7 +636,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
         else 
         {
         	$name	  	 = $property; 
-        	$description = $this->description();      	
+        	$description = $this->getEntityDescription();      	
         	$property 	 = $description->getProperty($property);
         	
         	if ( !$property ) 
@@ -674,11 +674,11 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */	
     public function getData($property = AnDomain::ACCESS_PUBLIC, $default = null)
     {
-    	$description	= $this->description();
+    	$description	= $this->getEntityDescription();
     	
 		if ( gettype($property) == 'integer' )
 		{
-		    $properties  = $this->description()->getProperty();
+		    $properties  = $this->getEntityDescription()->getProperty();
 		    $access      = (int) $property;
 			$data   = array();
 			
@@ -719,7 +719,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */	
 	public function __set($property, $value)
 	{
- 		if ( $this->description()->getProperty($property) )
+ 		if ( $this->getEntityDescription()->getProperty($property) )
  		{
  		    $this->setData($property, $value);
  		}			
@@ -738,7 +738,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	public function __get($property)
 	{
 		$result = null;		
-		if ( $this->description()->getProperty($property) ) {		
+		if ( $this->getEntityDescription()->getProperty($property) ) {		
 	       $result = $this->getData($property, null);
 		}				   
 		return $result;
@@ -752,7 +752,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */		
 	public function __isset($property)
 	{
-		if ( $property = $this->description()->getProperty($property) ) {
+		if ( $property = $this->getEntityDescription()->getProperty($property) ) {
 			 $name     = $property->getName();
 			
 			if ( $this->_data->offsetExists($name) ) 
@@ -787,7 +787,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	public function __unset($property)
 	{
-		if ( $property = $this->description()->getProperty($property) )
+		if ( $property = $this->getEntityDescription()->getProperty($property) )
 			unset($this->_data[$property->getName()]);
 	}
 	
@@ -940,7 +940,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
         	if ( $parts[0] == 'get' || $parts[0] == 'set' )
         	{
         		$property  = lcfirst(KInflector::implode(array_slice($parts, 1)));
-        		$property  = $this->description()->getProperty($property);
+        		$property  = $this->getEntityDescription()->getProperty($property);
         		if ( $property ) 
         		{
         			if ( $parts[0] == 'get' )
@@ -1027,7 +1027,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 * 
 	 * @return AnDomainRepositoryAbstract
 	 */
-	public function description()
+	public function getEntityDescription()
 	{
 		return $this->getRepository()->getDescription();
 	}
@@ -1041,13 +1041,13 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 */
 	public function inspect($dump = true)
 	{
-		$properties = $this->description()->getProperty();
+		$properties = $this->getEntityDescription()->getProperty();
 		$identifier = $this->getIdentifier();
 		$data		= array();
 		$data = array('identifier'=>$identifier);
 		$data['hash']  = $this->getHandle();
 		$data['state'] = $this->getEntityState();;
-		$data['keys']  = implode(',', array_keys($this->description()->getKeys()));
+		$data['keys']  = implode(',', array_keys($this->getEntityDescription()->getKeys()));
 		$data['required']      = array();
 		foreach($properties as $name => $property)
 		{ 
@@ -1059,7 +1059,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 		}
 		if ( count($this->_modified) ) {
 			foreach($this->modifications() as $property => $changes) {
-				$property = $this->description()->getProperty($property);
+				$property = $this->getEntityDescription()->getProperty($property);
 				$old = $property->serialize($changes->old);
 				$new = $property->serialize($changes->new);	
 				$data['modified'][$property->getName()] = array('old'=>count($old) < 2 ? array_pop($old) : $old, 'new'=>count($new) < 2 ? array_pop($new) : $new);
@@ -1092,14 +1092,14 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	public function cloneEntity($deep = true)
 	{
         $copy       = $this->getRepository()->getEntity(); 
-        $properties = $this->description()->getProperty();
+        $properties = $this->getEntityDescription()->getProperty();
         $data       = array();
         foreach($properties as $property)
         {
             if ( $property->isUnique() )
                 continue;
             
-            if ( $property === $this->description()->getIdentityProperty() )
+            if ( $property === $this->getEntityDescription()->getIdentityProperty() )
                 continue;
                 
             $name = $property->getName();

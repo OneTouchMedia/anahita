@@ -225,8 +225,8 @@ class AnDomainSpace extends KObject
         }
 		
 		//get all the entity parent classes		
-		$classes        = $entity->description()->getUniqueIdentifiers();
-		$description	= $entity->description();
+		$classes        = $entity->getEntityDescription()->getUniqueIdentifiers();
+		$description	= $entity->getEntityDescription();
         
 		foreach($identifiers as $key => $value)
 		{

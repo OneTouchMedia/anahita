@@ -36,7 +36,7 @@ class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponen
 	 */
 	public function assignedToActor($actor)
 	{
-		$actortype = $actor->description()->getInheritanceColumnValue()->getIdentifier();
+		$actortype = $actor->getEntityDescription()->getInheritanceColumnValue()->getIdentifier();
 		$this
 			 //either assigned to the actor
 			 ->where('assignments.actor','=',$actor)

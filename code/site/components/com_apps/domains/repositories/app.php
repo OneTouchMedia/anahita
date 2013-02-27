@@ -40,7 +40,7 @@ class ComAppsDomainRepositoryApp extends AnDomainRepositoryDefault
 		if ( $query->actor ) 
 		{
 			$actor      = $query->actor;
-			$identifier = $actor->description()->getInheritanceColumnValue()->getIdentifier();
+			$identifier = $actor->getEntityDescription()->getInheritanceColumnValue()->getIdentifier();
 			$query->component($actor->component,'<>');
 			$always = $this->getService('repos:apps.assignment')
 				->getQuery()->access(1)
