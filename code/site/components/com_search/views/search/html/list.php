@@ -29,8 +29,8 @@
 		<?php endif; ?>
 		
 		<div class="entity-description">
-			<?php $preview = @helper('text.truncate', strip_tags($item->body), array('length'=>400, 'read_more'=>true))?>
-			<?= @helper('text.highlight', $preview, $keywords) ?>
+			<?php $text = @helper('text.highlight', strip_tags($item->body), $keywords) ?>
+			<?= @helper('text.truncate', $text, array('length'=>400, 'read_more'=>true))?>
 		</div>
 		
 		<?php if($item->isModifiable()): ?>
@@ -68,8 +68,8 @@
 		</h3>
 		<?php endif; ?>	
 		<div class="entity-description">
-		<?php $preview = @helper('text.truncate', strip_tags($item->body), array('length'=>400, 'read_more'=>true))?>
-			<?= @helper('text.highlight', $preview, $keywords) ?>
+			<?php $text = @helper('text.highlight', strip_tags($item->body), $keywords) ?>
+			<?= @helper('text.truncate', $text, array('length'=>400, 'read_more'=>true))?>			
 		</div>
 		
 		<div class="entity-meta">
