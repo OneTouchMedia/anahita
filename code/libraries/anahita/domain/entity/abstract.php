@@ -175,7 +175,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 * 
 	 * @return boolean
 	 */
-	public function isModified
+	public function isModified()
 	{
 		return $this->getEntityState() == AnDomain::STATE_MODIFIED;
 	}
