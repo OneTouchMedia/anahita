@@ -27,5 +27,28 @@
  */
 class ComPostsDomainEntityComponent extends ComMediumDomainEntityComponent
 {
+	/**
+	 * Return max
+	 * 
+	 * @return int
+	 */
+	public function getPriority()
+	{
+		return -PHP_INT_MAX;
+	}
 	
+	/**
+	 * @{inheritdoc}
+	 */
+	protected function _setComposers($actor, $composers, $mode)
+	{
+		if ( $actor->authorize('action','com_posts:post:add') )
+		{
+			$composers->insert('posts',array(
+					'title'        => JText::_('COM-POSTS-COMPOSER-POST'),
+					'placeholder'  => JText::_('COM-POSTS-COMPOSER-PLACEHOLDER'),
+					'url'      => 'option=com_posts&layout=composer&view=post&oid='.$actor->id
+			));
+		}
+	}	
 }

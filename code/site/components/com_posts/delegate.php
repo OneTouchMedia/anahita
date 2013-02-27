@@ -43,21 +43,7 @@ class ComPostsDelegate extends ComAppsDomainDelegateDefault
         
         return parent::_initialize($config);
     }
-    
-    /**
-     * @{inheritdoc}
-     */
-    protected function _setComposers($actor, $composers, $mode)
-	{
-		if ( $actor->authorize('action','com_posts:post:add') )
-        {
-            $composers->insert('posts',array(
-                'title'        => JText::_('COM-POSTS-COMPOSER-POST'),
-                'placeholder'  => JText::_('COM-POSTS-COMPOSER-PLACEHOLDER'),
-                'url'      => 'option=com_posts&layout=composer&view=post&oid='.$actor->id
-            ));
-        }
-    }    
+  
         
 	/**
 	 * Return a set of resources and type of operation on each resource
