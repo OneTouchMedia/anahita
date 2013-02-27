@@ -155,7 +155,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 * 
 	 * @return string
 	 */
-	final public function getEntityState()
+	public function getEntityState()
 	{
 		return $this->getRepository()->getSpace()->getEntityState($this);
 	}
@@ -266,7 +266,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 	 * 
 	 * @return boolean
 	 */
-	final public function persisted()
+	public function persisted()
 	{	    
 		return $this->_persisted;
 	}
