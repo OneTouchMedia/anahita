@@ -95,7 +95,7 @@ class ComInstallerAdapterComponent extends ComInstallerAdapterAbstract
         $components = KService::get('repos:components.component', array('resources'=>'components'));
         
         //find or create a component
-        $component  = $components->findOrCreate(array('option'=>$this->_name,'parent'=>0), array('data'=>array('params'=>'')));
+        $component  = $components->findOrAddNew(array('option'=>$this->_name,'parent'=>0), array('data'=>array('params'=>'')));
         
         //remove any child component
         $components->getQuery()->option($this->_name)->parent('0','>')->destroy();
