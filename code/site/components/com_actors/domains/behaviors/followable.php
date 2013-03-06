@@ -121,7 +121,7 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
         self::$__disable_reset_stats = false;
         
         $edge = $this->getService('repos:actors.request')
-            ->findOrCreate(array(
+            ->findOrAddNew(array(
                 'requester'   => $actor ,                   
                 'requestee'   => $mixer             
             ));
@@ -196,7 +196,7 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
         }
                 
 		$edge = $this->getService('repos:actors.follow')
-		    ->findOrCreate(array(
+		    ->findOrAddNew(array(
 		        'leader'	  => $mixer,
 		        'follower'	  => $actor		        
             ));
@@ -282,7 +282,7 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
         self::$__disable_reset_stats = false;
                 
 		$edge = $this->getService('repos:actors.block')
-		    ->findOrCreate(array(
+		    ->findOrAddNew(array(
 				'blocker'	  => $mixer ,					
 				'blocked'	  => $actor		        
             ));

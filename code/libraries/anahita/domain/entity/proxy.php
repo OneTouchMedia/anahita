@@ -246,7 +246,7 @@ class AnDomainEntityProxy extends KObjectDecorator implements ArrayAccess
 				$query = $repository->getQuery()->where($condition)->limit(1);
 				
 				if ( $repository->hasBehavior('cachable') ) {
-				    $repository->getCache()->offsetSet((string)$query, null);
+				    $repository->emptyCache($query);
 				}
 				
 				$this->_object = false;

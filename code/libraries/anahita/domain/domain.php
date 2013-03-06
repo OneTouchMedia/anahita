@@ -86,7 +86,7 @@ class AnDomain
 	const OPERATION_UPDATE  = 4;
 	const OPERATION_DELETE  = 8;
     const OPERATION_DESTROY = 16;
-	const OPERATION_COMMIT  = 32;
+	const OPERATION_COMMIT  = 30;
     
     
     /**

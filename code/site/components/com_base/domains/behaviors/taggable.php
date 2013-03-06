@@ -126,7 +126,7 @@
     { 
         if ( is_string($tag) ) {
            //find a text tag
-           $tag = $this->getService('repos://site/tags.text')->findOrCreate(array('name'=>$tag));
+           $tag = $this->getService('repos://site/tags.text')->findOrAddNew(array('name'=>$tag));
         }
 
         //will not insert the tag if already inserted

@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
+abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Serializable
 {	
 	/**
 	 * Static cache to store runtime information of an entity
@@ -1137,6 +1137,33 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess
 			$this->mixin($behavior);
 		}
 		return parent::getMethods();
+	}
+	
+	/**
+	 * Return an array of raw data from which the object can be
+	 * recreated
+	 * 
+	 * @return array
+	 */
+	public function serialize()
+	{
+		$row = array();
+		$row = $this->_data->getRowData();
+		$row = array_merge($row, $this->getAffectedRowData());		
+		return serialize(array('row'=>$row,'identifier'=>(string)$this->getIdentifier()));
+	}
+	
+	/**
+	 * 
+	 */
+	public function unserialize($data)
+	{
+		$data = unserialize($data);
+		$this->_repository = AnDomain::getRepository($data['identifier']);
+		$this->_data = new AnDomainEntityData(new KConfig(array('entity'=>$this)));		
+		$this->_data->setRowData($data['row']);
+		$this->__service_container  = $this->_repository->getService();
+		$this->__service_identifier = $this->_repository->getIdentifier($data['identifier']);
 	}
 	
 	/**

@@ -286,26 +286,6 @@ class AnDomainDecoratorOnetomany extends AnObjectDecorator
     	$entity = $this->getRepository()->getEntity($config);
     	$this->insert($entity);
     	return $entity;
-    }
-
-    /**
-     * Return an entity of the aggregated type and set the initial
-     * property
-     *
-     * @param  array $data
-     * @param  array $config Extra configuation for instantiating the object
-     * @return AnDomainEntityAbstract
-     */
-    public function findOrCreate($data = array(), $config = array())
-    {
-    	deprecated('use findOrAddNew');
-    	$entity = $this->find($data);
-    
-    	if ( !$entity ) {
-    		$entity = $this->addNew($data, $config);
-    	}
-    
-    	return $entity;
     }    
     
 }

@@ -43,9 +43,7 @@ class ComDashboardViewDashboardHtml extends ComBaseViewHtml
 				
 		//make all the apps to listen to dispatcher
 		$components = $this->getService('repos://site/components.component')
-//			->getQuery()
-//		    ->order('ordering','ASC')
-			->fetchSet();
+						->fetchSet();
 		
 		$components->registerEventDispatcher($this->getService('anahita:event.dispatcher'));
 				

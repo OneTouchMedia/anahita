@@ -70,6 +70,21 @@ class ComStoriesDomainEntityComponent extends ComComponentsDomainEntityComponent
 	}
 	 
 	/**
+	 * On Dashboard event
+	 *
+	 * @param  KEvent $event The event parameter
+	 *
+	 * @return void
+	 */
+	public function onDashboardDisplay(KEvent $event)
+	{
+		$actor      = $event->actor;
+		$gadgets    = $event->gadgets;
+		$composers  = $event->composers;
+		$this->_setGadgets($actor, $gadgets, 'dashboard');		
+	}
+			
+	/**
 	 * @{inheritdoc}
 	 */
 	protected function _setGadgets($actor, $gadgets, $mode)

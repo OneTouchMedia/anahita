@@ -85,7 +85,7 @@ class AnDomainDecoratorManytomany extends AnDomainDecoratorOnetomany
 	 * @param  array $config Extra configuation for instantiating the object
 	 * @return AnDomainEntityAbstract
 	 */
-	public function findOrCreate($data = array(), $config = array())
+	public function findOrAddNew($data = array(), $config = array())
 	{
 		$target = $this->getRepository()->find($data);
 		
@@ -145,7 +145,7 @@ class AnDomainDecoratorManytomany extends AnDomainDecoratorOnetomany
 			);
 		
 		//shouldn't be able to add the same entity into  the same collection		
-		$relation = $this->_child->findOrCreate($data, $config);
+		$relation = $this->_child->findOrAddNew($data, $config);
 				 
 		return $relation;
 	}
@@ -195,31 +195,5 @@ class AnDomainDecoratorManytomany extends AnDomainDecoratorOnetomany
         foreach($this as $target) {
             $this->extract($target);
         }
-    }
-    
-    /**
-     * Return an entity of the aggregated type and set the initial
-     * property
-     *
-     * @param  array $data
-     * @param  array $config Extra configuation for instantiating the object
-     * @return AnDomainEntityAbstract
-     * @deprecated since 3.0
-     */
-    public function create($data = array(), $config = array())
-    {
-    	deprecated('use addNew');
-    	$config = new KConfig($config);
-    
-    	$config->append(array(
-    			'data' 			=> $data ,
-    			'relationship'	=> array()
-    	));
-    
-    	$entity = $this->getRepository()->getEntity($config);
-    
-    	$this->insert($entity, $config->relationship);
-    
-    	return $entity;
     }    
 }

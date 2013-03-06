@@ -465,7 +465,7 @@ function anahita_20()
     dbexec($query);
     
     //insert posts component    
-    dbexec("INSERT INTO `jos_components` VALUES(null, 'Posts', 'option=com_posts', 0, 0, '', '', '', 0, '', 1, '', 1)");
+    dbexec("INSERT INTO `jos_components` VALUES(null, 'Posts', 'option=com_posts', 0, 0, '', 'Posts', 'com_posts', 0, '', 1, '', 1)");
     
     dbexec("UPDATE jos_anahita_nodes SET permissions = REPLACE(permissions,'com_stories:story','com_posts:post') WHERE type LIKE 'ComActorsDomainEntityActor%' ");
     
@@ -503,4 +503,7 @@ where enable.type like 'ComAppsDomainEntityAssignment,com:apps.domain.entity.ass
 ");
 	dbexec("delete from jos_anahita_nodes where type like 'ComApps%'");
 	dbexec("delete from jos_anahita_edges where type like 'ComApps%'");
+	
+	dbexec("delete from jos_components where `option` like 'com_apps'");
+	dbexec("INSERT INTO `jos_components` VALUES(35, 'Components', 'option=com_components', 0, 0, 'option=com_components', 'Components', 'com_components', 0, 'js/ThemeOffice/component.png', 1, '', 1);");
 }

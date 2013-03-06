@@ -26,13 +26,13 @@
  * @link       http://www.anahitapolis.com
  */
 class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
-{   
+{       
     /**
-     * Counter. Caching only works if the counter is 0
+     * Disable
      * 
-     * @var int
-     */ 
-    static $_counter = 0;
+     * @var boolean
+     */
+    protected $_enable;
     
     /**
      * The repository cache
@@ -52,7 +52,8 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     {
         parent::__construct($config);
         
-        $this->_cache = $config->cache;
+        $this->_cache  = $config->cache;        
+        $this->_enable = $config->enable;
     }
         
     /**
@@ -67,6 +68,7 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
+        	'enable'	 => true,
             'priority'   => KCommand::PRIORITY_LOWEST,
             'cache'      => new ArrayObject()
         ));
@@ -92,47 +94,58 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     public function execute( $name, KCommandContext $context)
     {
         $operation = $context->operation;
-        $cache	   = $this->_cache;
         $parts     = explode('.', $name);
-        if ( $operation & AnDomain::OPERATION_FETCH && self::$_counter == 0 )
-        {            
-            $key	 	 = (string)$context->query;
-            
-            if ( $parts[0] == 'before' ) 
-            {
-                if ( $cache->offsetExists($key) ) 
-                {
-                    $context->data = $cache->offsetGet($key);
-                    return false;
-                }
-            }
-            else
-            {
-                $cache->offsetSet($key, $context->data);
-            }
-        } elseif ( $operation && count($parts) == 2 )
+        $cache	   = $this->_cache;
+        
+        if ( !$this->_enable || !$operation )
+        	return;
+
+        if ( $operation & AnDomain::OPERATION_COMMIT )
         {
-             //empty cache first
-            if ( count($this->_cache) ) 
-            {
-                $this->_cache->exchangeArray(array());
-            }
-            if ( $parts[0] == 'before' ) {
-                self::$_counter++;
-            } else {
-                self::$_counter--;
-            }
+        	$this->_cache = new ArrayObject();	
         }
+        
+        elseif ( $operation & AnDomain::OPERATION_FETCH ) 
+        {
+        	$key = $this->_getCacheKey($context->query);
+        	
+        	if ( $parts[0] == 'before' )
+        	{
+        		if ( $cache->offsetExists($key) )
+        		{
+        			$context->data = $cache->offsetGet($key);
+        			return false;
+        		}
+        	}
+        	else
+        	{
+        		$cache->offsetSet($key, $context->data);
+        	}
+        }                
     }
     
     /**
-     * Return the cache object 
-     *
-     * @return ArrayObject
+     * Empty the cache
+     * 
+     * @param AnDomainQuery $query
+     * 
+     * @return void
      */
-    public function getCache()
+    public function emptyCache($query)
     {
-        return $this->_cache;
+    	$this->_cache->offsetSet($this->_getCacheKey($query), null);    	
+    }
+    
+    /**
+     * Returns a key to use for cache 
+     * 
+     * @param AnDomainQuery $query
+     * 
+     * @return string
+     */
+    protected function _getCacheKey($query)
+    {
+    	return (string)$query;
     }
     
     /**

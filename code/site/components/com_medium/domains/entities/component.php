@@ -92,6 +92,22 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 		$this->_setGadgets($actor, $gadgets, 'profile');
 		$this->_setComposers($actor, $composers, 'profile');
 	}
+	
+	/**
+	 * On Dashboard event
+	 *
+	 * @param  KEvent $event The event parameter
+	 *
+	 * @return void
+	 */
+	public function onDashboardDisplay(KEvent $event)
+	{
+		$actor      = $event->actor;
+		$gadgets    = $event->gadgets;
+		$composers  = $event->composers;
+		$this->_setGadgets($actor, $gadgets, 'dashboard');
+		$this->_setComposers($actor, $composers, 'dashboard');			
+	}	
 		
 	/**
 	 * Set the composers for a profile/dashboard. This method should be implemented by the subclasses

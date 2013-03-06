@@ -914,6 +914,17 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	}
 	
 	/**
+	 * Return an array of serializable properties
+	 * 
+	 * @return array
+	 */
+	public function __sleep()
+	{
+		$vars = explode(' ','__service_identifier _state link binds operation distinct columns from join where group having order limit offset _prefix');		
+		return $vars;
+	}
+	
+	/**
 	 * The priority of the query
 	 * 
 	 * @return number

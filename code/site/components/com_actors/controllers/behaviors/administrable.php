@@ -127,6 +127,8 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
 	{
 		$data 	    = $context->data;
 		$this->getItem()->components->insert($data->app);
+		$this->commit();
+		die;
 	}
 	
 	/**
@@ -140,6 +142,8 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
 	{	
 		$data 	    = $context->data;		
 		$this->getItem()->components->extract($data->app);
+		$this->commit();
+		die;		
 	} 
     
     /**

@@ -370,7 +370,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 		
 		if( $this->getCommandChain()->run('before.fetch', $context) !== false )
 		{
-			$result 		 = $this->_fetchResult($context->query, $mode);
+			$result 		 = $context->result ? $context['result'] : $this->_fetchResult($context->query, $mode);
 			$context->result = $result;
 			switch($mode)
 			{
@@ -610,7 +610,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  	 * 
  	 * @return AnDomainEntityAbstract|null
  	 */
- 	public function findOrCreate($data, $config = array())
+ 	public function findOrAddNew($data, $config = array())
  	{
  		$entity = $this->find($data);
  		
