@@ -279,8 +279,20 @@ class AnDomainSpace extends KObject
                 {
                     //found an entity
 		            $entity = $this->_identity_map[$class][$key];
+
 		            //only return an entity if it's still within the space
-		            return $this->_entities->contains($entity) ? $entity : null;
+		            if ( !$this->_entities->contains($entity) ) {
+		            	return null;
+		            }		            
+		            
+		            //if the description we are using is the parent of the found entity
+		            //if not then we must have found a different entity with the common parent
+		            //as the caller repository
+		            if ( !is_a($entity, $description->getEntityIdentifier()->classname) ) {
+		            	return null;
+		            }
+		            
+		            return $entity;
 		        }
 		    }
 		}					
