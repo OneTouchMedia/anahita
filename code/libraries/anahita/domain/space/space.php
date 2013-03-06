@@ -66,7 +66,7 @@ class AnDomainSpace extends KObject
 		parent::__construct($config);
 				
 		$this->_state_machine	 	 = new AnDomainSpaceState();
-		$this->_entities 			 = new KObjectQueue();
+		$this->_entities 			 = $this->getService('anahita:domain.space.queue');
 		$this->_states				 = new AnObjectArray();
 	}
 	
@@ -313,12 +313,16 @@ class AnDomainSpace extends KObject
  	}
  	
 	/**
-	 * Return an array of entities
+	 * Return an array of entities. If the repository is set then return entities for the 
+	 * repository
 	 * 
+	 * @param AnDomainRepositoryAbstract $repository If the repository is set then return the entities
+	 * 												 for the $repository
 	 * @return KObjectQeueue
 	 */
-	public function getEntities()
+	public function getEntities($repository = null)
 	{
-		return $this->_entities;
+		return $repository ? $this->_entities->getRepositoryEntities($repository) : 
+					$this->_entities;
 	}
 }

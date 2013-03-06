@@ -591,14 +591,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  	 */
  	public function getEntities()
  	{
-	 	$entities = $this->_space->getEntities();
-	 	$data	  = $this->getService('anahita:domain.entityset', array('repository'=>$this));
-	 	foreach($entities as $entity) {
-	 		if ( $entity->getRepository() === $this ) {
-	 			$data->insert($entity);
-	 		}
-	 	}
-	 	return $data;
+	 	return $this->_space->getEntities($this);	 	
  	}
  	
  	 /**
