@@ -177,45 +177,6 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 		$this->_path = end($this->_load_stack);
 	
 		return $result;
-	}	
-	
-	/**
-	 * Loads the previous path of the current loaded path
-	 *
-	 * @param  array $data Template data
-	 *
-	 * @return string
-	 */	
-	public function loadParent($data = array())
-	{		
-		$current 	 = $this->getPath();
-		$template 	 = null;
-		$search_path = null;
-		foreach($this->_search_paths as $path) {
-			if ( strpos($current, $path) === 0 ) {
-				$template 	 = str_replace($path.'/', '',$current);
-				$search_path = $path;				
-				break;
-			}	
-		}
-		
-		$previous = null;
-		
-		$search_paths = array_slice($this->_search_paths, array_search($search_path, $this->_search_paths) + 1);
-				
-		foreach($search_paths as $path) {
-			$file = $path.'/'.$template;			
-			if ( $this->findFile($file) ) {				
-				$previous = $file;
-				break;
-			}			
-		}
-		
-		if ( !$previous ) {
-			throw new KTemplateException("The {$current} template has no previous");
-		}
-
-		return $this->loadFile($previous, $data);
 	}		
 	
 	/**
@@ -253,10 +214,8 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	 * @param boolean $process	If TRUE process the data using a tmpl stream. Default TRUE.
 	 */
 	public function loadTemplate($template, $data = array(), $process = true)
-	{
-		$file = $template.'.php';
-				
-		$path = $this->findPath($file);
+	{				
+		$path = $this->findTemplate($template);
 		 
 		if ( !$path ) {
 	    	throw new KTemplateException($template.' template not found for '.$this->getIdentifier());
@@ -319,7 +278,19 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	    }
 	    return $this->_helpers[$name];	
 	}		
-		
+
+	/**
+	 * Same as findPath except it automatically adds the .php extension
+	 * 
+	 * @param string $template The template path
+	 * 
+	 * @return string 
+	 */
+	public function findTemplate($template)
+	{
+		return $this->findPath($template.'.php');
+	}
+	
 	/**
 	 * Caches the found paths. @see KTemplateAbstract::findPath for more detail 
 	 *
