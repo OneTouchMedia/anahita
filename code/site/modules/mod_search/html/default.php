@@ -9,10 +9,14 @@ $scope = null;
 if ( @service()->has('mod://site/search.scope') ) {
 	$scope = @service('mod://site/search.scope');	
 }
+$url = 'option=com_search';
+if ( $actor ) {
+	$url .= '&oid='.$actor->uniqueAlias;
+}
 ?>
-<form action="<?=@route('option=com_search')?>" class="navbar-search pull-left">
+<form action="<?=@route($url)?>" class="navbar-search pull-left">
 	<input type="text" name="q" class="search-query" placeholder="<?= $label ?>">
-	<?php if ($actor) : ?>
+	<?php if ($actor && false) : ?>
 	<input type="hidden" name="oid" value="<?=$actor->id?>" />
 	<?php endif;?>
 	<?php if ($scope) : ?>
