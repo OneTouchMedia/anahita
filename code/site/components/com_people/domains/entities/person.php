@@ -143,6 +143,20 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
 		$this->set('name', $this->givenName.' '.$this->familyName);
 	}
     
+	/**
+	 * Return the username as unique alias
+	 * 
+	 * (non-PHPdoc)
+	 * @see AnDomainEntityAbstract::__get()
+	 */
+	public function __get($key)
+	{
+		if ( $key == 'uniqueAlias' ) {
+			return $this->username;
+		}
+		return parent::__get($key);
+	}
+	
     /**
      * Captures the password value when password is set through
      * magic methods
@@ -172,6 +186,16 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
     {
         $this->_password = $password;
         return $this;
+    }
+    
+    /**
+     * Return a person URL
+     * 
+     * @return string
+     */
+    public function getURL()
+    {
+    	return 'option=com_people&view=person&id='.$this->id.'&uniqueAlias='.$this->username;
     }
     
     /**

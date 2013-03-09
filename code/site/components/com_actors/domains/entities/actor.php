@@ -112,14 +112,19 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 	 */
 	public function __get($name)
 	{
-		if ( $name == 'components' ) {
+		if ( $name == 'components' ) 
+		{
 			if ( !isset($this->_components) ) {
 				$this->_components = $this->getService('com://site/actors.domain.entityset.component', array(
         				'actor' 		=> $this        				
 				));
 			}
 			return $this->_components;
-		} else {
+		} 
+		else if ( $name == 'uniqueAlias' ) {
+			return $this->get('id');
+		}
+		else {
 			return parent::__get($name);
 		}
 	}

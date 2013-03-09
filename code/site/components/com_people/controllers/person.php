@@ -63,18 +63,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      */
 	protected function _actionGet(KCommandContext $context)
 	{
-// 		try {
-// 		$data = serialize($this->getItem());
-// 		$person = unserialize($data);
-// 		$person->inspect();
-// 		die;
-// 		print_r($data);
-// 		}catch(Exception $e) {
-// 			print $e->getMessage();
-// 		}
-// 		die;
         $this->getToolbar('menubar')->setTitle(null);
-					
 		return parent::_actionGet($context);
 	}
 

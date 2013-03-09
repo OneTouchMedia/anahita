@@ -87,44 +87,28 @@ class JRouterSite extends KObject
             $vars->append(array('format'=>$uri->format));
         }
         
-        if ( empty($path) && count($vars) == 0 ) {
+        if ( empty($path) && count($vars) == 0 ) 
+        {
             $menu = JSite::getMenu(true)->getDefault();
             if ( $menu ) {
                 $vars->append(array('Itemid'=>$menu->id));
             }
         }
         
-        $vars->append(array('Itemid'=> null));
+        $segments  = explode('/', $path);        
+        $component = array_shift($segments);
         
-        //if there's an ItemId and no option set 
-        //the use the ItemId values
-        if ( false && $vars->Itemid && !$vars->option ) {
-            $menu = JSite::getMenu(true)->getItem($vars->Itemid);
-            if ( $menu ) {
-                $url  = clone $this->__url;
-                $url  = $url->setUrl($menu->link);
-                $vars->append($url->getQuery(true));
-                JSite::getMenu(true)->setActive($menu->id);                
-            }
-        }
-        
-        $segments = explode('/', $path);
-
-        if ( $component = array_shift($segments) ) {
-            $vars->append(array(
-                'option' => 'com_'.str_replace('com_','',$component)
-            ));
+        if ( !$component ) {
+        	$component = 'com_frontpage';
         }
         
         $vars->append(array(
-			'option' => 'com_frontpage'
-        ));        
+			'option' => 'com_'.str_replace('com_','',$component)
+		));
+                
+        $vars->append($this->getComponentRouter($vars->option)->parse($segments));
         
-        if ( $vars->option != 'com_frontpage' ) 
-        {
-        	$router = $this->getComponentRouter($vars->option);
-        	$vars->append($router->parse($segments));        	
-        }
+        $vars->append(array('Itemid'=> null));
                 
         return KConfig::unbox($vars);     
 	}
@@ -145,7 +129,7 @@ class JRouterSite extends KObject
             return $url;
         }
         
-        $component = str_replace('com_','',$query['option']);        
+        $component = str_replace('com_','',$query['option']);
         unset($query['option']);
                 
         if ( isset($query['format']) ) {

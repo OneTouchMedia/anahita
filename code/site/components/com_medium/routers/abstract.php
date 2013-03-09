@@ -36,7 +36,11 @@ abstract class ComMediumRouterAbstract extends ComBaseRouterDefault
     	    	
         $segments = array();
         
-        if ( isset($query['oid']) ) {            
+        if ( isset($query['oid']) ) 
+        {
+        	if ( $query['oid'] == 'viewer' ) {
+        		$query['oid'] = get_viewer()->uniqueAlias;
+        	}        	     
             $segments[] = '@'.$query['oid'];
             unset($query['oid']);
         }

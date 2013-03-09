@@ -41,7 +41,8 @@ abstract class ComActorsRouterAbstract extends ComBaseRouterDefault
         $has_id = isset($query['id']);
         $segments = parent::build($query);
         
-        if ( $has_id ) {
+        if ( $has_id ) 
+        {
         	if ( isset($query['get']) ) {
         		$segments[] = $query['get'];
         		if ( $query['get'] == 'graph' ) {
@@ -53,7 +54,12 @@ abstract class ComActorsRouterAbstract extends ComBaseRouterDefault
         		}
         		unset($query['get']);
         	}
-        } else if ( isset($query['oid']) ) {
+        } 
+        else if ( isset($query['oid']) ) 
+        {
+        	if ( $query['oid'] == 'viewer' ) {
+        		$query['oid'] = get_viewer()->uniqueAlias;
+        	}
         	$segments[] = '@'.$query['oid'];
         	unset($query['oid']);
         }

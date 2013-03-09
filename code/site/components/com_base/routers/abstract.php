@@ -142,7 +142,8 @@ abstract class ComBaseRouterAbstract extends KObject implements KServiceInstanti
         if ( empty($segments) ) {
             $vars['view'] = $this->getIdentifier()->package;
         }
-        else if ( count($segments) == 1 ) {
+        else if ( count($segments) == 1 ) 
+        {
         	if ( is_numeric(current($segments)) ) {
         		$vars['view'] = KInflector::singularize($this->getIdentifier()->package);
         		$vars['id']   = array_pop($segments);
