@@ -369,6 +369,7 @@ Element.implement(
 		{
 			if ( this.get('tag') == 'form' ) 
 				Object.set(options,{
+					method : 'get',
 					form : this
 				});
 			else if ( this.form ) {
