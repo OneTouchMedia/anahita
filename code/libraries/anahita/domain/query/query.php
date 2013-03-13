@@ -885,16 +885,20 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	 */
 	public function __toString()
 	{
-		$chain = clone $this->getRepository()->getCommandChain();			
-		$query = clone $this;
-		$chain->enqueue($query);
-		$context = $this->getRepository()->getCommandContext();
-		$context->caller = $this;
-		$context->query  = $query;
-		$chain->run('before.build', $context);
-		$context->result = AnDomainQueryBuilder::getInstance()->build($query);
-		$chain->run('after.after', $context);
-		return $context->result;
+		try {
+			$chain = clone $this->getRepository()->getCommandChain();			
+			$query = clone $this;
+			$chain->enqueue($query);
+			$context = $this->getRepository()->getCommandContext();
+			$context->caller = $this;
+			$context->query  = $query;
+			$chain->run('before.build', $context);
+			$context->result = AnDomainQueryBuilder::getInstance()->build($query);
+			$chain->run('after.after', $context);		
+			return $context->result;
+		} catch(Exception $e) {
+			trigger_error($e->getMessage());
+		}
 	}
 		
 	/**
