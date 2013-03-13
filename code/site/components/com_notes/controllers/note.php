@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @subpackage Controller
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -20,14 +20,14 @@ define('POST_MAX_LIMIT', 5000);
  * Post Controller
  * 
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @subpackage Controller
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPostsControllerPost extends ComMediumControllerDefault
+class ComNotesControllerNote extends ComMediumControllerDefault
 {
     /**
      * Adds a new post

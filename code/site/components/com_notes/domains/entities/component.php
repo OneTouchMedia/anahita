@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @subpackage Domain_Entity
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -18,14 +18,14 @@
  * Component object
  *
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @subpackage Domain_Entity
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPostsDomainEntityComponent extends ComMediumDomainEntityComponent
+class ComNotesDomainEntityComponent extends ComMediumDomainEntityComponent
 {
 	/**
 	 * Return max
@@ -42,12 +42,12 @@ class ComPostsDomainEntityComponent extends ComMediumDomainEntityComponent
 	 */
 	protected function _setComposers($actor, $composers, $mode)
 	{
-		if ( $actor->authorize('action','com_posts:post:add') )
+		if ( $actor->authorize('action','com_notes:note:add') )
 		{
-			$composers->insert('posts',array(
-					'title'        => JText::_('COM-POSTS-COMPOSER-POST'),
-					'placeholder'  => JText::_('COM-POSTS-COMPOSER-PLACEHOLDER'),
-					'url'      => 'option=com_posts&layout=composer&view=post&oid='.$actor->id
+			$composers->insert('notes',array(
+					'title'        => JText::_('COM-NOTES-COMPOSER-NOTE'),
+					'placeholder'  => JText::_('COM-NOTES-COMPOSER-PLACEHOLDER'),
+					'url'      => 'option=com_notes&layout=composer&view=post&oid='.$actor->id
 			));
 		}
 	}	

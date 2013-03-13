@@ -4,38 +4,37 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Medium
- * @subpackage Domain_Authorizer
+ * @package    Com_Notes
+ * @subpackage Controller_Behavior
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
- * @version    SVN: $Id$
+ * @version    SVN: $Id: resource.php 11985 2012-01-12 10:53:20Z asanieyan $
  * @link       http://www.anahitapolis.com
  */
 
 /**
- * Post authorizer
+ * Executable Behavior
  *
  * @category   Anahita
- * @package    Com_Medium
- * @subpackage Domain_Authorizer
+ * @package    Com_Notes
+ * @subpackage Controller_Behavior
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPostsDomainAuthorizerPost extends ComMediumDomainAuthorizerDefault
+class ComNotesControllerBehaviorExecutable extends ComMediumControllerBehaviorExecutable
 {
+ 
     /**
-     * Posts are not ediable
-     * 
-     * @param KCommandContext $context Context parameter
+     * Now HTML output for browse. Only json
      * 
      * @return boolean
      */
-    protected function _authorizeEdit($context)
-    {
+    public function canBrowse()
+    {   
         return false;
     }
 }

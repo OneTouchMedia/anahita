@@ -5,9 +5,9 @@
 	<?=@name($subject)?>	
 <?php else :?>
     <?php if ( $type == 'notification' ) : ?>	
-	<?=sprintf(@text('COM-POSTS-ADD-POST-NOTIFICATION'),@name($subject), @route($object->getURL()), @possessive($target))?>
+	<?=sprintf(@text('COM-NOTES-ADD-NOTE-NOTIFICATION'),@name($subject), @route($object->getURL()), @possessive($target))?>
     <?php else : ?>
-    <?=sprintf(@text('COM-POSTS-ADD-POST'),@name($subject), @possessive($target))?>
+    <?=sprintf(@text('COM-NOTES-ADD-NOTE'),@name($subject), @possessive($target))?>
     <?php endif; ?>
 <?php endif; ?>
 </data>
@@ -19,7 +19,7 @@
 <?php else : ?>
 <data name="email_body">
 <div><?= $object->body ?></div>
-<?php $commands->insert('viewstory', array('label'=>@text('COM-POSTS-VIEW-POST')))->href($object->getURL())?>
+<?php $commands->insert('viewstory', array('label'=>@text('COM-NOTES-VIEW-POST')))->href($object->getURL())?>
 </data>
 <?php endif;?>
 

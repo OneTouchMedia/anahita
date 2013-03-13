@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -13,4 +13,4 @@
  * @link       http://www.anahitapolis.com
  */
 
-class ComPostsRouter extends ComMediumRouterDefault {}
+class ComNotesRouter extends ComMediumRouterDefault {}

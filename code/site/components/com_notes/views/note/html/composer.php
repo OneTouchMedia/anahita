@@ -1,9 +1,9 @@
 <?php defined('KOOWA') or die ?>
 
-<?php if ( $actor->authorize('action', 'com_posts:post:add') ) : ?>
+<?php if ( $actor->authorize('action', 'com_notes:post:add') ) : ?>
 <div id="post-composer">
-	<form id="post-composer-form" action="<?= @route('option=com_posts&view=post&oid='.$actor->id) ?>" method="POST" data-formvalidator-options="'evaluateFieldsOnBlur':true">
-		<textarea class="input-block-level" data-validators="minLength:1 maxLength:<?= POST_MAX_LIMIT ?>" id="composer-textarea"  name="body" overtext="<?= @text('COM-POSTS-SHARE-PROMPT') ?>"></textarea>
+	<form id="post-composer-form" action="<?= @route('option=com_notes&view=post&oid='.$actor->id) ?>" method="POST" data-formvalidator-options="'evaluateFieldsOnBlur':true">
+		<textarea class="input-block-level" data-validators="minLength:1 maxLength:<?= POST_MAX_LIMIT ?>" id="composer-textarea"  name="body" overtext="<?= @text('COM-NOTES-SHARE-PROMPT') ?>"></textarea>
 	    <input type="hidden" name="composed" value="1" />
 		<div class="post-actions">
 		    <?php $app = @service('repos://site/apps.app')->fetch(array('component'=>'com_connect')); ?>
@@ -47,7 +47,7 @@
 			<div class="post-action pull-right">
 				<label class="checkbox" for="private-message">
 					<input id="private-flag" type="checkbox" name="private_message"> 
-					<?=@text('COM-POSTS-COMPOSER-PRIVATE-FLAG')?>
+					<?=@text('COM-NOTES-COMPOSER-PRIVATE-FLAG')?>
 				</label>
 			</div>
 			<?php endif; ?>

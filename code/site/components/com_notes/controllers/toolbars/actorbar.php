@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @subpackage Controller_Toolbar
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -15,28 +15,34 @@
  */
 
 /**
- * Posts Toolbar
+ * Actorbar. 
  *
  * @category   Anahita
- * @package    Com_Posts
+ * @package    Com_Notes
  * @subpackage Controller_Toolbar
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPostsControllerToolbarPost extends ComMediumControllerToolbarDefault
-{ 
+class ComNotesControllerToolbarActorbar extends ComBaseControllerToolbarActorbar
+{
     /**
-     * Set the toolbar commands
+     * Before _actionGet controller event
+     *
+     * @param  KEvent $event Event object 
      * 
-     * @return void
+     * @return string
      */
-    public function addToolbarCommands()
+    public function onBeforeControllerGet(KEvent $event)
     {
-        parent::addToolbarCommands();
+        parent::onBeforeControllerGet($event);
         
-        //no need to have comment status for messages
-        $this->_commands->extract('commentstatus');
-    }
+        if ( $this->getController()->isOwnable() && $this->getController()->actor ) 
+        {
+            $actor = pick($this->getController()->actor, get_viewer());
+            $this->setTitle(sprintf(JText::_('COM-NOTES-HEADER-NOTES'), $actor->name));
+            $this->setActor( $actor );
+        }
+    }    
 }
