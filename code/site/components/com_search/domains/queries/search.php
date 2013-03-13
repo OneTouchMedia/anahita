@@ -109,7 +109,7 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 		{
 			if ( $this->owner_context && !$scope->ownable ) 
 				continue;
-			$types[] = $scope->type;
+			$types[] = $scope->node_type;
 			if ( $scope->commentable ) {
 				$comments[] = (string)$scope->identifier;
 			}

@@ -64,6 +64,34 @@ class ComSearchDomainEntitysetScope extends KObjectArray implements KServiceInst
 	
 		return $container->get($config->service_identifier);
 	}	
+
+	/**
+	 *
+	 * @var int
+	 */
+	protected $_total;	
+	
+	/**
+	 * Return total 
+	 * 
+	 * @return int
+	 */
+	public function getTotal()
+	{
+		return $this->_total;
+	}
+	
+	/**
+	 * Set the total of the scope
+	 * 
+	 * @param int $total
+	 * 
+	 * @return void
+	 */
+	public function setTotal($total)
+	{
+		$this->_total = $total;
+	}
 	
 	/**
 	 * Return a scope using a key or not if not found

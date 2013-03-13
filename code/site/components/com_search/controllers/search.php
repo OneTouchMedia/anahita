@@ -67,6 +67,13 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     {           
     	$this->setView('searches');
     	
+    	$this->getToolbar('menubar')->setTitle('');
+    	
+    	if ( $this->q ) {
+    		//$this->getToolbar('menubar')->setTitle(sprintf(JText::_('COM-SEARCH-HEADER'), $this->q));
+    	} 
+    		
+    	
     	if ( $this->actor) {
         	$this->getToolbar('actorbar')->setTitle($this->actor->name);
         	$this->getService()->set('mod://site/search.owner', $this->actor);
@@ -77,19 +84,25 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     	    	
         $this->_state->insert('q')
         	->insert('scope')
-        	->insert('search_comments');
+        	->insert('search_comments')
+        	->insert('search_leaders')
+        ;
+        
         
     	JFactory::getLanguage()->load('com_actors');
 		
     	$this->keywords 		= array_filter(explode(' ',urldecode($this->q)));
     	$this->scopes			= $this->getService('com://site/search.domain.entityset.scope');
 		$this->current_scope	= $this->scopes->find($this->scope);
-		if ( $this->current_scope ) {
-			$this->getService()->set('mod://site/search.scope', $this->current_scope);
-		}
+		
+		if ( !$this->current_scope ) {
+			$this->current_scope = current($this->scopes->getIterator());
+		}	
+				
     	$query = $this->getService('com://site/search.domain.query.search')
     				->ownerContext($this->actor)
     				->searchTerm(urldecode($this->q))
+    				
     				->searchComments($this->search_comments)
     				->scope($this->current_scope)
     				->limit($this->limit, $this->start)

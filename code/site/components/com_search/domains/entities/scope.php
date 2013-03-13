@@ -31,6 +31,13 @@ class ComSearchDomainEntityScope extends KObject
 	 *
 	 * @var string
 	 */
+	public $node_type;
+	
+	/**
+	 * Scope type. Can be posts, actors or others
+	 * 
+	 * @var string
+	 */
 	public $type;
 	
 	/**
@@ -52,7 +59,14 @@ class ComSearchDomainEntityScope extends KObject
 	 *
 	 * @var boolean
 	 */
-	public $ownable;	
+	public $ownable;
+	
+	/**
+	 * Returns how many result count there are per scope
+	 * 
+	 * @var int
+	 */
+	public $result_count;
 		
 	/**
 	 * Constructor.
@@ -69,9 +83,11 @@ class ComSearchDomainEntityScope extends KObject
 		
 		$this->identifier = $config->identifier;
 		
-		$this->type		  = $config->type;
+		$this->node_type  = $config->node_type;
 		
 		$this->commentable = $config->commentable;
+		
+		$this->type		   = $config->type;
 		
 		$this->ownable 	   = $config->ownable;
 		
@@ -92,10 +108,10 @@ class ComSearchDomainEntityScope extends KObject
 		if ( $config->repository ) 
 		{ 
 			$config->append(array(
-				'identifier'  => $config->repository->getDescription()->getInheritanceColumnValue()->getIdentifier(),
-				'type'		  => (string)$config->repository->getDescription()->getInheritanceColumnValue(),
-				'commentable' => $config->repository->isCommentable(),
-				'ownable'	  => $config->repository->isOwnable()
+				'identifier'  	  => $config->repository->getDescription()->getInheritanceColumnValue()->getIdentifier(),
+				'node_type'		  => (string)$config->repository->getDescription()->getInheritanceColumnValue(),
+				'commentable'	  => $config->repository->isCommentable(),
+				'ownable'	      => $config->repository->isOwnable()
 			));
 		}
 			

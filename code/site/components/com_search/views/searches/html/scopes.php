@@ -1,17 +1,16 @@
-<ul class="nav nav-pills nav-stacked">
-<?php foreach($scopes as $scope ) : ?>
-	<?php 		
-		$name		= @text(strtoupper($scope->identifier->type.'-'.$scope->identifier->package.'-SEARCH-SCOPE-'.$scope->identifier->name));
-		$count		= (int)$items->getScopeCount($scope);
-			
-		if ( $count == 0 && $current_scope !== $scope )
-			continue;
-		$active = $scope == $current_scope;
-	?>
-	<li class="<?= $active ? 'active' : ''?>" >
-		<a data-trigger="ChangeScope" href="<?= @route('layout=results&scope='.$scope->getKey()) ?>"><?=  $name ?>
-			<small class="pull-right"><?= $count ?></small>
-		</a>
-	</li>
-<?php endforeach;?>
+<?php if ( false ) : ?>
+<li class="<?= !$current_scope ? 'active' : ''?>" >
+	<a data-trigger="ChangeScope" href="<?= @route('scope=&layout=results') ?>">
+		<?= @text('COM-SEARCH-EVERYTHING') ?>
+		<small class="pull-right"><?= $items->getScopes()->getTotal() ?></small>
+	</a>	
+</li>
+<?php endif; ?>
+<ul class="search-scopes nav nav-pills nav-stacked">
+<?php if ( $items->getScopes()->getTotal() ) : ?>
+	<?php $groups = @helper('scopes.group', $items->getScopes()) ?>
+	<?php foreach($groups as $name => $scopes) : ?>	
+	<?= @template('_scopes', array('scopes'=>$scopes,'header'=>$name))?>
+	<?php endforeach;?>	
+<?php endif;?>
 </ul>

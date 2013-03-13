@@ -1,12 +1,13 @@
 <?php defined('KOOWA') or die; ?>
 
-<module position="sidebar-b" style="none">
-<div class="search-scopes">
-	<?php if ( !empty($keywords)) : ?>
-	<?= @template('scopes') ?>
-	<?php endif;?>
-</div>
+<module position="sidebar-a" style="none">
+<?= @template('scopes') ?>
 </module>
-<div class="search-results">
-	<?= @template('results')?>
+<module position="sidebar-b" style="simple">
+	
+</module>
+<div class="an-entities-wrapper">
+	<?php if ( !empty($keywords)) : ?>
+	<?= @template('list') ?>
+	<?php endif;?>
 </div>

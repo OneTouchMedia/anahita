@@ -32,7 +32,14 @@ class ComSearchDomainEntitysetNode extends AnDomainEntitysetDefault
  	 * @var array
 	 */
 	protected $_scopes_count;
-		
+
+	/**
+	 * Scopes
+	 * 
+	 * @var array
+	 */
+	protected $_scopes;
+	
 	/**
 	 * Constructor.
 	 *
@@ -61,6 +68,27 @@ class ComSearchDomainEntitysetNode extends AnDomainEntitysetDefault
 		));
 	
 		parent::_initialize($config);
+	}
+	
+	/**
+	 * Return an array of scopes with a count per each scope
+	 * 
+	 * @return array
+	 */
+	public function getScopes()
+	{
+		if ( !isset($this->_scopes) ) 
+		{
+			$this->_scopes = clone $this->getService('com://site/search.domain.entityset.scope');			
+			$total = 0;
+			foreach($this->_scopes as $scope) 
+			{		
+				$scope->result_count = (int)$this->getScopeCount($scope);
+				$total += $scope->result_count;
+			}
+			$this->_scopes->setTotal($total);
+		}
+		return $this->_scopes;
 	}
 	
 	/**
