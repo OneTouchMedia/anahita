@@ -16203,7 +16203,7 @@ provides: [Delegator]
 					}
 				}
 			} else {
-				this.fireEvent('error', 'Could not find a trigger with the name ' + name + ' for event: ' + event.type);
+			//	this.fireEvent('error', 'Could not find a trigger with the name ' + name + ' for event: ' + event.type);
 			}
 			return this;
 		},
@@ -19599,6 +19599,7 @@ Element.implement(
 		{
 			if ( this.get('tag') == 'form' ) 
 				Object.set(options,{
+					method : 'get',
 					form : this
 				});
 			else if ( this.form ) {
