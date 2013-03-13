@@ -128,23 +128,23 @@ class JRouterSite extends KObject
         if ( !isset($query['option']) ) {
             return $url;
         }
-        
-        $component = str_replace('com_','',$query['option']);
-        unset($query['option']);
-                
+                        
         if ( isset($query['format']) ) {
             $uri->format = $query['format'];
             unset($query['format']);  
         }
         
-        $router = $this->getComponentRouter($component);
+        $router   = $this->getComponentRouter(str_replace('com_','', $query['option']));
         $parts    = $router->build($query);
                 
         if ( empty($parts) ) {
         	$parts = array();
         }
         
-        array_unshift($parts, $component);
+        if ( isset($query['option']) ) {
+        	array_unshift($parts, str_replace('com_','', $query['option']));
+        	unset($query['option']);
+        }
         
         //only add index.php is it's rewrite SEF
         array_unshift($parts,'index.php');
