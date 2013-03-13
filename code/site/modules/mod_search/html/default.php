@@ -13,9 +13,10 @@ $url = 'option=com_search';
 if ( $actor ) {
 	$url .= '&oid='.$actor->uniqueAlias;
 }
+
 ?>
-<form action="<?=@route($url)?>" class="navbar-search pull-left">
-	<input type="text" name="q" class="search-query" placeholder="<?= $label ?>">
+<form data-trigger="SearchRequest" action="<?=@route($url)?>" class="navbar-search pull-left">
+	<input type="text" name="q" class="search-query"  placeholder="<?= $label ?>">
 	<?php if ($actor && false) : ?>
 	<input type="hidden" name="oid" value="<?=$actor->id?>" />
 	<?php endif;?>
@@ -24,5 +25,5 @@ if ( $actor ) {
 	<?php if ( $scope->commentable ) : ?>
 	<?php endif;?>
 	<input type="hidden" name="search_comments" value="1" />
-	<?php endif;?>	
+	<?php endif;?>
 </form>
