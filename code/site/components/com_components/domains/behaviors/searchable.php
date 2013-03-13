@@ -35,6 +35,13 @@ class ComComponentsDomainBehaviorSearchable extends LibBaseDomainBehaviorEnablea
 	protected $_search_scope = array();
 	
 	/**
+	 * Scope t
+	 * 
+	 * @var string
+	 */
+	protected $_scope_type;
+	
+	/**
 	 * Constructor.
 	 *
 	 * @param KConfig $config An optional KConfig object with configuration options.
@@ -45,7 +52,8 @@ class ComComponentsDomainBehaviorSearchable extends LibBaseDomainBehaviorEnablea
 	{
 		parent::__construct($config);
 		
-		$this->_search_scope = $config->class;
+		$this->_search_scope = $config->class;		
+		$this->_scope_type   = $config->type;
 		
 	}
 	
@@ -61,6 +69,7 @@ class ComComponentsDomainBehaviorSearchable extends LibBaseDomainBehaviorEnablea
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
+			'type'  => null,
 			'class' => null
 		));
 	
@@ -88,7 +97,7 @@ class ComComponentsDomainBehaviorSearchable extends LibBaseDomainBehaviorEnablea
 	{
 		$searchables = array();
 		foreach($this->getEntityRepositories($this->_search_scope) as $repository) {			
-			$searchables[] = array('repository'=>$repository);
+			$searchables[] = array('repository'=>$repository,'type'=>$this->_scope_type);
 		}
 		return $searchables;
 	}
