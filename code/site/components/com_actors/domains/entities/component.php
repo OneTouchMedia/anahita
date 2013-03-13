@@ -41,7 +41,7 @@ class ComActorsDomainEntityComponent extends ComComponentsDomainEntityComponent
 		$config->append(array(
 				'behaviors' => array(
 					'assignable'=>array(),
-					'searchable'=>array('class'=>'ComActorsDomainEntityActor')
+					'searchable'=>array('class'=>'ComActorsDomainEntityActor','type'=>'actor')
 				)
 		));
 	

@@ -41,7 +41,7 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 		$config->append(array(
 			'behaviors' => array(
 					'assignable'=>array(),
-					'searchable'=>array('class'=>'ComMediumDomainEntityMedium')
+					'searchable'=>array('class'=>'ComMediumDomainEntityMedium','type'=>'post')
 			)
 		));		
 		
