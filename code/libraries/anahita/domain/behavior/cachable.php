@@ -42,6 +42,13 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     protected $_cache;
     
     /**
+     * Caches the data in an array
+     *
+     * @var array
+     */    
+    protected $_data;
+    
+    /**
      * Constructor.
      *
      * @param KConfig $config An optional KConfig object with configuration options.
