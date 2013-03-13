@@ -101,6 +101,9 @@ class ModMenuHtml extends ModBaseHtml
 	public function getRoute($route)
 	{				
 		if ( is_object($route) ) {
+			if ( $route->home ) {
+				return '';
+			}
 			$route = $route->link.'&Itemid='.$route->id;
 		}
 				
