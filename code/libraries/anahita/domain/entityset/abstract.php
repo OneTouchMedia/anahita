@@ -192,7 +192,7 @@ abstract class AnDomainEntitysetAbstract extends AnObjectSet
 	 */
 	public function setRepository($repository)
 	{
-		if ( !$this->_repository instanceof AnDomainRepositoryAbstract ) 
+		if ( !$repository instanceof AnDomainRepositoryAbstract ) 
 		{
 			if(is_string($repository) && strpos($repository, '.') === false )
 			{
