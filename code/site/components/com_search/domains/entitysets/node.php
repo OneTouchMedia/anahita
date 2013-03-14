@@ -105,6 +105,7 @@ class ComSearchDomainEntitysetNode extends AnDomainEntitysetDefault
 			$query = clone $this->_query;
 			$query->columns(array('node.type','count(*) AS count','node.parent_type'))
 					->scope(null)
+					->limit(0,0)
 					->group(array('node.type','node.parent_type'));
 
 

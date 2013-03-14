@@ -60,7 +60,7 @@ class ComNotesControllerNote extends ComMediumControllerDefault
         {
             //create a notification and pass the owner
             $notification = $this->createNotification(array(
-                'name'             => 'post_add',
+                'name'             => 'note_add',
                 'object'           => $entity,
                 'subscribers'      => array($entity->owner->subscriberIds->toArray(),$entity->owner)
             ))->setType('post', array('new_post'=>true));

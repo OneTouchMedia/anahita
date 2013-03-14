@@ -38,7 +38,7 @@ class ComSearchViewSearchesJson extends ComBaseViewJson
 		$data['scopes'] = array();
 		foreach($this->_state->scopes as $scope) {
 			$count = $this->_state->getList()->getScopeCount($scope);
-			$data['scopes'][] = array('name'=>$scope->getKey(),'count'=>$count);
+			$data['scopes'][] = array('name'=>$scope->getKey(),'count'=>(int)$count);
 		}		
 		return $data;
 	}	

@@ -1,5 +1,5 @@
 <?php if ( count($scopes) ) : ?>
-	<li class="nav-header"><?= $header ?></li>	
+	<li class="nav-header"><?= @text('COM-SEARCH-SCOPE-HEADER-'.$header) ?></li>	
 	<?php foreach($scopes as $scope ) : ?>
 			<?php 		
 				$name		= @text(strtoupper($scope->identifier->type.'-'.$scope->identifier->package.'-SEARCH-SCOPE-'.$scope->identifier->name));

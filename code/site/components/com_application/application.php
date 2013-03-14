@@ -149,13 +149,22 @@ class JSite extends JApplication
     {
         if ( !isset($this->_template) ) 
         {
-            //get the template
-            $template = KService::get('repos:templates.menu', array(
-                    'resources'         => 'templates_menu',
-                    'identity_property' => 'menuid'
-                ))->getQuery()->clientId(0)->fetchValue('template');
+        	if ( !KService::get('application.registry')
+        		->offsetExists('application-template') )
+        	{
+        		//get the template
+        		$template = KService::get('repos://site/templates.menu', array(
+        				'resources'         => 'templates_menu',
+        				'identity_property' => 'menuid'
+        		))->getQuery()->clientId(0)->fetchValue('template');
+
+        		KService::get('application.registry')
+        		->offsetSet('application-template', $template);
+        	}
+        	
+        	$template = KService::get('application.registry')->offsetGet('application-template');
             
-            $this->setTemplate(pick($template, 'base')); 
+            $this->setTemplate(pick($template, 'base'));
         }
         
         return $this->_template;
@@ -204,10 +213,6 @@ class JSite extends JApplication
      */
     public function &getRouter()
     {
-        $config =& JFactory::getConfig();
-        $options['mode'] = $config->getValue('config.sef');
-        //always force the sef
-        $router =& parent::getRouter('site', $options);
-        return $router;
+        return parent::getRouter('site', array('enable_rewrite'=>JFactory::getConfig()->getValue('sef_rewrite')));
     }
 }

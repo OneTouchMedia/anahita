@@ -32,6 +32,13 @@ class JRouterSite extends KObject
      */
     private $__url;
     
+    /**
+     * If enabled then index.php is removed from the routes
+     * 
+     * @var boolean
+     */
+    protected $_enable_rewrite;
+    
     /** 
      * Constructor.
      *
@@ -40,13 +47,19 @@ class JRouterSite extends KObject
      * @return void
      */ 
 	public function __construct($config = array()) 
-    {                
-		parent::__construct();
-        
-        //always force the router to SEF        
-        $this->_mode = JROUTER_MODE_SEF;
-        
-        $this->__url = KService::get('koowa:http.url');
+    {
+    	$config = new KConfig($config);
+    	
+    	$config->append(array(
+    		'enable_rewrite' => false,
+    		'url'	=> clone KService::get('koowa:http.url')	
+    	));
+    	
+		parent::__construct($config);
+		
+		$this->_enable_rewrite = $config->enable_rewrite;
+		
+        $this->__url = $config->url;
 	}
 
     /**
@@ -56,7 +69,7 @@ class JRouterSite extends KObject
      */
     public function getMode()
     {
-        return $this->_mode;   
+        return JROUTER_MODE_SEF;
     }
     
     /**
@@ -109,7 +122,7 @@ class JRouterSite extends KObject
         $vars->append($this->getComponentRouter($vars->option)->parse($segments));
         
         $vars->append(array('Itemid'=> null));
-                
+               
         return KConfig::unbox($vars);     
 	}
 
@@ -147,7 +160,9 @@ class JRouterSite extends KObject
         }
         
         //only add index.php is it's rewrite SEF
-        array_unshift($parts,'index.php');
+        if ( !$this->_enable_rewrite ) {
+        	array_unshift($parts,'index.php');
+        }
         
         $path  = implode('/', $parts);
 

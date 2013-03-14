@@ -154,9 +154,8 @@ abstract class ComBaseRouterAbstract extends KObject implements KServiceInstanti
         else {
         	
         	$path    = implode('/', $segments);
-        	$matches = array();
-        	
-        	if ( preg_match('/(\w+\/)?(\d+)\/(\w+)/', $path, $matches) ) {
+        	$matches = array();        	
+        	if ( preg_match('/(\w+\/)?(\d+)(\/\w+)?/', $path, $matches) ) {
         		
         		if ( !empty($matches[1]) ) {
         			$view = trim($matches[1],'/');
@@ -165,12 +164,11 @@ abstract class ComBaseRouterAbstract extends KObject implements KServiceInstanti
         		}
         		
         		$vars['view'] = KInflector::singularize($view);
-        		$vars['id']  = $matches[2];
-        		$vars['get'] = $matches[3];
+        		$vars['id']   = $matches[2];
+        		if ( isset($matches[3]) )
+        			$vars['get'] = trim($matches[3],'/');
         		
-        		$segments	 = array_filter(explode('/', str_replace($matches[0], '', $path)));
-        		        		
-        		
+        		$segments	 = array_filter(explode('/', str_replace($matches[0], '', $path)));        		
         	}        	
         }        
         

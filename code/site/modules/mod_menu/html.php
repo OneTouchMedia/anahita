@@ -100,11 +100,29 @@ class ModMenuHtml extends ModBaseHtml
 	 */
 	public function getRoute($route)
 	{				
-		if ( is_object($route) ) {
-			if ( $route->home ) {
+		if ( is_object($route) ) {			
+			
+			if ( $route->home ) 
 				return '';
+			
+			switch($route->type)
+			{
+				case 'menulink' :
+					$query = $route->query;
+					if ( isset($query['Itemid']) ) {
+						$route = $menu = &JSite::getMenu()->getItem($query['Itemid']);
+					}  else {
+						$route = null;
+					}
+					if ( !$route ) break;
+				case 'component' : 
+					$route = $route->link.'&Itemid='.$route->id;
+					break;
+				case 'url' :
+					return $route->link;
+				default :
+					return '';
 			}
-			$route = $route->link.'&Itemid='.$route->id;
 		}
 				
 		if ( strpos($route, 'index.php?') === 0) {			
