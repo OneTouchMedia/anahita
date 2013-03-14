@@ -89,10 +89,14 @@ class ComNotificationsControllerNotification extends ComBaseControllerService
                 
 		$context->query = $this->actor->getNotifications()->getQuery();
         
-        $set = parent::_actionBrowse($context)->order('createdOn','DESC');
+        $set = parent::_actionBrowse($context)->order('creationTime','DESC');
           
         if ( $this->layout != 'popover' ) {
             $set->limit(0);
+        }
+        
+        if ( $this->new ) {
+        	$set->id( $this->actor->newNotificationIds->toArray() );
         }
         
         //only zero the notifications if the viewer is the same as the 

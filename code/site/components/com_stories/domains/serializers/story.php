@@ -68,15 +68,15 @@ class ComStoriesDomainSerializerStory extends ComBaseDomainSerializerDefault
                 $data['object'] = $items->toSerializableArray();
             }
         }
+        
+        $data['creatiomTime'] = $entity->creationTime->getDate();        
 
-        foreach($entity->getComments() as $comment) {    
-            $data['comments'][] = $comment->toSerializableArray();
+        if ( $entity->getIdentifier()->name == 'story' ) 
+        {
+	        foreach($entity->getComments() as $comment) {
+	        	$data['comments'][] = $comment->toSerializableArray();
+	        }        
         }
-         
-        
-        
-        $data['creatiomTime'] = $entity->creationTime->getDate();
-                     
         return $data;
     }    
 }
