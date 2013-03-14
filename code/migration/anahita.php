@@ -432,7 +432,7 @@ function anahita_20()
     dbexec($query);
     
     //convert the notifications to point to the note
-    $query = "update jos_anahita_nodes as nf, jos_anahita_nodes as note set nf.story_object_type = 'com:notes.domain.entity.note', nf.name = IF(nf.name='story_comment','note_comment',IF(nf.name='story_add' or nf.name='private_message','note_add',nf.name)) where note.id = nf.story_object_id and note.type like 'ComMediumDomainEntityMedium,ComNotesDomainEntityNote,com:notes.domain.entity.note' and nf.story_object_type like 'com:stories.domain.entity.story' and nf.type like 'ComNotificationsDomainEntityNotification,com:notifications.domain.entity.notification'";
+    $query = "update jos_anahita_nodes as nf, jos_anahita_nodes as note set nf.component = 'com_notes', nf.story_object_type = 'com:notes.domain.entity.note', nf.name = IF(nf.name='story_comment','note_comment',IF(nf.name='story_add' or nf.name='private_message','note_add',nf.name)) where note.id = nf.story_object_id and note.type like 'ComMediumDomainEntityMedium,ComNotesDomainEntityNote,com:notes.domain.entity.note' and nf.story_object_type like 'com:stories.domain.entity.story' and nf.type like 'ComNotificationsDomainEntityNotification,com:notifications.domain.entity.notification'";
     dbexec($query);
     
     //set the story data in the notes to null
