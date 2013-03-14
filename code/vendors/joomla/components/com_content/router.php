@@ -30,14 +30,13 @@ class ComContentRouter extends ComBaseRouterDefault
 	public function build(&$query)
 	{
 		$segments = array();
-		
 		if ( isset($query['Itemid']) ) 
 		{
 			$menu = &JSite::getMenu();
 			$menuItem = &$menu->getItem($query['Itemid']);
 			if ( $menuItem ) 
 			{
-				$query['id'] = $menuItem->alias;			
+				$query['id'] = $menuItem->route;			
 				unset($query['view']);
 				unset($query['Itemid']);
 				unset($query['layout']);
@@ -61,15 +60,12 @@ class ComContentRouter extends ComBaseRouterDefault
 	{	
 		$vars = array();
 		
-		if ( count($segments) == 1 ) 
-		{
-			$itemId = array_shift($segments);
-			$menu 	= &JSite::getMenu();
-			$item	= $menu->getItems('alias', $itemId, true);
-			if ( $item ) {
-				$vars = $item->query;
-				$vars['Itemid'] = $item->id;
-			}
+		$route  = implode('/', $segments);
+		$menu 	= &JSite::getMenu();
+		$item	= $menu->getItems('route', $route, true);
+		if ( $item ) {
+			$vars = $item->query;
+			$vars['Itemid'] = $item->id;
 		}
 		
 		elseif ( count($segments) == 2 )

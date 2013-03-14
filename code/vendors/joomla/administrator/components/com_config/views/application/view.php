@@ -78,15 +78,7 @@ class ConfigApplicationView
 							<fieldset class="adminform">
 								<legend><?php echo JText::_( 'User Settings' ); ?></legend>
 								<?php echo $userparams->render('userparams'); ?>
-							</fieldset>
-							<fieldset class="adminform">
-								<legend><?php echo JText::_( 'Media Settings' ); ?>
-				<span class="error hasTip" title="<?php echo JText::_( 'Warning' );?>::<?php echo JText::_( 'WARNPATHCHANGES' ); ?>">
-					<?php echo ConfigApplicationView::WarningIcon(); ?>
-				</span>
-								</legend>
-								<?php echo $mediaparams->render('mediaparams'); ?>
-							</fieldset>
+							</fieldset>							
 						</td>
 						<td width="40%">
 							<?php require_once($tmplpath.DS.'config_debug.php'); ?>
@@ -102,7 +94,7 @@ class ConfigApplicationView
 						<td width="60%">
 							<?php require_once($tmplpath.DS.'config_server.php'); ?>
 							<?php require_once($tmplpath.DS.'config_locale.php'); ?>
-							<?php require_once($tmplpath.DS.'config_ftp.php'); ?>
+							
 						</td>
 						<td width="40%">
 							<?php require_once($tmplpath.DS.'config_database.php'); ?>
