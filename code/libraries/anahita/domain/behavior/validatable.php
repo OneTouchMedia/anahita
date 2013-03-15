@@ -128,6 +128,17 @@ class AnDomainBehaviorValidatable extends AnDomainBehaviorAbstract
     }
     
     /**
+     * Only validate the entity and return true or false if the entity 
+     * passed the validation
+     *
+     * @return boolean
+     */    
+    public function validateEntity()
+    {
+    	return $this->getValidator()->validateEntity($this->_mixer);
+    }
+    
+    /**
      * Validates an entity properties values using the passed validations.
      * If no validations are passed, the properties are validated using their
      * default validations
