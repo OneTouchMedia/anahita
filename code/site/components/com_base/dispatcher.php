@@ -137,7 +137,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
         {
             if ( KRequest::type() == 'HTTP' ) 
             {
-                $login_url   = 'index.php?option=com_user&view=login';
+                $login_url   = JRoute::_('index.php?option=people&view=session');
                 $return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();                        
                 $login_url  .= '&return='.base64_encode($return_url);
                 $message = JText::_('LIB-AN-PLEASE-LOGIN-TO-SEE');
