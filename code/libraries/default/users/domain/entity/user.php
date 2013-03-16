@@ -48,5 +48,20 @@ class LibUsersDomainEntityUser extends AnDomainEntityDefault
 		));
 		
 		return parent::_initialize($config);
+	}	
+	
+	/**
+	 * Automatically sets the activation token for the user 
+	 * 
+	 * @return LibUsersDomainEntityUser
+	 */
+	public function requiresActivation()
+	{
+		jimport('joomla.user.helper');
+		$token = JUtility::getHash(JUserHelper::genRandomPassword());
+		$salt  = JUserHelper::getSalt('crypt-md5');
+		$hashedToken = md5($token.$salt).':'.$salt;
+		$this->activation = $hashedToken;
+		return $this;		
 	}
 }
