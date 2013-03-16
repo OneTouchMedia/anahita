@@ -97,8 +97,8 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         if ( JFactory::getUser()->id > 0 )
             return false;
             
-//        if ( !get_config_value('users.allowUserRegistration', true) )
-//            return false;        
+       if ( !get_config_value('users.allowUserRegistration', true) )
+           return false;        
     }
     
     /**

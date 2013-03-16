@@ -40,7 +40,19 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         
         $this->_action_map['post'] = 'authenticate';
     }
-      
+
+    /**
+     * Return true
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return boolean
+     */
+    public function canExecute(KCommandContext $context)
+    {
+    	return true;
+    }
+    
     /**
     * Initializes the default configuration for the object
     *
@@ -71,12 +83,24 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     protected function _actionGet(KCommandContext $context)
     {
         //if there's not a valid user then return unathorized
-        if ( JFactory::getUser()->id == 0 ) {
-             $context->status = KHttpResponse::UNAUTHORIZED;
-        } else {
+        if ( JFactory::getUser()->id == 0 ) 
+        {
+        	if ( $this->format == 'html' ) {
+        		//display the login page
+        		return $this->getView()->display();
+        	}
+        	$context->status = KHttpResponse::UNAUTHORIZED;
+        } else 
+        {
             $person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
             $this->_state->setItem(array('personId'=> $person->id ));
-            return $this->getView()->display();  
+            if ( $this->format == 'html' ) {
+            	$url = $this->setRedirect($person->getURL())->getRedirect()->url;
+            	$this->getService('application')->redirect($url);
+            }
+            else {
+            	return $this->getView()->display();  
+            }
         }
     }
     
@@ -104,6 +128,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         $credentials  = KConfig::unbox($data);
         $options      = array();
         $response     = $authenticate->authenticate($credentials, $options);
+        
         if ($response->status === JAUTHENTICATE_STATUS_SUCCESS)
         {
             $response = (array)$response;
@@ -167,8 +192,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
          // Trigger onLoginFailure Event
         JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$response));
         $context->setError(new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED));
-        return false;              
-        
+        return false;
     }
     
     /**

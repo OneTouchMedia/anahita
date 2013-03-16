@@ -42,7 +42,8 @@ class ComPeopleRouter extends ComActorsRouterDefault
     {
     	$query = array();
     	
-    	if ( count($segments) && !is_numeric($segments[0]) && $segments[0] != 'person') 
+    	if ( count($segments) && !is_numeric($segments[0]) && 
+    			!in_array($segments[0], array('person','session','password'))) 
     	{
     		$query['username'] = $segments[0];
     		//@TODO the parent::parse wants a numeric ID in order
@@ -56,7 +57,7 @@ class ComPeopleRouter extends ComActorsRouterDefault
     	else {
     		$query = parent::parse($segments);
     	}    	
-    	    	
+   	
     	return $query;
     }
 }

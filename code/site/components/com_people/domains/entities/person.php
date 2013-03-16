@@ -184,6 +184,10 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
      */ 
     public function setPassword($password)
     {
+    	//make sure the passowrd is set to an empty string 
+    	if ( empty($password) ) {
+    		$password = ' ';
+    	}
         $this->_password = $password;
         return $this;
     }
