@@ -317,7 +317,8 @@ abstract class LibBaseViewAbstract extends KObject
 	 */
 	public function getRoute( $route = '', $fqr = true)
 	{
-		if ( !is_array($route) ) {
+		if ( !is_array($route) ) 
+		{
 			$parts = array();
 			parse_str(trim($route), $parts);
 			$route = $parts;
@@ -352,21 +353,27 @@ abstract class LibBaseViewAbstract extends KObject
             $data = $this->_state->getData($this->_state->isUnique());
             
             $route = array_merge($route, $data);
+            
+            //Add the format information to the route only if it's not 'html'
+            if(!isset($parts['format'])) {
+            	$route['format'] = $this->getIdentifier()->name;
+            }
 	    }
-	    
-	    //Add the format information to the route only if it's not 'html'
-	    if(!isset($parts['format'])) {
-	        $route['format'] = $this->getIdentifier()->name;
-	    }
-	    
-	    if ( $route['format'] == 'html')
-	    		unset($route['format']);
 	    
 	    $parts = array_merge($route, $parts);
-	    	    
-	    return $this->getService('application')
+
+	    $route = $this->getService('application')
 	    		->getRouter()
-	    		->build('index.php?'.http_build_query($parts));	    	    
+	    		->build('index.php?'.http_build_query($parts));
+	    
+	    //Add the host and the schema
+	    if ($fqr === null || $fqr === true)
+	    {
+	    	$route->scheme = $this->getBaseUrl()->scheme;
+	    	$route->host   = $this->getBaseUrl()->host;
+	    }
+	    	    
+	    return $route;    	    
 	}
     
     /**
