@@ -142,8 +142,11 @@ class JRouterSite extends KObject
             return $url;
         }
                         
-        if ( isset($query['format']) ) {
-            $uri->format = $query['format'];
+        if ( isset($query['format']) ) 
+        {
+        	if ( $query['format'] != 'html') {
+        		$uri->format = $query['format'];
+        	}
             unset($query['format']);  
         }
         
@@ -170,7 +173,7 @@ class JRouterSite extends KObject
         $uri->setQuery($query);        
         $uri->setPath(JURI::base(true).'/'.$path);
 
-		return (string)$uri;
+		return $uri;
 	}
 
     /**
