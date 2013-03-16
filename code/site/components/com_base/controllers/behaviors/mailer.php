@@ -114,8 +114,9 @@ class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
 						
 		$emails	= (array)$config['to'];
 		$output = $this->getEmailView()
-			->layout($config->template)
-			->display($config['data'])
+					->layout($config->template)
+					->config($config)
+					->display($config['data'])
 			;
 		//@TODO what the hell is this. use template filter 
 		//also what if the mailer is not HTML ??
