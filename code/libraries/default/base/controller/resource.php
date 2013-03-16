@@ -247,12 +247,6 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
         					->build('index.php?'.http_build_query($parts));
         
         $this->_redirect = $redirect;
-            
-        if ( KRequest::method() == 'GET' ) {
-        	//@TOOD remove this
-        	_die('deprecated');
-            JFactory::getApplication()->redirect($redirect->url, $redirect->message, $redirect->type);
-        }
         
         return $this;
     }  
