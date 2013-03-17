@@ -133,13 +133,28 @@ class JRouterSite extends KObject
      * 
      * @return void
      */
-	function build($url)
+	function build($url = '')
 	{                
         $uri = clone $this->__url;
-        $uri->setUrl(str_replace('index.php','',$url));        
+        
+        if ( strpos($url,'index.php?') === false ) {
+        	$url = 'index.php?'.$url;
+        }
+        
+        if ( $url == 'index.php?' ) {
+        	$uri->setPath(JURI::base(true));
+        	return $uri;	
+        }
+        
+        //lets remove the index.php to avoid using the .php as the format
+        $url = str_replace('index.php', '', $url);
+        
+        $uri->setUrl($url);
+                        
         $query = $uri->getQuery(true);
+        
         if ( !isset($query['option']) ) {
-            return $url;
+           	throw new KException("No component is specified in the route '$url'");
         }
                         
         if ( isset($query['format']) ) 
