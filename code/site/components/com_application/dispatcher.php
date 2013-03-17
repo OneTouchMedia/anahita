@@ -46,10 +46,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         {
             $classname = $config->service_identifier->classname;
             $instance  = new $classname($config);
-            $container->set($config->service_identifier, $instance);
-            
-            //Add the service alias to allow easy access to the singleton
-            $container->setAlias('application', $config->service_identifier);
+            $container->set($config->service_identifier, $instance);            
         }
     
         return $container->get($config->service_identifier);
@@ -303,7 +300,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         $this->_application = JFactory::getApplication('site', array('session'=>PHP_SAPI !== 'cli'));
         
-        $this->getService()->set('application', $this->_application);        
+        $this->getService()->set('application', $this->_application);
+        $this->getService()->set('application.router', $this->_application->getRouter());        
         
         //set the session handler to none for
         if ( PHP_SAPI == 'cli' ) {
