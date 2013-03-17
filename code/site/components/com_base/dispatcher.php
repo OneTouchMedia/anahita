@@ -25,6 +25,13 @@
  */
 class ComBaseDispatcher extends LibBaseDispatcherDefault
 {
+	/**
+	 * The login url use to redirect if the user is not authorized
+	 * 
+	 * @var URI
+	 */
+	protected $_login_url;
+	
     /** 
      * Constructor.
      *
@@ -38,6 +45,8 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 		
 		if ( $config->auto_asset_import  )
 			$this->registerCallback('after.render', array($this, 'importAsset'));
+		
+		$this->_login_url = $config->login_url;
 	}
 	
 	/**
@@ -52,6 +61,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 	protected function _initialize(KConfig $config)
 	{
 	    $config->append(array(
+	    	'login_url'			=> $this->getService('application.router')->build('option=people&view=session'),
 	        'auto_asset_import' => true
 	    ));
 	    
@@ -111,42 +121,51 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	} 
         catch(KException $exception) 
     	{
-	    	$context = $this->getCommandContext();
-            $context['exception'] = $exception;
-            $result = $this->execute('dispatcherexception', $context);
+    		$result = $this->_handleDispatchException($context, $exception);    		
     	}
   
     	return $result;
     }    
     
     /**
-     * Called after an exception has been thrown in the action dispatch 
+     * Handles a dispatch exception
      * 
-     * @param KCommandContext $context ['exception'=>KException]
+     * @param KCommandContext $context The dispatch context
+     * @param KException $exception    The exception object
      * 
-     * @return boolean
+     * @return mixed The return to be passed to the command chain
      */
-    protected function _actionDispatcherexception(KCommandContext $context)
-    {       
-        $exception = $context['exception'];
-        
-        $viewer = get_viewer();
-        
-        //if format html then redirect to login
-        if ( $this->format == 'html' && $viewer->guest() && $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED  ) 
-        {
-            if ( KRequest::type() == 'HTTP' ) 
-            {
-                $login_url   = JRoute::_('index.php?option=people&view=session');
-                $return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();                        
-                $login_url  .= '&return='.base64_encode($return_url);
-                $message = JText::_('LIB-AN-PLEASE-LOGIN-TO-SEE');
-                JFactory::getApplication()->redirect($login_url, $message);
-                return false;
-            }
+    protected function _handleDispatchException(KCommandContext $context, KException $exception)
+    {
+    	$viewer = get_viewer();
+    	
+    	//if format html then redirect to login
+    	if ( $this->format == 'html'
+    			&& $viewer->guest() && KRequest::type() == 'HTTP' )
+    	{
+    		//if there's invalid data then a bad formed
+    		//was being saved. go back
+    		if ( $exception->getCode() == KHttpResponse::BAD_REQUEST ) 
+    		{
+	    		//go back;
+    		 	$this->registerCallback('after.dispatch', array($this, 'forward'), array('exception'=>$exception));
+    		 	return true;
+    		}
+    			//if the error is between 401 and 405
+			elseif ( $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED &&
+    			$exception->getCode() >= KHttpResponse::UNAUTHORIZED )
+    			{
+    			$login_url   = clone $this->_login_url;
+    			$return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();
+    			$login_url->setQuery('return='.base64_encode($return_url), true);
+    			$message 	 = JText::_('LIB-AN-PLEASE-LOGIN-TO-SEE');
+    					$this->getService('application')->redirect($login_url, $message);
+			}
+    				
+			return false;
         }
         
-        throw $exception;        
+        throw $exception;
     }
     
   	/**
@@ -158,7 +177,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      * 
      * @return mixed
      */
-	public function _actionForward(KCommandContext $context)
+	protected function _actionForward(KCommandContext $context)
 	{
         //If content is reset then return the content of the controller
         if ( ($this->format == 'json' || KRequest::type() == 'AJAX' )
@@ -178,7 +197,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
                     ->execute('get', $context);
                 ;
             }
-        }
+        }        
         
 		return parent::_actionForward($context);
 	}
