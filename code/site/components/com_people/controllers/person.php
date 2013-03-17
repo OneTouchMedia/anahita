@@ -27,6 +27,20 @@
  */
 class ComPeopleControllerPerson extends ComActorsControllerDefault
 {
+	/**
+	 * Constructor.
+	 *
+	 * @param KConfig $config An optional KConfig object with configuration options.
+	 *
+	 * @return void
+	 */
+	public function __construct(KConfig $config)
+	{
+		parent::__construct($config);
+		
+		$this->registerCallback('after.add', array($this, 'mailActivationLink'));				
+	}
+		
     /**
      * Initializes the default configuration for the object
      *
@@ -94,11 +108,15 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      */
     public function canAdd()
     {
-        if ( JFactory::getUser()->id > 0 )
+    	//if user is alrready logged in
+		if ( JFactory::getUser()->id > 0 ) {
             return false;
-            
-       if ( !get_config_value('users.allowUserRegistration', true) )
-           return false;        
+		}
+		
+		//if user registration not allowed            
+		if ( !get_config_value('users.allowUserRegistration', true) ) {
+			return false;        
+		}
     }
     
     /**
@@ -110,6 +128,9 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      */
     protected function _actionAdd(KCommandContext $context)
     {
+    	$context->data->username = 'd'.uniqid();
+    	$context->data->email = 'd'.uniqid().'@example.com';
+    	
         //we are not saving this person but just validating it
         $person = parent::_actionAdd($context);
         $data   = $context->data;        
@@ -146,10 +167,11 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $user->set('gid', $authorize->get_group_id( '', 'Registered', 'ARO' ));
         $date =& JFactory::getDate();
         $user->set('registerDate', $date->toMySQL());
-        if ( get_config_value('users.useractivation', false) ) {
+        if ( get_config_value('users.useractivation', false) ) 
+        {
             jimport('joomla.user.helper');
-            //$user->set('activation', JUtility::getHash( JUserHelper::genRandomPassword()) );
-            //$user->set('block', '1');
+            $user->set('activation', JUtility::getHash( JUserHelper::genRandomPassword()) );
+            $user->set('block', '1');
         }
         
         $user->save();
@@ -239,7 +261,21 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
          
         return $person;      
     }
-     
+
+    /**
+     * Mail an activation link
+     *
+     * @return void
+     */    
+    public function mailActivationLink()
+    {
+    	if ( $this->format == 'html' ) {    		
+    		return $this->getView()->layout('activation_link_sent')->display();
+    		//
+    		$this->setRedirect('layout=activation_link_sent');
+    	}    		
+    }
+    
     /**
      * Called before the setting page is displayed
      * 

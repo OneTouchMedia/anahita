@@ -49,7 +49,8 @@ class ComPeopleDomainValidatorPerson extends AnDomainValidatorAbstract
         $config->append(array(
             'validations'=> array(
                 'username' => array(
-                    'length' => array('max'=>100)
+                    'length'  => array('max'=>100),
+                	'format'  => 'username'
                 )
             )
         ));   

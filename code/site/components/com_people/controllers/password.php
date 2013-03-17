@@ -185,6 +185,7 @@ class ComPeopleControllerPassword extends ComBaseControllerResource
 		{
 			$this->mail(array(
 					'to' 	   => 'ash@peerglobe.com',
+					'subject'  => sprintf(JText::_('COM-PEOPLE-PASSWORD-RESET-SUBJECT'), JFactory::getConfig()->getValue('sitename')),
 					'template' => 'password_reset'
 			));
 			

@@ -28,6 +28,19 @@
  */
 class ComPeopleFilterUsername extends KFilterCmd
 {
+	/**
+	 * Validate a value
+	 *
+	 * @param   scalar  Value to be validated
+	 * @return  bool    True when the variable is valid
+	 */
+	protected function _validate($value)
+	{
+		$value = trim($value);
+		$pattern = '/^[A-Za-z][A-Za-z0-9_]*$/';
+		return (is_string($value) && (preg_match($pattern, $value)) == 1);		
+	}	
+	
     /**
      * Sanitize a value
      *

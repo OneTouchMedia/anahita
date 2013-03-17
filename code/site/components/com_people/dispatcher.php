@@ -27,17 +27,15 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 {
 	/**
 	 * (non-PHPdoc)
-	 * @see ComBaseDispatcher::_actionDispatcherexception()
+	 * @see ComBaseDispatcher::_handleDispatchException()
 	 */
-	protected function _actionDispatcherexception(KCommandContext $context)
-	{
-		$exception = $context->exception;
-		
+    protected function _handleDispatchException(KCommandContext $context, KException $exception)
+    {		
 		//if a session throws exception then check the code
 		//and generate a correct message
 		if ( $this->getController()->getIdentifier()->name == 'session' ) 
 		{
-			if ( KRequest::type() == 'HTTP' )
+			if ( KRequest::type() == 'HTTP' && $this->format == 'html' )
 			{
 				switch($exception->getCode()) 
 				{
@@ -48,12 +46,53 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 					default : 
 						$message = 'COM-PEOPLE-AUTHENTICATION-FAILED-UNKOWN';break;
 				}
-				$login_url   = JRoute::_('index.php?option=people&view=session');
-				JFactory::getApplication()->redirect($login_url, JText::_($message));
+				
+				$this->getService('application')
+						->redirect($this->_login_url, JText::_($message));
+								
 				return false;
 			}
 		}
+		elseif ( $this->getController()->getIdentifier()->name == 'person' ) 
+		{
+			//if the registration is closed
+			if ( $this->format == 'html' && 
+					KRequest::type() == 'HTTP' && $exception->getCode() == KHttpResponse::METHOD_NOT_ALLOWED )
+			{
+				if ( KRequest::method() == 'GET' && $this->getRequest()->layout == 'add' )
+				{
+					$this->getService('application')
+							->redirect($this->_login_url, JText::_('COM-PEOPLE-REGISTRATION-CLOSED'), 'error');
+					return false;					
+				}
+			}
+		}
 		
-		return parent::_actionDispatcherexception($context);		
-	}	
+		return parent::_handleDispatchException($context, $exception);		
+	}
+	
+	/**
+	 * If a person has been registered succesfully and no activation is required then
+	 * log them in. If activation is required show a message 
+	 * 
+	 * (non-PHPdoc)
+	 * @see ComBaseDispatcher::_actionForward()
+	 */
+	protected function _a_ctionForward(KCommandContext $context)
+	{
+		//if a http request 
+		//then creating a person
+		if ( KRequest::type() == 'HTTP' )
+		{
+			if ( $this->getController()->getIdentifier()->name == 'person' )
+			{
+				if ( $context->status == KHttpResponse::CREATED )
+				{
+					_die();	
+				}
+			}			
+		}		
+		
+		return parent::_actionForward($context);	
+	}
 }

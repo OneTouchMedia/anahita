@@ -9,22 +9,22 @@
 	
 		<form data-behavior="FormValidator" action="<?= @route() ?>" method="post">
 		<fieldset>
-			<legend><?php print JText::_('Reset your Password'); ?></legend>
+			<legend><?= @text('COM-PEOPLE-RESET-PASSWORD'); ?></legend>
 			
 			<div class="control-group">				
 				<div class="controls">
-					<input data-validators="required" placeholder=<?php print JText::_('Password'); ?> id="password1" name="password" type="password" />
+					<input data-validators="required" placeholder=<?= @text('COM-PEOPLE-PASSWORD'); ?> id="password1" name="password" type="password" />
 				</div>
 			</div>
 			
 			<div class="control-group">
 				<div class="controls">
-					<input placeholder=<?php print JText::_('Verify Password');?> data-validators="required validate-match matchInput:'password' matchName:'<?php print JText::_( 'Password' )?>'" type="password" id="password2" name="password2" value="" />
+					<input placeholder=<?= @text('COM-PEOPLE-PASSWORD-VERIFY');?> data-validators="required validate-match matchInput:'password' matchName:'<?= @text( 'Password' )?>'" type="password" id="password2" name="password2" value="" />
 				</div>
 			</div>
 			
 			<div class="form-actions">
-				<button type="submit" class="btn btn-primary"><?php print JText::_('Submit'); ?></button>
+				<button type="submit" class="btn btn-primary"><?= @text('LIB-AN-ACTION-SAVE') ?></button>
 			</div>
 			
 		</fieldset>		
