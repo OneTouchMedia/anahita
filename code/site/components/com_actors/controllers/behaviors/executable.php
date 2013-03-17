@@ -44,8 +44,9 @@ class ComActorsControllerBehaviorExecutable extends LibBaseControllerBehaviorExe
 	 */
 	public function canRead()
 	{	    
-	    if ( $this->layout == 'add' )
-	        return $this->canAdd();	        
+	    if ( $this->layout == 'add' ) {
+	        return $this->_mixer->canAdd();	   
+	    }     
 	   
         if ( !$this->getItem() )    	    
             return false;    
@@ -60,7 +61,12 @@ class ComActorsControllerBehaviorExecutable extends LibBaseControllerBehaviorExe
 	 */
 	public function canEdit()
 	{		
-		return $this->getItem()->authorize('administration');
+		if ( $this->getItem() 
+				&& $this->getItem()->authorize('administration') ) {
+			return true;
+		}
+		
+		return false;
 	}
 		
 	/**
