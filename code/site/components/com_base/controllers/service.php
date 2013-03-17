@@ -116,7 +116,7 @@ class ComBaseControllerService extends LibBaseControllerService
 	 */
 	protected function _actionPost(KCommandContext $context)
 	{
-	   	$action = $this->getState()->isUnique() ? 'edit' : 'add';
+	   	$action = $this->getItem() ? 'edit' : 'add';
 		$result = $this->execute($action, $context);
 		return $result;
 	}	
