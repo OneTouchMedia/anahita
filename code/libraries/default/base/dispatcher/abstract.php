@@ -84,7 +84,7 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 	 *  ignore AJAX reuqest (in socialengien we never forward an ajax request)
 	 * 
 	 */
-	public function _actionForward(KCommandContext $context)
+	protected function _actionForward(KCommandContext $context)
 	{
         //only forward for HTML formats
         if ( $this->format != 'html' ) {
