@@ -12,6 +12,7 @@ define('JPATH_BASE', $dir);
 
 require_once JPATH_BASE.'/includes/framework.php';
 
+KService::get('koowa:loader')->loadIdentifier('com://site/application.aliases');
 KService::get('com://site/application.dispatcher')->load();
 
 KServiceIdentifier::setApplication('dev', JPATH_BASE.'/cli');
