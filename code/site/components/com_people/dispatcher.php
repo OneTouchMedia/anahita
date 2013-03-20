@@ -125,7 +125,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	            $this->getController()->login();
 	            if ( $this->reset_password ) 
 	            {
-	                $url = $this->getController()->getItem()->getURL().'&get=settings&edit=account';
+	                $url = $this->getController()->getItem()->getURL().'&get=settings&edit=account&reset_password=1';
 	            }
 	            else {
 	                $url = $this->_login_redirect_url;
