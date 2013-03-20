@@ -5,7 +5,7 @@
  * 
  * @category   Anahita
  * @package    Com_Actors
- * @subpackage Controller_Behavior
+ * @subpackage Controller_Permission
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -15,18 +15,18 @@
  */
 
 /**
- * Executable Behavior
+ * Abstract Actor Permission
  *
  * @category   Anahita
  * @package    Com_Actors
- * @subpackage Controller_Behavior
+ * @subpackage Controller_Permission
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComActorsControllerBehaviorExecutable extends LibBaseControllerBehaviorExecutable
-{    		
+abstract class ComActorsControllerPermissionAbstract extends LibBaseControllerPermissionDefault
+{
 	/**
 	 * Authorize Delete. Only if the viewer if is an admin of the actor
      * 
@@ -194,31 +194,29 @@ class ComActorsControllerBehaviorExecutable extends LibBaseControllerBehaviorExe
     /**
      * If the viewer has been blocked by an actor then don't bring up the actor
      * 
-     * @param KCommandContext $context The CommandChain Context
+     * @param string $action The action
      * 
      * @return boolean
      */
-    public function canExecute(KcommandContext $context)
+    public function canExecute($action)
     {        
         if ( $this->getItem() && $this->getItem()->blocking(get_viewer()) )
             return false;
-        
-        $action = '_action'.ucfirst($context->action);
-        
+                
         //if the action is an admin action then check if the
         //viewer is an admin
         if ( $this->isAdministrable() ) 
         {
             $methods = $this->getBehavior('administrable')->getMethods();
             
-            if ( in_array($action, $methods) ) {              
+            if ( in_array('_action'.ucfirst($action), $methods) ) {              
                 if ( $this->canAdministare() === false ) {
                     return false;
                 }
             }
         }
              
-        return parent::canExecute($context);
+        return parent::canExecute($action);
     }        
     
     /**

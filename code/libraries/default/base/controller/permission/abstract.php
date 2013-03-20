@@ -25,15 +25,8 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class LibBaseControllerBehaviorExecutable extends KControllerBehaviorExecutable
+abstract class LibBaseControllerPermissionAbstract extends KControllerBehaviorAbstract
 {
-    /**
-     * The read-only state of the behavior
-     *
-     * @var boolean
-     */
-    protected $_readonly;
-
     /**
      * Constructor.
      *
@@ -42,8 +35,6 @@ class LibBaseControllerBehaviorExecutable extends KControllerBehaviorExecutable
     public function __construct( KConfig $config)
     {
         parent::__construct($config);
-
-        $this->_readonly = (bool) $config->readonly;
     }
         
     /**
@@ -91,7 +82,7 @@ class LibBaseControllerBehaviorExecutable extends KControllerBehaviorExecutable
                 return false;
             }
                         
-            if ( $this->_mixer->canExecute($context) === false ) 
+            if ( $this->_mixer->canExecute($action) === false ) 
             {
                 $context->setError(new KControllerException(
                         'Action '.ucfirst($action).' Not Allowed', KHttpResponse::METHOD_NOT_ALLOWED
@@ -105,25 +96,13 @@ class LibBaseControllerBehaviorExecutable extends KControllerBehaviorExecutable
     }
     
     /**
-     * Set the readonly state of the behavior
-     *
-     * @param boolean
-     * @return KControllerBehaviorExecutable
+     * Return the object handle
+     * 
+     * @return string
      */
-    public function setReadOnly($readonly)
+    public function getHandle()
     {
-         $this->_readonly = (bool) $readonly;
-         return $this;
-    }
-
-    /**
-     * Get the readonly state of the behavior
-     *
-     * @return boolean
-     */
-    public function isReadOnly()
-    {
-        return $this->_readonly;
+        return KMixinAbstract::getHandle();
     }
         
     /**
@@ -134,70 +113,23 @@ class LibBaseControllerBehaviorExecutable extends KControllerBehaviorExecutable
     *
     * @return boolean
     */
-    public function canExecute(KCommandContext $context)
-    {
-        $action = $context->action;
-        
+    public function canExecute($action)
+    {        
         $ret    = true;
         
         //Check if the action can be executed
         $method = 'can'.ucfirst($action);
         
-        if ( in_array($method, $this->_mixer->getMethods()) )
-        {
+        if ( in_array($method, $this->_mixer->getMethods()) ) {
             $ret = $this->_mixer->$method();
-        } 
+        } else {
+        	//if method doesn't exist then check if the action
+        	//exists
+        	$actions = $this->getActions();
+        	$actions = array_flip($actions);
+        	$ret	 = isset($actions[$action]);
+        }
                
         return $ret;
-    }
-    
-    /**
-     * Generic authorize handler for controller browse actions
-     *
-     * @return  boolean     Can return both true or false.
-     */
-    public function canBrowse()
-    {
-        return true;
-    }
-
-    /**
-     * Generic authorize handler for controller read actions
-     *
-     * @return  boolean     Can return both true or false.
-     */
-    public function canRead()
-    {
-        return true;
-    }
-
-    /**
-     * Generic authorize handler for controller edit actions
-     *
-     * @return  boolean     Can return both true or false.
-     */
-    public function canEdit()
-    {
-        return !$this->_readonly;
-    }
-
-    /**
-     * Generic authorize handler for controller add actions
-     *
-     * @return  boolean     Can return both true or false.
-     */
-    public function canAdd()
-    {
-        return !$this->_readonly;
-    }
-
-    /**
-     * Generic authorize handler for controller delete actions
-     *
-     * @return  boolean     Can return both true or false.
-     */
-    public function canDelete()
-    {
-         return !$this->_readonly;
-    }          
+    }       
 }

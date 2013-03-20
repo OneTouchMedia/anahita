@@ -121,7 +121,11 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	} 
         catch(KException $exception) 
     	{
-    		$result = $this->_handleDispatchException($context, $exception);    		
+    		if ( $this->format == 'html' ) 
+    		{
+    			$result = $this->_handleDispatchException($context, $exception);
+    		} 
+    		else throw $exception;
     	}
   
     	return $result;
@@ -140,9 +144,19 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	$viewer = get_viewer();
     	
     	//if format html then redirect to login
-    	if ( $this->format == 'html'
-    			&& $viewer->guest() && KRequest::type() == 'HTTP' )
+    	if ( $viewer->guest() && KRequest::type() == 'HTTP' )
     	{
+    		//first lets see if the controller can render the error page
+    		$template  = $this->getController()->getView()->getTemplate();   
+    		$layouts   = array('_error_'.$exception->getCode(),'_error_default');
+    		foreach($layouts as $layout) 
+    		{
+    			if ( $template->findTemplate($layout) ) {
+    				$exception->content = $template->loadTemplate($layout);
+    				throw $exception;
+    			}    			
+    		}
+    		
     		//if there's invalid data then a bad formed
     		//was being saved. go back
     		if ( $exception->getCode() == KHttpResponse::BAD_REQUEST ) 
@@ -154,7 +168,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     			//if the error is between 401 and 405
 			elseif ( $exception->getCode() <= KHttpResponse::METHOD_NOT_ALLOWED &&
     			$exception->getCode() >= KHttpResponse::UNAUTHORIZED )
-    			{
+			{
     			$login_url   = clone $this->_login_url;
     			$return_url  = KRequest::method() == 'GET' ? KRequest::url() : KRequest::referrer();
     			$login_url->setQuery('return='.base64_encode($return_url), true);

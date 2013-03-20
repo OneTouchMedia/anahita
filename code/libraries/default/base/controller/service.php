@@ -56,7 +56,6 @@ class LibBaseControllerService extends LibBaseControllerResource
                 'validatable',
                 'committable',
                 'loggable'),
-            'readonly'      => false
         ));
               
         parent::_initialize($config);

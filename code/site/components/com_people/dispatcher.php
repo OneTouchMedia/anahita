@@ -25,6 +25,50 @@
  */
 class ComPeopleDispatcher extends ComBaseDispatcher
 {
+    /**
+     * The URL to redirect the user if they're logged in
+     *
+     * @var string
+     */
+    protected $_redirect_url;
+    
+    /**
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+    
+        $this->_redirect_url = $config->redirect_url;
+    }
+    
+    /**
+     * Initializes the default configuration for the object
+     *
+     * Called from {@link __construct()} as a first step of object instantiation.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    protected function _initialize(KConfig $config)
+    {
+        //you can set the redirect url for when a user is logged in
+        //as follow
+        //KService::setConfig('com://site/people.view.session.html', array(
+        // 'redirect_url' => 'mynewurl'
+        //));
+        $config->append(array(
+                'redirect_url' => 'option=com_dashboard&view=dashboard'
+        ));
+    
+        parent::_initialize($config);
+    }
+        
 	/**
 	 * (non-PHPdoc)
 	 * @see ComBaseDispatcher::_handleDispatchException()
@@ -35,31 +79,27 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 		//and generate a correct message
 		if ( $this->getController()->getIdentifier()->name == 'session' ) 
 		{
-			if ( KRequest::type() == 'HTTP' && $this->format == 'html' )
+			switch($exception->getCode()) 
 			{
-				switch($exception->getCode()) 
-				{
-					case KHttpResponse::UNAUTHORIZED :
-						$message = 'COM-PEOPLE-AUTHENTICATION-FAILED';break;
-					case KHttpResponse::FORBIDDEN : 
-						$message = 'COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED';break;
-					default : 
-						$message = 'COM-PEOPLE-AUTHENTICATION-FAILED-UNKOWN';break;
-				}
-				
-				$this->getService('application')
-						->redirect($this->_login_url, JText::_($message));
-								
-				return false;
+				case KHttpResponse::UNAUTHORIZED :
+					$message = 'COM-PEOPLE-AUTHENTICATION-FAILED';break;
+				case KHttpResponse::FORBIDDEN : 
+					$message = 'COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED';break;
+				default : 
+					$message = 'COM-PEOPLE-AUTHENTICATION-FAILED-UNKOWN';break;
 			}
+			
+			$this->getService('application')
+					->redirect($this->_login_url, JText::_($message));
+							
+			return false;
 		}
 		elseif ( $this->getController()->getIdentifier()->name == 'person' ) 
 		{
 			//if the registration is closed
-			if ( $this->format == 'html' && 
-					KRequest::type() == 'HTTP' && $exception->getCode() == KHttpResponse::METHOD_NOT_ALLOWED )
+			if ( $exception->getCode() == KHttpResponse::METHOD_NOT_ALLOWED )
 			{
-				if ( KRequest::method() == 'GET' && $this->getRequest()->layout == 'add' )
+				if ( $context->action == 'read' && $this->getRequest()->layout == 'add' )
 				{
 					$this->getService('application')
 							->redirect($this->_login_url, JText::_('COM-PEOPLE-REGISTRATION-CLOSED'), 'error');
@@ -72,27 +112,62 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	}
 	
 	/**
+	 * (non-PHPdoc)
+	 * @see ComBaseDispatcher::_actionDispatch()
+	 */
+	protected function _actionDispatch(KCommandContext $context)
+	{
+	    if ( $this->token &&
+	            $this->getController()->getIdentifier()->name == 'person' )
+	    {
+	        if ( $this->getController()->canRead() ) 
+	        {
+	            $this->getController()->login();
+	            $url = $this->getController()->setRedirect(array('url'=>$this->_redirect_url))->getRedirect()->url;
+	            $this->getService('application')->redirect($url);
+	            return false;	            
+	        }     
+	    }
+	    	    
+	    $result = parent::_actionDispatch($context);
+	}
+	
+	/**
 	 * If a person has been registered succesfully and no activation is required then
 	 * log them in. If activation is required show a message 
 	 * 
 	 * (non-PHPdoc)
 	 * @see ComBaseDispatcher::_actionForward()
 	 */
-	protected function _a_ctionForward(KCommandContext $context)
+	protected function _actionForward(KCommandContext $context)
 	{
-		//if a http request 
-		//then creating a person
-		if ( KRequest::type() == 'HTTP' )
+	    //if creating a new person login the person in
+	    if ( $this->format == 'html' )
+	    {
+	        if ( $this->getController()->getIdentifier()->name == 'person' )
+	        {
+	            if ( $context->status == KHttpResponse::CREATED ) 
+	            {
+	                $this->getController()->login();
+	                $this->getController()->setRedirect(array('url'=>$this->_redirect_url));
+	            }
+	        }
+	    }    
+	       	    	    
+		elseif ( $this->getController()->getIdentifier()->name == 'session' )
 		{
-			if ( $this->getController()->getIdentifier()->name == 'person' )
+			//if a new session is created then render the session
+			//info or redirect
+			if ( $context->status == KHttpResponse::CREATED ) 
 			{
-				if ( $context->status == KHttpResponse::CREATED )
-				{
-					_die();	
-				}
-			}			
-		}		
-		
-		return parent::_actionForward($context);	
+			    if ( $this->format == 'html' ) {
+			        $this->getController()->setRedirect(array('url'=>$this->_redirect_url));
+			    } 
+			    else {
+			        $context->result = $this->getController()->display();
+			    }
+			}
+		}
+		return parent::_actionForward($context);				
 	}
 }

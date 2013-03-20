@@ -130,7 +130,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         $result = parent::_actionPost($context);
         
         if ( is($result, 'AnDomainEntityAbstract')  ) {
-            $this->setRedirect( $result->getURL().'&get=settings');
+          //  $this->setRedirect( $result->getURL().'&get=settings');
         }
         
         return $result;

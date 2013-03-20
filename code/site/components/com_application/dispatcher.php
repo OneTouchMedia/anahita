@@ -163,8 +163,10 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      */        
     protected function _actionRender(KCommandContext $context)
     {
+    	$base_url = $this->getService('koowa:http.url', array('url'=>JURI::base()));
+    	    	
         $config = array(
-            'base_url'  => (string)KRequest::base(),
+            'base_url'  => $base_url,
             'template'  => $this->_application->getTemplate(),
             'request'   => $this->_request
         );

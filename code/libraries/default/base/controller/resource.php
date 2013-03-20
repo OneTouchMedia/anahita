@@ -63,13 +63,9 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
         if($config->dispatch_events) {
             $this->mixin(new KMixinToolbar($config->append(array('mixer' => $this))));
         }
-        
-        //Made the executable behavior read-only
-        if($this->isExecutable()) {
-            $this->getBehavior('executable')->setReadOnly($config->readonly);
-        }        
     }
         
+    
     /**
      * Initializes the default configuration for the object
      *
@@ -81,9 +77,12 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
      */
     protected function _initialize(KConfig $config)
     {
+    	$permission       = clone $this->getIdentifier();
+    	$permission->path = array($permission->path[0], 'permission');
+    	register_default(array('identifier'=>$permission, 'prefix'=>$this));
+    	    	
         $config->append(array(
-            'readonly'  => true,
-            'behaviors' => array('executable'),
+            'behaviors' => array($permission),
             'request'   => array('format' => 'html'),
         ))->append(array(
             'view'      => $config->request->get ? $config->request->get : ($config->request->view ? $config->request->view : $this->getIdentifier()->name)

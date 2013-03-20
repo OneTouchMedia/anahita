@@ -223,6 +223,20 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
         return $password;
     }
     
+    /**
+     * Return the user object of the person
+     * 
+     * @return LibUsersDomainEntityUser
+     */
+    public function getUserObject()
+    {
+    	//@TODO we should use a belongs to relationship for this
+    	$user = $this->getService('repos://'.$this->getIdentifier()->application.'/users.user')
+    		->fetch(array('id'=>$this->userId));	
+    	
+    	return $user;
+    }
+    
 	/**
 	 * Return whether this person is a guest
 	 * 

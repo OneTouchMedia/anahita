@@ -20,7 +20,6 @@ KService::setAlias('application.registry',    'com://site/application.registry')
 KService::setAlias('application.dispatcher',  'com://site/application.dispatcher');
 KService::setAlias('application', 			  'com://site/application');
 KService::setAlias('application.router',	  'com://site/application.router');
-
 KService::setConfig('application.registry', array('cache_prefix'=>$config->cache_prefix,'cache_enabled'=>$config->cache_enabled));
 
 ?>

@@ -15,7 +15,7 @@
  */
 
 /**
- * Base Executable Behavior
+ * Default Permission
  *
  * @category   Anahita
  * @package    Com_Base
@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComBaseControllerBehaviorExecutable extends LibBaseControllerBehaviorExecutable
+class ComBaseControllerPermissionDefault extends LibBaseControllerPermissionDefault
 {
     /**
      * Generic authorize handler for controller add actions
@@ -35,15 +35,15 @@ class ComBaseControllerBehaviorExecutable extends LibBaseControllerBehaviorExecu
     public function canAdd()
     {
         $result = false;
-        
-        if(parent::canAdd())
+         
+		if(version_compare(JVERSION,'1.6.0','ge')) 
+		{
+            $result = JFactory::getUser()->authorise('core.create') === true;
+        } 
+        else 
         {
-            if(version_compare(JVERSION,'1.6.0','ge')) {
-                $result = JFactory::getUser()->authorise('core.create') === true;
-            } else {
-                $result = JFactory::getUser()->get('gid') > 22;
-            }
-        }
+            $result = JFactory::getUser()->get('gid') > 22;
+		}
     
         return $result;
     }
@@ -56,14 +56,11 @@ class ComBaseControllerBehaviorExecutable extends LibBaseControllerBehaviorExecu
     public function canEdit()
     {
         $result = false;
-    
-        if(parent::canEdit())
-        {
-            if(version_compare(JVERSION,'1.6.0','ge')) {
-                $result = JFactory::getUser()->authorise('core.edit') === true;
-            } else {
-                $result = JFactory::getUser()->get('gid') > 22;
-            }
+
+        if(version_compare(JVERSION,'1.6.0','ge')) {
+            $result = JFactory::getUser()->authorise('core.edit') === true;
+        } else {
+            $result = JFactory::getUser()->get('gid') > 22;
         }
     
         return $result;
@@ -78,13 +75,10 @@ class ComBaseControllerBehaviorExecutable extends LibBaseControllerBehaviorExecu
     {
         $result = false;
     
-        if(parent::canDelete())
-        {
-            if(version_compare(JVERSION,'1.6.0','ge')) {
-                $result = JFactory::getUser()->authorise('core.delete') === true;
-            } else {
-                $result = JFactory::getUser()->get('gid') > 22;
-            }
+        if(version_compare(JVERSION,'1.6.0','ge')) {
+            $result = JFactory::getUser()->authorise('core.delete') === true;
+        } else {
+            $result = JFactory::getUser()->get('gid') > 22;
         }
     
         return $result;

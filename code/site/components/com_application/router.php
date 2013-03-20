@@ -154,7 +154,8 @@ class JRouterSite extends KObject
         $query = $uri->getQuery(true);
         
         if ( !isset($query['option']) ) {
-           	throw new KException("No component is specified in the route '$url'");
+        	return $url;
+           	//throw new KException("No component is specified in the route '$url'");
         }
                         
         if ( isset($query['format']) ) 

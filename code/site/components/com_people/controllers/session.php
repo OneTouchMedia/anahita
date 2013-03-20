@@ -38,20 +38,12 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {        
         parent::__construct($config);
         
-        $this->_action_map['post'] = 'authenticate';
-    }
+        $this->_action_map['post'] = 'add';
 
-    /**
-     * Return true
-     * 
-     * @param KCommandContext $context
-     * 
-     * @return boolean
-     */
-    public function canExecute(KCommandContext $context)
-    {
-    	return true;
-    }
+        if  ( $this->isDispatched() ) {
+        	$this->registerCallback('after.add', array($this, 'display'));
+        }
+    }   
     
     /**
     * Initializes the default configuration for the object
@@ -66,8 +58,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {
         $config->append(array(
             //by default the format is json
-            'request'   => array('format'=>'json'),
-            'readonly'  => false
+            'request'   => array('format'=>'json')            
         ));
 
         parent::_initialize($config);
@@ -82,30 +73,80 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      */
     protected function _actionGet(KCommandContext $context)
     {
-        //if there's not a valid user then return unathorized
-        if ( JFactory::getUser()->id == 0 ) 
-        {
-        	if ( $this->format == 'html' ) {
-        		//display the login page
-        		return $this->getView()->display();
-        	}
-        	$context->status = KHttpResponse::UNAUTHORIZED;
-        } else 
-        {
-            $person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
-            $this->_state->setItem(array('personId'=> $person->id ));
-            if ( $this->format == 'html' ) {
-            	$url = $this->setRedirect($person->getURL())->getRedirect()->url;
-            	$this->getService('application')->redirect($url);
-            }
-            else {
-            	return $this->getView()->display();  
-            }
-        }
+    	$person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
+    	$this->_state->setItem($person);    	
+    	return $this->getView()->display();
+    }
+
+    /**
+     * Creates a new session
+     * 
+     * @param array   $user     The user as an array
+     * @param boolean $remember Flag to whether remember the user or not
+     * 
+     * @return void
+     */
+    public function login(array $user, $remember = false)
+    {		
+		$session  = &JFactory::getSession();
+    		
+		// we fork the session to prevent session fixation issues
+		$session->fork();   
+		JFactory::getApplication()->_createSession($session->getId());
+    		
+    	// Import the user plugin group
+		JPluginHelper::importPlugin('user');
+    	$options = array();	    	
+    	$results = JFactory::getApplication()->triggerEvent('onLoginUser', array($user, $options));
+    	$failed  = false;
+    		
+		foreach($results as $result)
+		{
+			$failed = $result instanceof JException || $result instanceof Exception || $result === false;
+			if ( $failed )
+				break;
+		}
+    		
+		if ( !$failed )
+		{
+			// Set the remember me cookie if enabled
+			jimport('joomla.utilities.simplecrypt');
+			jimport('joomla.utilities.utility');
+    		
+    			//if remeber is true or json api is being called
+    			//return a cookie that contains the credential
+			if ( $remember === true )
+			{
+    				//legacy for now
+    				$key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
+    				$crypt    = new JSimpleCrypt($key);
+    				$cookie  = $crypt->encrypt(serialize($credentials));
+    				$lifetime = time() + AnHelperDate::yearToSeconds();
+    				setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
+			}
+    			    			
+			return true;
+    		
+		} else {
+    		
+			$user = $this->getService('repos://site/users.user')->fetch(array('username'=>$user['username']));
+    		
+			if ( $user && $user->block ) {
+    				throw new KControllerException('User is blocked', KHttpResponse::FORBIDDEN);
+			}
+			else {
+				throw new KControllerException('Unkown Error');
+			}
+			return false;
+		}  
+    	// Trigger onLoginFailure Event
+    	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$user));
+    	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
+    	return false;
     }
     
     /**
-     * Authenticate a person. If a username password is passed then the user is first logged in. 
+     * Authenticate a person and create a new session If a username password is passed then the user is first logged in. 
      * 
      * @param KCommandContext $context Command chain context 
      * 
@@ -115,84 +156,32 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      * @throws KControllerException with KHttpResponse::FORBIDDEN code If person is authenticated but forbidden
      * @throws KControllerException with KHttpResponse::INTERNAL_SERVER_ERROR code for unkown error
      */
-    protected function _actionAuthenticate(KCommandContext $context)
+    protected function _actionAdd(KCommandContext $context)
     {
-        $data     = $context->data;
-        
-        if ( JFactory::getUser()->id > 0 ) {            
-            return $this->display();    
-        }
-        jimport( 'joomla.user.authentication');
+        $data = $context->data;
+                
+        jimport('joomla.user.authentication');
        
         $authenticate = & JAuthentication::getInstance();
         $credentials  = KConfig::unbox($data);
         $options      = array();
-        $response     = $authenticate->authenticate($credentials, $options);
-        
-        if ($response->status === JAUTHENTICATE_STATUS_SUCCESS)
+        $authentication = $authenticate->authenticate($credentials, $options);
+        if ( $authentication->status === JAUTHENTICATE_STATUS_SUCCESS )
         {
-            $response = (array)$response;
-            $session  = &JFactory::getSession();
-
-            // we fork the session to prevent session fixation issues
-            $session->fork();
-            
-            //legacy
-            JFactory::getApplication()->_createSession($session->getId());
-            
-            // Import the user plugin group
-            JPluginHelper::importPlugin('user');
-            
-            // OK, the credentials are authenticated.  Lets fire the onLogin event
-            $results = JFactory::getApplication()->triggerEvent('onLoginUser', array($response, $options));
-            $failed  = false;
-            
-            foreach($results as $result) 
-            {
-               $failed = $result instanceof JException || $result instanceof Exception || $result === false;
-               if ( $failed )
-                    break; 
-            }
-            
-            if ( !$failed )
-            {
-                // Set the remember me cookie if enabled
-                jimport('joomla.utilities.simplecrypt');
-                jimport('joomla.utilities.utility');
-                
-                //if remeber is true or json api is being called
-                //return a cookie that contains the credential        
-                if ( $data->remember === true || $this->format == 'json'  )
-                {
-                    //legacy for now
-                    $key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
-                    $crypt    = new JSimpleCrypt($key);
-                    $cookie  = $crypt->encrypt(serialize($credentials));
-                    $lifetime = time() + AnHelperDate::yearToSeconds();
-                    setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
-                }
-                if ( $this->isDispatched() ) {
-                	return $this->display();
-                }
-                return true;
-                
-            } else {
-                
-                $user = $this->getService('repos://site/users.user')->fetch(array('username'=>$response['username']));
-                
-                if ( $user && $user->block ) {
-                    $context->setError(new KControllerException('User is blocked', KHttpResponse::FORBIDDEN));                
-                }
-                else {                    
-                    $context->setError(new KControllerException('Unkown Error'));
-                }
-                return false;
-            }
+        	try
+        	{
+        		$this->login((array)$authentication);
+        		$context->status = KHttpResponse::CREATED;
+        	}
+        	catch(Exception $e) {
+        		$context->setError($e);
+        		return false;
+        	}
+        } else {
+        	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$authentication));
+        	$context->setError(new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED));
+        	return false;        	
         }
-         // Trigger onLoginFailure Event
-        JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$response));
-        $context->setError(new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED));
-        return false;
     }
     
     /**
@@ -203,7 +192,8 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      * @return void
      */
     protected function _actionDelete(KCommandContext $context)
-    {
+    {        
+    	$context->status = KHttpResponse::RESET_CONTENT;
         //we don't care if a useris logged in or not just delete
         JFactory::getApplication()->logout();
     }    

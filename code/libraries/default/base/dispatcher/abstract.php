@@ -96,9 +96,13 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
         $redirect->append(array(
             'type' => 'success'            
         ));
-        
-        if ( empty($redirect->url) ) {
-            $redirect['url'] = (string)KRequest::referrer();
+                
+        if ( empty($redirect->url) ) 
+        {
+            if ( $context->data->return )            
+                $redirect['url'] = base64_decode($context->data->return);                                    
+            else 
+                $redirect['url'] = (string)KRequest::referrer();
         }
 		
 		//if a the result of disatched is string then
@@ -117,7 +121,8 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 			return $context->result;
 		}
 				
-		if (KRequest::type() == 'HTTP') {
+		if (KRequest::type() == 'HTTP' && !empty($redirect['url']) ) 
+		{
 			JFactory::getApplication()
 					->redirect($redirect['url'], $redirect['message'], $redirect['type']);
 		} else {

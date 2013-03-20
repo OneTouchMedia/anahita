@@ -28,6 +28,13 @@
 class ComPeopleControllerPerson extends ComActorsControllerDefault
 {
 	/**
+	 * Flag to whether an activation is required or not
+	 * 
+	 * @var boolean
+	 */
+	protected $_activation_required;
+	
+	/**
 	 * Constructor.
 	 *
 	 * @param KConfig $config An optional KConfig object with configuration options.
@@ -38,7 +45,11 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	{
 		parent::__construct($config);
 		
-		$this->registerCallback('after.add', array($this, 'mailActivationLink'));				
+		$this->_activation_required = $config->activation_required;
+		
+		if ( $this->_activation_required ) {
+			$this->registerCallback('after.add', array($this, 'mailActivationLink'));
+		}		
 	}
 		
     /**
@@ -53,7 +64,9 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	protected function _initialize(KConfig $config)
 	{	
 		$config->append(array(
-		      'behaviors' => array('validatable')     
+			'activation_required' => get_config_value('users.useractivation'),
+			'behaviors'			  => array('validatable','mailer'),
+		    'login_callback'      => array($this, 'login')
 		));
 		
 		parent::_initialize($config);
@@ -65,7 +78,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         {
             $config->append(array(
                     'request'    => array(
-                            'id' => get_viewer()->id
+						'id' => get_viewer()->id
                     )
             ));
         }
@@ -100,26 +113,6 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
     }
     
     /**
-     * Returns whether registration is possible or not. The user can not 
-     * registered if it's already logged in or the configuration value
-     * 'users.allowUserRegistration' is set to no
-     * 
-     * @return boolean Returns whether registration is possible or not.
-     */
-    public function canAdd()
-    {
-    	//if user is alrready logged in
-		if ( JFactory::getUser()->id > 0 ) {
-            return false;
-		}
-		
-		//if user registration not allowed            
-		if ( !get_config_value('users.allowUserRegistration', true) ) {
-			return false;        
-		}
-    }
-    
-    /**
      * Person add action creates a new person object.
      * 
      * @param KCommandContext $context Commaind chain context
@@ -127,10 +120,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      * @return AnDomainEntityAbstract
      */
     protected function _actionAdd(KCommandContext $context)
-    {
-    	$context->data->username = 'd'.uniqid();
-    	$context->data->email = 'd'.uniqid().'@example.com';
-    	
+    {    	
         //we are not saving this person but just validating it
         $person = parent::_actionAdd($context);
         $data   = $context->data;        
@@ -148,11 +138,11 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
                 ->addValidation('email',   'uniqueness')
                 ;
                 
-        if ( $person->validate() === false ) {
+        if ( $person->validate() === false ) {      	
             $context->setError(new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST));
             return false;
         }
-             
+
         $person->reset();
         
         $user       = clone JFactory::getUser();
@@ -167,11 +157,16 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $user->set('gid', $authorize->get_group_id( '', 'Registered', 'ARO' ));
         $date =& JFactory::getDate();
         $user->set('registerDate', $date->toMySQL());
-        if ( get_config_value('users.useractivation', false) ) 
+        
+        if ( $this->_activation_required ) 
         {
             jimport('joomla.user.helper');
             $user->set('activation', JUtility::getHash( JUserHelper::genRandomPassword()) );
             $user->set('block', '1');
+            $context->append(array(
+				'headers' => array(
+					'X-User-Activation-Required' => true
+			)));
         }
         
         $user->save();
@@ -189,15 +184,22 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         }
                             
         //set the status
-        $context->status  = KHttpResponse::CREATED;
-        //return a custom tag for user activiation required
-        $context->append(array(
-            'headers' => array(
-              'User-Activation-Required' => get_config_value('users.useractivation')
-        )));
+        $context->status  = KHttpResponse::CREATED; 
+        
+        $this->setItem($person);
                         
         return $person;
         
+    }
+    
+    /**
+     * Return whether the action is required or not
+     * 
+     * @return boolean
+     */
+    public function activationRequired()
+    {
+    	return $this->_activation_required;	
     }
     
     /**
@@ -263,17 +265,48 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
     }
 
     /**
+     * (non-PHPdoc)
+     * @see ComActorsControllerAbstract::_actionPost()
+     */
+    protected function _actionPost(KCommandContext $context)
+    {
+    	$result = parent::_actionPost($context);
+    	return $result;
+    }   
+     
+    /**
      * Mail an activation link
      *
+     * @param KCommandContext $context The context parameter
+     * 
      * @return void
      */    
-    public function mailActivationLink()
-    {
-    	if ( $this->format == 'html' ) {    		
-    		return $this->getView()->layout('activation_link_sent')->display();
-    		//
-    		$this->setRedirect('layout=activation_link_sent');
-    	}    		
+    public function mailActivationLink(KCommandContext $context)
+    {    	    	
+		$person = $context->result;
+		$this->user = $person->getUserObject();
+		$this->mail(array(
+    				'to' 		=> 'ash@peerglobe.com',
+    				'subject'	=> 'Activate your account',
+    				'template'	=> 'account_activate'
+		));
+		//redirect only happens if it's html
+		$this->setRedirect(array('url'=>'view=session','message'=>'activation link has been sent'));
+    }
+    
+    /**
+     * Login the user after creating it
+     *
+     * @param KCommandContext $context The context parameter
+     * 
+     * @return void
+     */
+    public function login()
+    {    
+    	$user = (array)JFactory::getUser($this->getItem()->userId);
+    	$this->getService()->set('com:people.viewer', $this->getItem());
+    	$controller = $this->getService('com://site/people.controller.session');
+    	return $controller->login($user);
     }
     
     /**

@@ -55,7 +55,7 @@ class LibBaseControllerAbstract extends KControllerAbstract
      * @return void
      */
     protected function _initialize(KConfig $config)
-    {        
+    {            	
         parent::_initialize($config);    
     }
             

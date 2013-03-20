@@ -84,7 +84,7 @@ abstract class LibBaseViewAbstract extends KObject
 		
 	    //set the base url
         if(!$config->base_url instanceof KHttpUrl) {
-            $this->_baseurl = KService::get('koowa:http.url', array('url' => $config->base_url));
+            $this->_baseurl = $this->getService('koowa:http.url', array('url' => $config->base_url));
         } else {
             $this->_baseurl = $config->base_url;
         }

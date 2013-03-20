@@ -8,12 +8,13 @@
   </head>
 
   <body>	  	
-	<?= @template('tmpl/js') ?>	
-    <?= @template('tmpl/navbar') ?>
+	<?= @template('tmpl/js') ?>
     
     <div id="container-system-message" class="container">       
     	<?= @render('messages') ?>
     </div>
+    		
+    <?= @template('tmpl/navbar') ?>
     
     <?= @render('modules', 'header') ?> 
 	<?= @render('modules', 'showcase', array('style'=>'none')) ?>
