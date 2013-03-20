@@ -123,7 +123,14 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	        if ( $this->getController()->canRead() ) 
 	        {
 	            $this->getController()->login();
-	            $url = $this->getController()->setRedirect(array('url'=>$this->_login_redirect_url))->getRedirect()->url;
+	            if ( $this->reset_password ) 
+	            {
+	                $url = $this->getController()->getItem()->getURL().'&get=settings&edit=account';
+	            }
+	            else {
+	                $url = $this->_login_redirect_url;
+	            }
+	            $url = $this->getService('application.router')->build($url);
 	            $this->getService('application')->redirect($url);
 	            return false;	            
 	        }     

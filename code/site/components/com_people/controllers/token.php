@@ -38,7 +38,7 @@ class ComPeopleControllerToken extends ComBaseControllerResource
     {
         parent::__construct($config);
     
-        $this->registerCallback('after.reset', array($this, 'mailConfirmation'));
+        $this->registerCallback('after.add', array($this, 'mailConfirmation'));
     }
     
     /**
@@ -68,66 +68,9 @@ class ComPeopleControllerToken extends ComBaseControllerResource
      */
     protected function _actionPost(KCommandContext $context)
     {
-        $token = pick($this->id);
-    
-        if ( $token )
-        {
-            $this->user = $this->getService('repos://site/users.user')
-            ->getQuery()
-            ->activation($token)
-            ->block(false)
-            ->fetch();
-            //remove the activation
-        }
-    
-        $result = null;
-    
-        if ( $this->user ) {
-            $result = $this->execute('edit',  $context);
-        } else {
-            $result = $this->execute('reset', $context);
-        }
+        $result = $this->execute('add',  $context);
         return $result;
-    }
-    
-    /**
-     * Edits a password
-     *
-     * @param KCommandContext $context
-     *
-     * @return void
-     */
-    protected function _actionEdit(KCommandContext $context)
-    {
-        $person = $this->getService('repos://site/people.person')
-        ->getQuery()
-        ->disableChain()->userId($this->user->id)->fetch();
-    
-        if ( $person )
-        {
-            $password = $context->data->password;
-            $person->setPassword($password);
-            	
-            //passwrod validation has passed then store the passord in the user
-            if ( $person->validateEntity() )
-            {
-                $this->user->setData(array(
-                        'password' 		=> $person->getPassword(true),
-                        'activation'	=> null
-                ));
-    
-                $this->user->save();
-                $this->setRedirect(array('url'=>'view=session','message'=>'login'));
-            } else {
-                $context->setError(new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST));
-                return false;
-            }
-        } else {
-            $context->setError(new KControllerException('Invalid Token', KHttpResponse::NOT_FOUND));
-            return false;
-        }
-    
-    }
+    }        
     
     /**
      * Resets a password
@@ -136,7 +79,7 @@ class ComPeopleControllerToken extends ComBaseControllerResource
      *
      * @return void
      */
-    protected function _actionReset(KCommandContext $context)
+    protected function _actionAdd(KCommandContext $context)
     {
         $data  = $context->data;
         $email = $data->email;
@@ -149,6 +92,7 @@ class ComPeopleControllerToken extends ComBaseControllerResource
         
         if ( $user ) {
             $user->requiresActivation()->save();
+            $context->status = KHttpResponse::CREATED;
             $this->user = $user;
         }
         else {
@@ -176,28 +120,5 @@ class ComPeopleControllerToken extends ComBaseControllerResource
             	
             $this->setRedirect('layout=email_sent');
         }
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see LibBaseControllerResource::_actionGet()
-     */
-    protected function _actionGet(KCommandContext $context)
-    {
-        $this->_state->insert('id');
-        
-        if ( $this->id )
-        {
-            $this->user = $this->getService('repos://site/users.user')
-                ->getQuery()
-                ->activation($this->id)
-                ->block(false)
-                ->fetch();
-
-            if ( $this->user ) {
-                $this->getView()->layout('_reset');
-            }            
-        }
-        return $this->getView()->display();
     }    
 }
