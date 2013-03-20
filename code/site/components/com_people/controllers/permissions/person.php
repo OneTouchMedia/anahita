@@ -82,6 +82,7 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
            {
                $this->setItem($this->getRepository()->fetch(array('userId'=>$user->id)));               
                $user->activation = null;
+               $user->block = false;
                $user->save();
            }
         }

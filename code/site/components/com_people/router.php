@@ -41,9 +41,9 @@ class ComPeopleRouter extends ComActorsRouterDefault
     public function parse($segments)
     {
     	$query = array();
-    	
+    	$view  = KInflector::singularize($segments[0]);
     	if ( count($segments) && !is_numeric($segments[0]) && 
-    			!in_array($segments[0], array('person','session','password'))) 
+    			!in_array($view, array('person','session','token'))) 
     	{
     		$query['username'] = $segments[0];
     		//@TODO the parent::parse wants a numeric ID in order
@@ -54,9 +54,16 @@ class ComPeopleRouter extends ComActorsRouterDefault
     		unset($query['id']);
     	}
     	
-    	else {
-    		$query = parent::parse($segments);
-    	}    	
+    	else 
+    	{
+    	    $path  = implode('/', $segments);
+    	    if ( preg_match('/tokens\/.*/',$path) ) 
+    	    {
+    	        $query['view'] = 'token';
+    	        $query['id']   = array_pop($segments);
+    	    }
+    		else $query = parent::parse($segments);
+    	}
    	
     	return $query;
     }

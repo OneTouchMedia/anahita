@@ -30,7 +30,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
      *
      * @var string
      */
-    protected $_redirect_url;
+    protected $_login_redirect_url;
     
     /**
      * Constructor.
@@ -43,7 +43,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
     {
         parent::__construct($config);
     
-        $this->_redirect_url = $config->redirect_url;
+        $this->_login_redirect_url = $config->login_redirect_url;
     }
     
     /**
@@ -59,11 +59,11 @@ class ComPeopleDispatcher extends ComBaseDispatcher
     {
         //you can set the redirect url for when a user is logged in
         //as follow
-        //KService::setConfig('com://site/people.view.session.html', array(
-        // 'redirect_url' => 'mynewurl'
+        //KService::setConfig('com://site/people.dispatcher', array(
+        // 'login_redirect_url' => 'mynewurl'
         //));
         $config->append(array(
-                'redirect_url' => 'option=com_dashboard&view=dashboard'
+                'login_redirect_url' => 'option=com_dashboard&view=dashboard'
         ));
     
         parent::_initialize($config);
@@ -123,13 +123,13 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	        if ( $this->getController()->canRead() ) 
 	        {
 	            $this->getController()->login();
-	            $url = $this->getController()->setRedirect(array('url'=>$this->_redirect_url))->getRedirect()->url;
+	            $url = $this->getController()->setRedirect(array('url'=>$this->_login_redirect_url))->getRedirect()->url;
 	            $this->getService('application')->redirect($url);
 	            return false;	            
 	        }     
 	    }
 	    	    
-	    $result = parent::_actionDispatch($context);
+	    return parent::_actionDispatch($context);
 	}
 	
 	/**
@@ -146,10 +146,13 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	    {
 	        if ( $this->getController()->getIdentifier()->name == 'person' )
 	        {
-	            if ( $context->status == KHttpResponse::CREATED ) 
+	            //if new person is created an no activation is 
+	            //required
+	            if ( $context->status == KHttpResponse::CREATED && 
+	                    !$this->getController()->activationRequired() ) 
 	            {
 	                $this->getController()->login();
-	                $this->getController()->setRedirect(array('url'=>$this->_redirect_url));
+	                $this->getController()->setRedirect(array('url'=>$this->_login_redirect_url));
 	            }
 	        }
 	    }    
@@ -161,7 +164,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 			if ( $context->status == KHttpResponse::CREATED ) 
 			{
 			    if ( $this->format == 'html' ) {
-			        $this->getController()->setRedirect(array('url'=>$this->_redirect_url));
+			        $this->getController()->setRedirect(array('url'=>$this->_login_redirect_url));
 			    } 
 			    else {
 			        $context->result = $this->getController()->display();

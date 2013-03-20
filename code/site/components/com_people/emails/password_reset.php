@@ -5,7 +5,7 @@
 <?= @text('COM-PEOPLE-PASSWORD-RESET-BODY')?>
 
 
-<?= @route('view=password&token='.$user->activation) ?>
+<?= @route('view=token&id='.$user->activation) ?>
 
 
 

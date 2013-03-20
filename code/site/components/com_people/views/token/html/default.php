@@ -3,7 +3,7 @@
 
 <div>
 	<div class="user">
-		<form data-behavior="FormValidator" action="<?= @route() ?>" method="post">
+		<form data-behavior="FormValidator" action="<?= @route('view=token') ?>" method="post">
 		<fieldset>
 			<legend><?php print JText::_( 'RESET YOUR PASSWORD' ) ?></legend>
 			<div class="control-group">				

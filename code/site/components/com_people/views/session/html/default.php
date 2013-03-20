@@ -42,13 +42,8 @@
 	
 		<ul>
 			<li>
-				<a href="<?= @route('view=password') ?>">
+				<a href="<?= @route('view=token') ?>">
 					<?php print JText::_('COM-PEOPLE-LOGIN-FORGOT-PASSWORD'); ?>
-				</a>
-			</li>
-			<li>
-				<a href="<?= @route('view=username') ?>">
-					<?php print JText::_('COM-PEOPLE-LOGIN-FORGOT-USERNAME'); ?>
 				</a>
 			</li>
 		</ul>
