@@ -101,8 +101,14 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 			{
 				if ( $context->action == 'read' && $this->getRequest()->layout == 'add' )
 				{
-					$this->getService('application')
+				    if ( JFactory::getUser()->id ) {
+				        $url = $this->getService('application.router')->build('index.php?'.get_viewer()->getURL());
+				        $this->getService('application')->redirect($url);
+				    }
+					else {
+					    $this->getService('application')
 							->redirect($this->_login_url, JText::_('COM-PEOPLE-REGISTRATION-CLOSED'), 'error');
+					}
 					return false;					
 				}
 			}
