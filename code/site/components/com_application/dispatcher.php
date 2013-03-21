@@ -129,19 +129,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         $component = $this->option;
         
         if ( !empty($component) ) 
-        {
-            $item    = $this->_application->getMenu()->getActive();
-                         
-            switch(true) 
-            {
-                //don't render if home menu or front page                            
-                case isset($item) && $item->alias == 'home' && KRequest::method() == 'GET' :
-                case $component  == 'com_frontpage' :                
-                    $result = '';
-                    break;
-                default :
-                    $result = JComponentHelper::renderComponent($component);    
-            }
+        {            
+            $result  = JComponentHelper::renderComponent($component);
             
             //legacy. joomla event
             $this->_application->triggerEvent('onAfterDispatch', array($result));
