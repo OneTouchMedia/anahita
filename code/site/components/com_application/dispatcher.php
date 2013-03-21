@@ -219,25 +219,22 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _actionRoute(KCommandContext $context)
     {
         //route the application
-        $vars = $this->_application->getRouter()->parse(KRequest::url());
-        
-        JRequest::set($vars, 'get', false );
-        
-        KRequest::set('get.option', KRequest::get('request.option','cmd'));
-                    
+        $url  = clone KRequest::url();
+        $this->_application->getRouter()->parse($url);
+        JRequest::set($url->query, 'get', false);
+                            
         // trigger the onAfterRoute events
         $this->_application->triggerEvent('onAfterRoute');
 
         //globally set ItemId
         global $Itemid;
         
-        $Itemid = KRequest::get('get.Itemid','int',0);
+        $Itemid = KRequest::get('get.Itemid','int', 0);
         
         //set the request        
         $this->setRequest(KRequest::get('get','raw'));
         
-        $this->_request->append(array(
-            'format' => KRequest::format() ? KRequest::format() : 'html',
+        $this->_request->append(array(        
             'tmpl'   => KRequest::type() == 'AJAX' ? 'raw' : 'default',
         ));
     }

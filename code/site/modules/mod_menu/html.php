@@ -101,10 +101,7 @@ class ModMenuHtml extends ModBaseHtml
 	public function getRoute($route)
 	{				
 		if ( is_object($route) ) {			
-			
-			if ( $route->home ) 
-				return '';
-			
+						
 			switch($route->type)
 			{
 				case 'menulink' :
@@ -116,7 +113,7 @@ class ModMenuHtml extends ModBaseHtml
 					}
 					if ( !$route ) break;
 				case 'component' : 
-					$route = $route->link.'&Itemid='.$route->id;
+					$route = 'index.php?option=com_menu&id='.$route->id;
 					break;
 				case 'url' :
 					return $route->link;

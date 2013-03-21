@@ -30,7 +30,7 @@ class JRouterSite extends KObject
      * 
      * @var KHttpUrl
      */
-    private $__url;
+    private $_clonable_url;
     
     /**
      * If enabled then index.php is removed from the routes
@@ -59,7 +59,7 @@ class JRouterSite extends KObject
 		
 		$this->_enable_rewrite = $config->enable_rewrite;
 		
-        $this->__url = $config->url;
+        $this->_clonable_url = $config->url;
 	}
 
     /**
@@ -81,49 +81,30 @@ class JRouterSite extends KObject
      */
 	public function parse($url)
 	{
-        // Get the path
-        $uri  = clone $this->__url;
-        //clean up the url
-        //remove the index.php
-        $url  = preg_replace('/index\/?.php/','',$url);
-        $uri->setUrl($url);        
-        $path = $uri->path;
-        //remove the base
-        $path = substr_replace($path, '', 0, strlen(JURI::base(true)));
-        //remove trailing /
-        $path = trim($path , '/');
-                        
-        $vars = new KConfig($uri->getQuery(true));
-        
-        //set the format
-        if ( $uri->format ) {            
-            $vars->append(array('format'=>$uri->format));
-        }
-        
-        if ( empty($path) && count($vars) == 0 ) 
-        {
-            $menu = JSite::getMenu(true)->getDefault();
-            if ( $menu ) {
-                $vars->append(array('Itemid'=>$menu->id));
-            }
-        }
-        
-        $segments  = explode('/', $path);        
-        $component = array_shift($segments);
-        
-        if ( !$component ) {
-        	$component = 'com_frontpage';
-        }
-        
-        $vars->append(array(
-			'option' => 'com_'.str_replace('com_','',$component)
-		));
-                
-        $vars->append($this->getComponentRouter($vars->option)->parse($segments));
-        
-        $vars->append(array('Itemid'=> null));
-               
-        return KConfig::unbox($vars);     
+	    $path  = $url->path;
+	    //bug in request
+	    if ( $url->format == 'php') {
+	        $path .= '.php';
+	        $url->format = null;
+	    }	    	    
+	    $path  = substr_replace($path, '', 0, strlen(KRequest::base()));	    	    
+	    $path  = str_replace('index.php', '', $path);
+	    $path  = trim($path, '/');
+	    $url->path   = $path;
+	    $url->format = $url->format ? $url->format : pick(KRequest::format(), 'html');	    
+	    if(!empty($url->format) ) {
+	        $url->query['format'] = $url->format;
+	    }
+	    $segments   = explode('/', trim($url->path,'/'));
+	    $segments   = array_filter($segments);	    	    	    
+	    $component  = count($segments) ? array_shift($segments) : 'menu';
+	    $query      = $this->getComponentRouter($component)->parse($segments);	   
+	    $url->query = array_merge($url->query, array('option'=>'com_'.$component), $query);
+	    //legacy reasons
+	    if ( empty($url->query['Itemid']) ) {
+	        $url->query['Itemid'] = null;
+	    }
+	    return true;	       
 	}
 
     /**
@@ -133,63 +114,40 @@ class JRouterSite extends KObject
      * 
      * @return void
      */
-	function build($url = '')
-	{                
-        $uri = clone $this->__url;
+	function build($query = '')
+	{
+	    $query = str_replace('index.php?', '', $query);	    
+        $uri = clone $this->_clonable_url;
+        $uri->setQuery($query);
+        $query = $uri->query;
         
-        if ( strpos($url,'index.php?') === false ) {
-        	$url = 'index.php?'.$url;
+        if ( isset($query['format']) ) {            
+            $uri->format = $query['format'];                        
+            unset($query['format']);
         }
         
-        if ( $url == 'index.php?' ) {
-        	$uri->setPath(JURI::base(true));
-        	return $uri;	
-        }
-        
-        //lets remove the index.php to avoid using the .php as the format
-        $url = str_replace('index.php', '', $url);
-        
-        $uri->setUrl($url);
-                        
-        $query = $uri->getQuery(true);
-        
-        if ( !isset($query['option']) ) {
-        	return $url;
-           	//throw new KException("No component is specified in the route '$url'");
-        }
-                        
-        if ( isset($query['format']) ) 
-        {
-        	if ( $query['format'] != 'html') {
-        		$uri->format = $query['format'];
-        	}
-            unset($query['format']);  
-        }
-        
-        $router   = $this->getComponentRouter(str_replace('com_','', $query['option']));
-        $parts    = $router->build($query);
-                
-        if ( empty($parts) ) {
-        	$parts = array();
-        }
+        $parts = array();
         
         if ( isset($query['option']) ) {
-        	array_unshift($parts, str_replace('com_','', $query['option']));
-        	unset($query['option']);
+            $router   = $this->getComponentRouter(str_replace('com_','', $query['option']));
+            $parts    = pick($router->build($query), array());
         }
+                
+        if ( isset($query['option']) ) {
+            array_unshift($parts, str_replace('com_','', $query['option']));
+            unset($query['option']);
+        }
+
+        $uri->query = $query;
         
         //only add index.php is it's rewrite SEF
         if ( !$this->_enable_rewrite ) {
-        	array_unshift($parts,'index.php');
+            array_unshift($parts,'index.php');
         }
-        
+        array_unshift($parts, KRequest::base()->path);        
         $path  = implode('/', $parts);
-
-        //lets set the query stuff
-        $uri->setQuery($query);        
-        $uri->setPath(JURI::base(true).'/'.$path);
-
-		return $uri;
+        $uri->path = $path;
+        return $uri;        
 	}
 
     /**
