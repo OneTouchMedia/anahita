@@ -4,7 +4,7 @@ require_once('init.php');
 
 $path = @$_SERVER['argv'][1];
 
-$installer = KService::get('com://dev/installer.controller',array(
+$installer = KService::get('com://dev/installer.controller.default',array(
         'request' => array(
             'path' => $path     
         )
