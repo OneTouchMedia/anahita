@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Base
+ * @package    Com_Mailer
  * @subpackage Controller_Behavior
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -18,21 +18,21 @@
  * Mailer Behavior can be used to send emails using a template
  *
  * @category   Anahita
- * @package    Com_Base
+ * @package    Com_Mailer
  * @subpackage Controller_Behavior
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
+class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 {
 	/**
 	 * Email View
 	 * 
-	 * @var ComBaseEmailView
+	 * @var ComMailerEmailView
 	 */
-	protected $_view;
+	protected $_template_view;
 	
 	/**
 	 * Constructor.
@@ -44,6 +44,8 @@ class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
 	public function __construct(KConfig $config)
 	{
 		parent::__construct($config);
+		
+		$this->_template_view = $config->template_view;
 	}
 		
 	/**
@@ -58,7 +60,7 @@ class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-	
+	        'template_view' => 'com://site/mailer.view.template'
 		));
 	
 		parent::_initialize($config);
@@ -67,19 +69,27 @@ class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
 	/**
 	 * Return the email view
 	 * 
-	 * @return ComBaseEmailView
+	 * @return ComMailerViewTemplate
 	 */
-	public function getEmailView()
+	public function getEmailTemplateView()
 	{
-		if ( !isset($this->_view) ) 
-		{
-			$identifier = clone $this->getIdentifier();
-			$identifier->path = array('email');
-			$identifier->name = 'view';
-			register_default(array('identifier'=>$identifier, 'default'=>array('ComBaseEmailView')));
-			$this->_view = $this->getService($identifier,array('base_url'=>KRequest::url()));
-		}
-		return $this->_view;
+	    if ( !$this->_template_view instanceof ComMailerViewTemplate ) 
+	    {
+	        $identifier = clone $this->_mixer->getIdentifier();
+	        $identifier->path = array('emails');
+
+	        $paths[] = dirname($identifier->filepath);
+	        $paths[] = implode(DS, array(JPATH_THEMES, JFactory::getApplication()->getTemplate(), 'emails', $identifier->type.'_'.$identifier->package));
+	        $paths[] = implode(DS, array(JPATH_THEMES, JFactory::getApplication()->getTemplate(), 'emails')); 	        
+	        $config = array(
+                'base_url'          => KRequest::url(),
+	            'template_paths'    => $paths
+	        );	
+     
+	        $this->_template_view = $this->getService($this->_template_view, $config);    
+	    }
+	    
+	    return $this->_template_view;		
 	}
 	
 	/**
@@ -95,8 +105,7 @@ class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 */
 	public function mail($config = array())
 	{
-		$config = new KConfig($config);		
-		
+		$config = new KConfig($config);
 		
 		$data   = $this->getState()->toArray();
 		
@@ -111,9 +120,9 @@ class ComBaseControllerBehaviorMailer extends KControllerBehaviorAbstract
 		$config->append(array(
 			'data' => $data	
 		));
-						
+					
 		$emails	= (array)$config['to'];
-		$output = $this->getEmailView()
+		$output = $this->getEmailTemplateView()
 					->layout($config->template)
 					->config($config)
 					->display($config['data'])

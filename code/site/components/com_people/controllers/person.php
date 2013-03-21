@@ -65,7 +65,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	{	
 		$config->append(array(
 			'activation_required' => get_config_value('users.useractivation'),
-			'behaviors'			  => array('validatable','mailer'),
+			'behaviors'			  => array('validatable','com://site/mailer.controller.behavior.mailer'),
 		    'login_callback'      => array($this, 'login')
 		));
 		
@@ -89,7 +89,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      * {@inheritdoc}
      */
 	protected function _actionGet(KCommandContext $context)
-	{
+	{	  
         $this->getToolbar('menubar')->setTitle(null);
 		return parent::_actionGet($context);
 	}

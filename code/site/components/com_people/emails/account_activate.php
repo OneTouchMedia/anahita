@@ -4,4 +4,4 @@
 
 <?= @text('COM-PEOPLE-PASSWORD-RESET-BODY')?>
 
-<?= @route('view=person&token='.$user->activation) ?>
+<?= @route('option=com_people&view=person&token='.$user->activation) ?>

@@ -53,7 +53,7 @@ class ComPeopleControllerToken extends ComBaseControllerResource
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-                'behaviors' => array('mailer')
+                'behaviors' => array('com://site/mailer.controller.behavior.mailer')
         ));
     
         parent::_initialize($config);
