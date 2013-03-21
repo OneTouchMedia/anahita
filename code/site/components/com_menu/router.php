@@ -59,11 +59,11 @@ class ComMenuRouter extends ComBaseRouterDefault
             $item   = $menu->getItems('home', true, true);
         }
 
-		if ( $item ) {
+		if ( !empty($item) ) {
 			$vars = $item->query;
 			$vars['Itemid'] = $item->id;
 		}
-		
+		$vars = array_merge(array('option'=>null), $vars);
 		return $vars;
     }    
 }
