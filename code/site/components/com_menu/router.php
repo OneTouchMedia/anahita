@@ -32,14 +32,19 @@ class ComMenuRouter extends ComBaseRouterDefault
     public function build(&$query)
     {
         $segments = array();
+        
         if ( isset($query['id']) ) 
         {
             $item = JSite::getMenu()->getItem($query['id']);                        
             if ( $item ) {
-                $route = $item->route;
-                unset($query['id']);
-                $segments[] = $route;                
+                if ( $item->home ) {
+                    unset($query['option']);                    
+                } else {
+                    $route = $item->route;
+                    $segments[] = $route;                    
+                }
             }
+            unset($query['id']);
         }
         return $segments;
     }
