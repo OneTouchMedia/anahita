@@ -15,10 +15,8 @@
         	
             <?= @render('logo') ?>
             <div id="desktop-main-menu" class="nav-collapse collapse">
+            	<?= @service('mod://site/search.html') ?>
 	            <?= @helper('modules.render','navigation', array('style'=>'none')) ?>
-	            
-
-	            <?= @service('mod://site/search.html') ?>
 	            <?php if( $viewer_module = @helper('modules.render','viewer', array('style'=>'none'))): ?>
 	            <span class="viewer pull-right"><?= $viewer_module ?></span>
 	            <?php endif; ?>

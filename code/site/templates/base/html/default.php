@@ -16,32 +16,13 @@
     		
     <?= @template('tmpl/navbar') ?>
     
-    <?= @render('modules', 'header') ?> 
-	<?= @render('modules', 'showcase', array('style'=>'none')) ?>
-	<?= @render('modules', 'feature', array('style'=>'simple')) ?>
-    <?= @render('modules', 'utility', array('style'=>'none')) ?>
-    <?= @render('modules', 'maintop', array('style'=>'simple')) ?>
+    <?= @render('modules', '1', array('style'=>'none')) ?>
+	<?= @render('modules', '2', array('style'=>'simple')) ?>
+	<?= @render('modules', '3', array('style'=>'simple')) ?>
+    <?= @render('modules', '4', array('style'=>'simple')) ?>
+    <?= @render('modules', '5', array('style'=>'simple')) ?>
+    
     <?= @render('component') ?>
-    <?= @render('modules', 'mainbottom', array('style'=>'simple')) ?>
-    
-    <?php if ( $bottom = @render('modules', 'bottom', array('style'=>'simple')) ) : ?>
-    <div id="bottom-wrapper" class="visible-desktop">
-    <?= $bottom ?>
-    </div>
-    <?php endif; ?>
-
-	<?php if ( $footer = @render('modules', 'footer', array('style'=>'simple')) ) : ?>
-    <div id="footer-wrapper" class="visible-desktop">
-    <?= $footer ?>
-    </div>
-    <?php endif; ?>
-    
-    <div id="copyright-wrapper" class="visible-desktop">
-    	<div class="container">
-    	<?= @render('copyright') ?>
-    	</div>
-    </div>
-
     <?= @render('analytics') ?> 
   </body>
 </html>
