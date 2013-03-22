@@ -1,11 +1,10 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
-<module position="sidebar-b" style="basic"></module>
 
-<div>	
-	<div class="user">
-		<form action="<?=@route()?>" method="post">
+<div class="row">
+	<div class="offset3 span6">
+		<form action="<?=@route()?>" method="post" class="well">
 		<fieldset>
-			<legend><?php print JText::_('LOGIN') ?></legend>
+			<legend><?= @text('COM-PEOPLE-LOGIN-TITLE') ?></legend>
 			
 			<?php KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service')?>
 			<?php if ( class_exists('ComConnectTemplateHelperService', true) ): ?>
@@ -14,15 +13,15 @@
 			</div>
 			<?php endif; ?>
 			
-			<div class="control-group">				
+			<div class="control-group">			
 				<div class="controls">
-					<input name="username" placeholder="<?= @text('COM-PEOPLE-LOGIN-PLACEHOLDER-USERNAME-EMAIL')?>" id="username" type="text" alt="username" size="18" />
+					<input class="input-block-level" name="username" placeholder="<?= @text('COM-PEOPLE-LOGIN-PLACEHOLDER-USERNAME-EMAIL')?>" id="username" type="text" alt="username" size="18" />
 				</div>
 			</div>
 			
 			<div class="control-group">				
 				<div class="controls">
-					<input type="password" placeholder="<?= @text('COM-PEOPLE-LOGIN-PLACEHOLDER-PASSWORD')?>" id="passwd" name="password" size="18" alt="password" />
+					<input class="input-block-level" type="password" placeholder="<?= @text('COM-PEOPLE-LOGIN-PLACEHOLDER-PASSWORD')?>" id="passwd" name="password" size="18" alt="password" />
 				</div>
 			</div>
 			
@@ -34,23 +33,20 @@
 				</label>
 			</div>
 			<?php endif; ?>
-			<div class="form-actions">
-				<input type="submit" name="Submit" class="btn btn-primary" value="<?php print JText::_('LOGIN') ?>" />
-			</div>
 			
+			<div class="form-actions">
+				<input type="submit" name="Submit" class="btn btn-primary" value="<?php print JText::_('COM-PEOPLE-ACTION-LOGIN') ?>" />
+			</div>
 		</fieldset>
-	
-		<ul>
-			<li>
-				<a href="<?= @route('view=token') ?>">
-					<?php print JText::_('COM-PEOPLE-LOGIN-FORGOT-PASSWORD'); ?>
-				</a>
-			</li>
-		</ul>
-		<?php if ( !empty($this->return) ) : ?>
-			<input type="hidden" name="return" value="<?= $this->return; ?>" />
-		<?php endif;?>
-		</form>
 
+		<a href="<?= @route('view=token') ?>">
+		<?php print JText::_('COM-PEOPLE-LOGIN-FORGOT-PASSWORD'); ?>
+		</a>
+		
+		<?php if ( !empty($this->return) ) : ?>
+		<input type="hidden" name="return" value="<?= $this->return; ?>" />
+		<?php endif;?>
+		
+		</form>
 	</div>
 </div>
