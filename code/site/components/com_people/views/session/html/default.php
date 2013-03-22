@@ -35,7 +35,7 @@
 			<?php endif; ?>
 			
 			<div class="form-actions">
-				<input type="submit" name="Submit" class="btn btn-primary" value="<?php print JText::_('COM-PEOPLE-ACTION-LOGIN') ?>" />
+				<input type="submit" name="Submit" class="btn btn-large" value="<?php print JText::_('COM-PEOPLE-ACTION-LOGIN') ?>" />
 			</div>
 		</fieldset>
 

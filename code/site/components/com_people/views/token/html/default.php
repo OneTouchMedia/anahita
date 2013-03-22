@@ -13,7 +13,7 @@
 			</div>
 		
 			<div class="form-actions">
-				<button type="submit" class="btn btn-primary">
+				<button type="submit" class="btn btn-large">
 					<?= @text('COM-PEOPLE-ACTION-RESET-PASSWORD'); ?>
 				</button>
 			</div>
