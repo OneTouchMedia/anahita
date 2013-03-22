@@ -1,19 +1,21 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
-<module position="sidebar-b" style="basic"></module>
 
-<div>
-	<div class="user">
-		<form data-behavior="FormValidator" action="<?= @route('view=token') ?>" method="post">
+<div class="row">
+	<div class="offset3 span6">
+		<form data-behavior="FormValidator" action="<?= @route('view=token') ?>" method="post" class="well">
 		<fieldset>
-			<legend><?php print JText::_( 'RESET YOUR PASSWORD' ) ?></legend>
+			<legend><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD') ?></legend>
 			<div class="control-group">				
 				<div class="controls">
-					<input id="email" name="email" type="text" placeholder="<?= @text('COM-PEOPLE-EMAIL-PLACEHOLDER') ?>"  data-validators="required validate-email" />
+					<p><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD-INSTRUCTIONS') ?></p>
+					<input class="input-block-level" id="email" name="email" type="text" placeholder="<?= @text('COM-PEOPLE-EMAIL-PLACEHOLDER') ?>"  data-validators="required validate-email" />
 				</div>
 			</div>
 		
 			<div class="form-actions">
-				<button type="submit" class="btn btn-primary"><?php print JText::_('Submit'); ?></button>
+				<button type="submit" class="btn btn-primary">
+					<?= @text('COM-PEOPLE-ACTION-RESET-PASSWORD'); ?>
+				</button>
 			</div>
 		</fieldset>
 		<?php echo JHTML::_( 'form.token' ); ?>
