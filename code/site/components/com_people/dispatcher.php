@@ -74,7 +74,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	 * @see ComBaseDispatcher::_handleDispatchException()
 	 */
     protected function _handleDispatchException(KCommandContext $context, KException $exception)
-    {		
+    {
 		//if a session throws exception then check the code
 		//and generate a correct message
 		if ( $this->getController()->getIdentifier()->name == 'session' ) 

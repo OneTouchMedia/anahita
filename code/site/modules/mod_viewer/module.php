@@ -32,8 +32,10 @@ class ModViewerModule extends ModBaseModule
 	protected function _actionDisplay()
 	{
 		if ( !get_viewer()->guest() ) {
-			$this->return = base64_encode(JURI::base());
-			return parent::_actionDisplay();
+			$this->return = base64_encode(JURI::base());			
+		} else {
+		    $this->getView()->layout('login');
 		}
+		return parent::_actionDisplay();
 	}
 }

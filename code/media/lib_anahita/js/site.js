@@ -546,20 +546,28 @@ Delegator.register('click', {
 	},
 	'Submit' : function(event, el, api) {
 		event.stop();
-		if ( el.hasClass('disabled') )
-		{
+		if ( el.hasClass('disabled') ) {
 		    return false;
 		}
-		data = el.get('href').toURI().getData();
-		var form = Element.Form({action:el.get('href'), data:data});
-		if ( el.get('target') ) {
-			form.set('target', el.get('target'));
+		if ( api.get('form') ) {
+			var form = document.getElement(api.get('form'));
+			var submit = function() {
+				form.spin();
+				form.submit();			
+			}
+		} else {
+			data = el.get('href').toURI().getData();
+			var form = Element.Form({action:el.get('href'), data:data});
+			if ( el.get('target') ) {
+				form.set('target', el.get('target'));
+			}	
+			var submit = function(){
+				el.spin();
+				form.inject(document.body, 'bottom');
+				form.submit();			
+			}			
 		}
-		var submit = function(){
-			el.spin();
-			form.inject(document.body, 'bottom');
-			form.submit();			
-		}
+		
 		if ( api.get('promptMsg') ) {
 			api.get('promptMsg').prompt({onConfirm:submit});
 		}		
@@ -589,7 +597,8 @@ Delegator.register('click', {
 	}
 });
 
-(function(){
+(function() {
+	var remote_popups = {};
 	Delegator.register('click', 'BS.showPopup', {
 		handler: function(event, link, api) {
 			var target, url;	
@@ -606,24 +615,32 @@ Delegator.register('click', {
 						
 			if ( target )								
 				target.getBehaviorResult('BS.Popup').show();
-			else {
+			else 
+			{
+				if ( remote_popups[url] ) {
+					remote_popups[url].show();
+					return;
+				}
 				var popup = Bootstrap.Popup.from({
 					header : 'Prompt.loading'.translate(),
-					body   : '<div class="uiActivityIndicator">&nbsp;</div>',
-					buttons : [{name: 'Action.close'.translate(), dismiss:true}]
+					body   : '<div class="uiActivityIndicator">&nbsp;</div>',					
 				});
-				popup.show();			
+				remote_popups[url] = popup;
+				popup.show();
 				var req = new Request.HTML({
 					url : url,
-					onSuccess : function(nodes, tree, html) { 
-					    var title = html.parseHTML().getElement('.popup-header');
-					    var body  = html.parseHTML().getElement('.popup-body');
-					    if ( title ) {
-					    	popup.element.getElement('.modal-header').empty().adopt(title);
-					    }
-					    if ( body ) {
-					    	popup.element.getElement('.modal-body').empty().adopt(body);
-					    }
+					onSuccess : function(nodes, tree, html) {
+						var sections = {};
+						['header','body','footer'].each(function(section) {
+							var element = popup.element.getElement('.modal-' + section);
+							var section = new RegExp('<popup:'+section+'>([\\s\\S]*?)<\/popup:'+section+'>');
+							var matches = section.exec(html);
+							if ( matches ) {
+								element.set('html', matches[1]);
+							} else {
+								element.hide();
+							}
+						});						
 					}
 				}).get();
 			}
