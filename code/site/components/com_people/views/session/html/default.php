@@ -4,7 +4,7 @@
 	<div class="offset3 span6">
 		<form action="<?=@route()?>" method="post" class="well">
 		<fieldset>
-			<legend><?= @text('COM-PEOPLE-LOGIN-TITLE') ?></legend>
+			<legend><?= @text('COM-PEOPLE-SESSION-TITLE') ?></legend>
 			
 			<?php KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service')?>
 			<?php if ( class_exists('ComConnectTemplateHelperService', true) ): ?>
@@ -15,32 +15,32 @@
 			
 			<div class="control-group">			
 				<div class="controls">
-					<input class="input-block-level" name="username" placeholder="<?= @text('COM-PEOPLE-LOGIN-PLACEHOLDER-USERNAME-EMAIL')?>" id="username" type="text" alt="username" size="18" />
+					<input class="input-block-level" name="username" placeholder="<?= @text('COM-PEOPLE-SESSION-PLACEHOLDER-USERNAME-EMAIL')?>" id="username" type="text" alt="username" size="18" />
 				</div>
 			</div>
 			
 			<div class="control-group">				
 				<div class="controls">
-					<input class="input-block-level" type="password" placeholder="<?= @text('COM-PEOPLE-LOGIN-PLACEHOLDER-PASSWORD')?>" id="passwd" name="password" size="18" alt="password" />
+					<input class="input-block-level" type="password" placeholder="<?= @text('COM-PEOPLE-SESSION-PLACEHOLDER-PASSWORD')?>" id="passwd" name="password" size="18" alt="password" />
 				</div>
 			</div>
 			
 			<?php if(JPluginHelper::isEnabled('system', 'remember')) : ?>
 			<div id="form-login-remember" class="control-group">
 				<label class="checkbox">
-					<input type="checkbox" name="remember" value="yes" alt="<?php print JText::_('Remember me'); ?>" />
-					<?php print JText::_('Remember me'); ?>
+					<input type="checkbox" name="remember" value="yes" alt="<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>" />
+					<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>
 				</label>
 			</div>
 			<?php endif; ?>
 			
 			<div class="form-actions">
-				<input type="submit" name="Submit" class="btn btn-large" value="<?php print JText::_('COM-PEOPLE-ACTION-LOGIN') ?>" />
+				<input type="submit" name="Submit" class="btn btn-large" value="<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>" />
 			</div>
 		</fieldset>
 
 		<a href="<?= @route('view=token') ?>">
-		<?php print JText::_('COM-PEOPLE-LOGIN-FORGOT-PASSWORD'); ?>
+		<?= @text('COM-PEOPLE-SESSION-FORGOT-PASSWORD'); ?>
 		</a>
 		
 		<?php if ( !empty($this->return) ) : ?>
