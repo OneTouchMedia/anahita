@@ -132,6 +132,7 @@ class AnDomainEntityData extends KObject implements ArrayAccess
 
         $condition[$this->_description->getIdentityProperty()->getName()] = $this->_entity->getIdentityId();		
 		
+        $this->_entity->getRepository()->getStore()->getCommandChain()->disable();
 		$this->_entity->getRepository()->getCommandChain()->disable();
 		 
 		$query = $this->_entity->getRepository()->getQuery()
@@ -150,7 +151,8 @@ class AnDomainEntityData extends KObject implements ArrayAccess
 		}
 
 		$this->_entity->getRepository()->getCommandChain()->enable();
-
+		$this->_entity->getRepository()->getStore()->getCommandChain()->enable();
+		
 		return !empty($data);
     }
     
