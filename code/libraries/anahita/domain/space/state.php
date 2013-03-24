@@ -159,7 +159,7 @@ class AnDomainSpaceState extends KObject
 	 */
 	protected function _validateId($entity)
 	{
-	    return !is_null($entity->getIdentityId());
+	    return !is_null($entity->getIdentityId()) && $entity->persisted();
 	}	
 		
 	/**
