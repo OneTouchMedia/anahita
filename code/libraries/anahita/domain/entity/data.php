@@ -128,22 +128,30 @@ class AnDomainEntityData extends KObject implements ArrayAccess
      */
     public function load($properties)
     {
-		$condition[$this->_description->getIdentityProperty()->getName()] = $this->_entity->getIdentityId();
+        $condition = array();
+
+        $condition[$this->_description->getIdentityProperty()->getName()] = $this->_entity->getIdentityId();		
 		
 		$this->_entity->getRepository()->getCommandChain()->disable();
 		 
 		$query = $this->_entity->getRepository()->getQuery()
-			->columns($properties)->where($condition);
+			        ->columns($properties)
+		            ->where($condition);
 		
-		$data = $this->_entity->getRepository()->fetch($query, AnDomain::FETCH_ROW);
+		$data  = $this->_entity->getRepository()->fetch($query, AnDomain::FETCH_ROW);
 
-		$this->_row = array_merge($this->_row, $data);
-		
-		foreach($properties as $property) {
-			unset($this->_materialized[$property]);
+		if ( !empty($data) ) 
+		{
+		    $this->_row = array_merge($this->_row, (array)$data);
+		    
+		    foreach($properties as $property) {
+		        unset($this->_materialized[$property]);
+		    }		    
 		}
 
-		$this->_entity->getRepository()->getCommandChain()->enable();    	
+		$this->_entity->getRepository()->getCommandChain()->enable();
+
+		return !empty($data);
     }
     
     /**
