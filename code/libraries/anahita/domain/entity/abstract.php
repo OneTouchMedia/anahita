@@ -480,35 +480,36 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	 * @return void
 	 */
 	public function load($properties = array())
-	{
-		if ( $this->persisted() )
-		{		    
-			settype($properties, 'array');
-	
-			if ( empty($properties) ) 
-			{
-			    //only load serializbale properties (i.e. attributes, many to one relationships)
-				$properties = array();
-				foreach($this->getEntityDescription()->getProperty() as $property)
-				{
-				    if ( $property->isSerializable() )
-				        $properties[] = $property->getName();
-				}
-				$keys		= array_keys($this->getEntityDescription()->getKeys());
-				$properties = array_diff($properties, $keys);
-			}
-			
-			$this->_data->load($properties);
-			
-			//the loaded properties are no longer modified
-			foreach($properties as $property) {
-				unset($this->_modified[$property]);
-			}
-			
-			//reset the element if there are no modified
-			if ( count($this->_modified) === 0 )
-				$this->reset();
-		}
+	{	
+	    settype($properties, 'array');
+	    
+	    if ( empty($properties) )
+	    {
+	        //only load serializbale properties (i.e. attributes, many to one relationships)
+	        $properties = array();
+	        foreach($this->getEntityDescription()->getProperty() as $property)
+	        {
+	            if ( $property->isSerializable() )
+	                $properties[] = $property->getName();
+	        }
+	        $keys		= array_keys($this->getEntityDescription()->getKeys());
+	        $properties = array_diff($properties, $keys);
+	    }
+	    	
+	    if ( $this->_data->load($properties) )
+	    {
+	        //the loaded properties are no longer modified
+	        foreach($properties as $property) {
+	            unset($this->_modified[$property]);
+	        }
+
+	        //reset the element if there are no modified
+	        if ( count($this->_modified) === 0 ) {
+	            $this->reset();
+	        }
+	        	        
+	        $this->_persisted = true;
+	    }
 	}
     
     /**
