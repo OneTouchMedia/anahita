@@ -159,10 +159,14 @@ abstract class AnDomainValidatorAbstract extends KObject
     {
         $description = $entity->getEntityDescription();
         
-        if ( $entity->getEntityState() == AnDomain::STATE_NEW )
-            $properties = $description->getProperty();
-        else
+        //if entity is persisted only look at the modified 
+        //properties
+        if ( $entity->isModified() ) {
             $properties = array_intersect_key($description->getProperty(), KConfig::unbox($entity->getModifiedData()));
+        }
+        else {
+            $properties = $description->getProperty();
+        }
                     
         foreach($properties as $property)
         {
