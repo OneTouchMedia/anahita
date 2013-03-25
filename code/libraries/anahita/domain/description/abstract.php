@@ -345,6 +345,27 @@ abstract class AnDomainDescriptionAbstract
 	}
 	
 	/**
+	 * Materialize an array of key values from a row data
+	 * 
+	 * @param array $data Row data
+	 * 
+	 * @return array
+	 */
+	public function getKeyValues(array $data)
+	{
+	    $keys   = array();
+	    
+	    foreach($this->getKeys() as $key)
+	    {
+	        if ( $key->isMaterializable($data) ) {
+	            $keys[$key->getName()] = $key->materialize($data, null);
+	        }
+	    }
+	    
+	    return $keys;
+	}
+	
+	/**
 	 * Return an array of properties that uniquely define an entity
 	 * 
 	 * @return array

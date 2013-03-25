@@ -198,6 +198,16 @@ class AnDomainRelationshipManytoone extends AnDomainRelationshipProperty impleme
 	}
 		
 	/**
+	 * (non-PHPdoc)
+	 * @see AnDomainPropertyAbstract::isMaterializable()
+	 */
+	public function isMaterializable(array $data)
+	{
+	    $child_key =  $this->_child_column->key();
+	    return array_key_exists($child_key, $data);
+	}
+		
+	/**
 	 * Materialize a many-to-one relationship for the entity and the data from 
 	 * the database
 	 * 
@@ -207,17 +217,17 @@ class AnDomainRelationshipManytoone extends AnDomainRelationshipProperty impleme
 	 * @return AnDomainProxyEntity
 	 */
 	public function materialize(array $data, $instance)
-	{	
+	{
 		if ( empty($data) ) {
 			return null;
-		}
-		
-		$child_key =  $this->_child_column->key();
+		}	
 			
-		if ( !array_key_exists($child_key, $data) ) {
+		if ( !$this->isMaterializable($data) ) {
 			throw new AnDomainExceptionMapping($this->getName().' Mapping Failed');
 		}
 
+		$child_key =  $this->_child_column->key();
+		
 		//get parent value
 		$parent_value = $data[$child_key];
 		

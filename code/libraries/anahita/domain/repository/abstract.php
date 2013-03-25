@@ -682,10 +682,10 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 		$keys 	  	  = array();
 		$description  = $this->_description;
 
-		$keys   = array();
-
-		foreach($description->getKeys() as $key) {
-			$keys[$key->getName()] = $key->materialize($data, null);
+		$keys   = $description->getKeyValues($data);
+		
+		if ( empty($keys) ) {
+		    throw new AnDomainRepositoryException('Trying to create an entity witout any identiftying keys');
 		}
 				
 		//if an entity found with them same key already
@@ -699,13 +699,15 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 
 		$inheritance_column 	= $description->getInheritanceColumn();
 		
-		if ( $inheritance_column )
+		if ( $inheritance_column && 
+		        isset($data[$inheritance_column->key()]) )
 		{
 		    $identifier = $data[$inheritance_column->key()];
 		    $identifier = substr($identifier, strrpos($identifier,',') + 1);
 		}
-		else 
+		else { 
 		    $identifier = $this->_prototype->getIdentifier();
+		}
 		  
 		$entity	= $this->_instantiateEntity($identifier, $data);
 

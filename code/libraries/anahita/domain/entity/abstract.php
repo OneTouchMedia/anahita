@@ -281,6 +281,31 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
         return $this->getEntityDescription()->getIdentityProperty()->getName();
     }
     
+    /**
+     * Return an array of data that can be used to identify this entity
+     * 
+     * @return array
+     */
+    public function getIdentifyingData()
+    {
+        $keys  = array_keys($this->getEntityDescription()->getKeys());
+        $data  = array();
+        foreach($keys as $key) 
+        {
+            if ( $this->_data->isMaterialized($key) )
+            {
+                $value = $this->get($key);
+                if ( $value ) {
+                    $data[$key] = $value;
+                    if ( !$all ) {
+                        return $data;
+                    }
+                }
+            }
+        }
+        return $data;
+    }    
+    
 	/**
 	 * Returns the value of the entity identity property
 	 * 
@@ -481,6 +506,19 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	 */
 	public function load($properties = array())
 	{	
+	    //prevent from creating two differne entities	    	    
+	    if ( !$this->_persisted ) 
+	    {
+	        $keys   = $this->getIdentifyingData();
+	        //if found another entity 
+	        $entity = $this->getRepository()->find($keys, false);
+	        if ( $entity && $entity !== $this ) 
+	        {
+	            $this->reset();
+	            return $entity->load($properties);
+	        }
+	    }
+
 	    settype($properties, 'array');
 	    
 	    if ( empty($properties) )
@@ -489,27 +527,44 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	        $properties = array();
 	        foreach($this->getEntityDescription()->getProperty() as $property)
 	        {
-	            if ( $property->isSerializable() )
+	            if ( $property->isSerializable() ) {
 	                $properties[] = $property->getName();
+	            }
 	        }
-	        $keys		= array_keys($this->getEntityDescription()->getKeys());
+	        $keys		= array_keys($this->getEntityDescription()->getKeys());	        	       
 	        $properties = array_diff($properties, $keys);
 	    }
-	    	
+	    
 	    if ( $this->_data->load($properties) )
-	    {
-	        //the loaded properties are no longer modified
-	        foreach($properties as $property) {
-	            unset($this->_modified[$property]);
-	        }
-
-	        //reset the element if there are no modified
-	        if ( count($this->_modified) === 0 ) {
+	    {	        
+	        //enttiy has been fetched for the first time
+	        if ( !$this->_persisted ) 
+	        {
+	            $keys = $this->getIdentifyingData();
+	            $this->_persisted = true;
+	            $this->getRepository()->getSpace()->insertEntity($this, $keys);
 	            $this->reset();
-	        }
-	        	        
-	        $this->_persisted = true;
+	        } 
+	        else 
+	        {
+	            //the loaded properties are no longer modified
+	            foreach($properties as $property) {
+	                unset($this->_modified[$property]);
+	            }
+	            
+	            //reset the element if there are no modified
+	            if ( count($this->_modified) === 0 ) {
+	                $this->reset();
+	            }	            
+	        }	        	        	        
+	    } 
+	    
+	    //if an entity is not loaded then reset it
+	    else {
+	        $this->reset();
 	    }
+	    
+	    return $this;
 	}
     
     /**

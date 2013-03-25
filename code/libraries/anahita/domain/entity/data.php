@@ -127,17 +127,15 @@ class AnDomainEntityData extends KObject implements ArrayAccess
      * @return void
      */
     public function load($properties)
-    {
-        $condition = array();
-
-        $condition[$this->_description->getIdentityProperty()->getName()] = $this->_entity->getIdentityId();		
-		
+    {		
+        $keys = $this->_entity->getIdentifyingData();
+        
         $this->_entity->getRepository()->getStore()->getCommandChain()->disable();
 		$this->_entity->getRepository()->getCommandChain()->disable();
 		 
 		$query = $this->_entity->getRepository()->getQuery()
 			        ->columns($properties)
-		            ->where($condition);
+		            ->where($keys);
 		
 		$data  = $this->_entity->getRepository()->fetch($query, AnDomain::FETCH_ROW);
 
@@ -180,6 +178,18 @@ class AnDomainEntityData extends KObject implements ArrayAccess
        return isset($this->_property[$key]);
     }
 
+    /**
+     * Return whether a key has been materialized
+     * 
+     * @param string $key
+     * 
+     * @return boolean
+     */
+    public function isMaterialized($key)
+    {
+        return isset($this->_materialized[$key]);
+    }
+    
     /**
      * Get an item from the array by offset
      *
@@ -256,41 +266,58 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     		return;
     	}
 			
-    	if ( isset($this->_materialized[$key]) )
+    	if ( isset($this->_materialized[$key]) ) {
     		return;
+    	}
     		
     	if ( $property = $this->_description->getProperty($key) )
     	{    
     		$repository  = $this->_entity->getRepository();
-    				
-    		try 
+
+    		//if a property is serialzable but not materizable
+    		//then the data must be missing
+    		if ( $property->isSerializable() && 
+    		        !$property->isMaterializable($this->_row)
+    		        )
     		{
-    			$value	= $property->materialize($this->_row, $this->_entity);	
-    		} 
-    		catch(AnDomainExceptionMapping $e) 
-    		{
-    			//lazy load the value alogn with all the entities whose
-    			//$key value is missing
-				$repository->getCommandChain()->disable();
-				$repository->getStore()->getCommandChain()->disable();
-				$entities = $repository->getEntities();
-				$ids	  = array();
-				foreach($entities as $entity) {
-					$ids[] = $entity->getIdentityId();
-				}				
-				$result 	 = $repository->fetch($ids, AnDomain::FETCH_ROW_LIST);
-				$identity	 = $repository->getDescription()->getIdentityProperty();
-				foreach($result as $data) 
-				{
-					//find the idenitty. Don't try to fetch
-					if ( $entity = $repository->find($identity->materialize($data, null), false) ) {
-						$entity->setRowData($data);
-					}
-				}
-				$value	= $property->materialize($this->_row, $this->_entity);
-				$repository->getCommandChain()->enable();
-				$repository->getStore()->getCommandChain()->enable();
+    		    //lazy load the value alogn with all the entities whose
+    		    //$key value is missing    		    
+    		    $repository->getCommandChain()->disable();
+    		    $repository->getStore()->getCommandChain()->disable();
+    		    $entities = $repository->getEntities();
+    		    $query    = $repository->getQuery();
+    		    $keys     = array();
+    		    foreach($entities as $entity)
+    		    {
+    		        if ( $entity->persisted() )
+    		        {
+    		            $data = $entity->getIdentifyingData();
+    		            $key   = current(array_keys($data));
+    		            $value = current($data);
+    		            $keys[$key][] = $value;
+    		        }
+    		    }
+    		    
+    		    foreach($keys as $key => $values) {
+    		        $query->where($key,'IN',$values,'OR');
+    		    }
+    		   
+    		    $result = $repository->fetch($query, AnDomain::FETCH_ROW_LIST);
+    		    
+    		    foreach($result as $data)
+    		    {
+    		        $keys   = $repository->getDescription()->getKeyValues($data);
+    		        $entity = $repository->find($keys, false);
+    		        if ( $entity ) {
+    		            $entity->setRowData($data);
+    		        }
+    		    }
+    		        		    
+    		    $repository->getCommandChain()->enable();
+    		    $repository->getStore()->getCommandChain()->enable();    		    
     		}
+    		
+    		$value	= $property->materialize($this->_row, $this->_entity);
 			
     		$this->_setPropertyValue($key, $value);
 			    		

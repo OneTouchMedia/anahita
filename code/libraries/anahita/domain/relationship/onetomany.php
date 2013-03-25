@@ -144,7 +144,16 @@ class AnDomainRelationshipOnetomany extends AnDomainRelationshipProperty
 		$this->_entityset  = $entityset;
 		return $this;
 	}
-		
+
+	/**
+	 * (non-PHPdoc)
+	 * @see AnDomainPropertyAbstract::isMaterializable()
+	 */
+	public function isMaterializable(array $data)
+	{
+	    return false;
+	}
+	
 	/**
 	 * Materialize a relationship for the parent entity 
 	 * 

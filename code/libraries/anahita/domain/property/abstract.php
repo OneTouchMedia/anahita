@@ -329,6 +329,15 @@ abstract class AnDomainPropertyAbstract
 	}
 	
 	/**
+	 * Provides a test to see if a property is materializable given data
+	 *
+	 * @param array $data
+	 * 
+	 * @return boolean
+	 */	
+	abstract public function isMaterializable(array $data);
+	
+	/**
 	 * Materilize a property from the raw data. If the entity object has been
 	 * already been initialized it will be passed to the function. If a property is
 	 * unique it will not be passed the entity 
