@@ -297,9 +297,6 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
                 $value = $this->get($key);
                 if ( $value ) {
                     $data[$key] = $value;
-                    if ( !$all ) {
-                        return $data;
-                    }
                 }
             }
         }
