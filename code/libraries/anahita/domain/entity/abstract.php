@@ -213,7 +213,21 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
         $result = $this->getRepository()->getSpace()->validateEntities($failed);
 		return !$failed->contains($this); 
 	}
-
+	
+	/**
+	 * Tries to only save the entity
+	 * 
+	 * @return boolean
+	 */
+	public function saveEntity()
+	{	 
+	    $ret = null;   
+	    if ( $this->getRepository()->validate($this) ) {
+	        $ret = $this->getRepository()->commit($this);
+	    }
+	    return $ret;
+	}
+	
 	/**
 	 * Forwards the call to the space commit entities
 	 * 
@@ -398,7 +412,8 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 				//then save the new author first before saving topic
 				//only set the dependency 
 				if ( $value->getEntityState() == AnDomain::STATE_NEW ) {
-					$this->getRepository()->getSpace()->switchPriority($this, $value);
+				    //save the child before saving the parent
+					$this->getRepository()->getSpace()->setSaveOrder($value, $this);
                 }
 			}
 			//if value is not null do a composite type checking
@@ -762,14 +777,12 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	 */	
 	public function __set($property, $value)
 	{
- 		if ( $this->getEntityDescription()->getProperty($property) )
- 		{
+ 		if ( $this->getEntityDescription()->getProperty($property) ) {
  		    $this->setData($property, $value);
  		}			
-		else 
-		{		   
+		else {
 			$this->$property = $value;
-		}		
+		}
 	}
 	
 	/**

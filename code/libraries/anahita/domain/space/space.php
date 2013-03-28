@@ -107,15 +107,15 @@ class AnDomainSpace extends KObject
      */
     public function commitEntities(&$failed = null)
     {                
-        $restult  = $this->validateEntities($failed);
+        $result  = $this->validateEntities($failed);
         
-        while($restult && count($entities = $this->getCommitables()))
+        while($result && count($entities = $this->getCommitables()))
         {
             foreach($entities as $entity)
             {
-                $restult = $entity->getRepository()->commit($entity);
+                $result = $entity->getRepository()->commit($entity);
                 
-                if ( $restult === false ) {
+                if ( $result === false ) {
                    $failed->insert($entity);
                 }
             }
@@ -166,14 +166,14 @@ class AnDomainSpace extends KObject
 	}
 
 	/**
-	 * Switch priority of $child and $parent if the $child_priority is higher than $parent_priority
+	 * Set the save order 
 	 * 
 	 * @param AnDomainEntityAbstract $entity1 Lower priorty index (Higher) domain entity
 	 * @param AnDomainEntityAbstract $entity2 Higher priorty index (Lower) domain entity
      * 
 	 * @return void
 	 */
-	public function switchPriority($entity1, $entity2)
+	public function setSaveOrder($entity1, $entity2)
 	{
         //lower priorty index means it's saved first (higher priorty)
         //so if $entity1 has lower priorty index (higher priority) than $entity2
@@ -185,8 +185,8 @@ class AnDomainSpace extends KObject
         //lower priority index means higher priority
         $higher_priority = min($this->_entities->getPriority($entity1), $this->_entities->getPriority($entity2));
         
-        $this->_entities->setPriority($entity1,  $lower_priority);
-        $this->_entities->setPriority($entity2,  $higher_priority);
+        $this->_entities->setPriority($entity1,  $higher_priority);
+        $this->_entities->setPriority($entity2,  $lower_priority);
 	}
 	
 	/**
