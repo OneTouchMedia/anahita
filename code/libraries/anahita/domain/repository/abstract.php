@@ -233,7 +233,8 @@ abstract class AnDomainRepositoryAbstract extends KCommand
         if ( $entity->isValidatable() ) {
             $entity->resetErrors();
         }
-        return $this->getCommandChain()->run('on.validate', $context);
+        $result = $this->getCommandChain()->run('on.validate', $context);
+        return $result !== false;
 	}
 	 
     /**
@@ -610,7 +611,10 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  		//if not found an entity
  		//or found one but it' either delete or destroyed
  		//create a new entity
- 		if ( !$entity || ($entity->getEntityState() & AnDomain::STATE_DELETED || $entity->getEntityState() &  AnDomain::STATE_DESTROYED )) {
+ 		if ( !$entity ||
+ 		         ($entity->getEntityState() & AnDomain::STATE_DELETED || 
+ 		          $entity->getEntityState() &  AnDomain::STATE_DESTROYED )) 
+ 		{
  			$config = new KConfig($config);
  			$config->append(array(
  				'data' => $data
