@@ -116,12 +116,12 @@ class AnDomainBehaviorValidatable extends AnDomainBehaviorAbstract
     /**
      * Return a set of entity errors
      * 
-     * @return KObjectSet
+     * @return AnObjectSet
      */
     public function getErrors()
     {                
         if ( !isset($this->_errors[$this->_mixer]) ) {
-            $this->_errors[$this->_mixer] = new KObjectSet();
+            $this->_errors[$this->_mixer] = new AnObjectSet();
         }
         
         return clone $this->_errors[$this->_mixer];
