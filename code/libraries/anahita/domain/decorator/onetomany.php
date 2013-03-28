@@ -138,7 +138,15 @@ class AnDomainDecoratorOnetomany extends AnObjectDecorator
 	public function insert($entity)
 	{
 		$entity->set($this->_property,$this->getRoot());
-    	return $this->getObject()->insert($entity);
+		
+		//only add the entity into the entityset if it has 
+		//already been loaded
+		//otherwise don't
+		if ( $this->getObject()->isLoaded() ) {
+		    $this->getObject()->insert($entity);
+		}
+		
+		return $entity;
 	}
 
 	/**
