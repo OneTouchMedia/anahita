@@ -1,13 +1,17 @@
 <?php defined('KOOWA') or die; ?>
+
 <?php if ( $current_scope && ($current_scope->commentable || $current_scope->ownable) ) : ?>
-<div class="well">
+<fieldset>
+	<legend><?= @text('COM-SEARCH-OPTIONS') ?></legend>
 	<?php if ( $current_scope && $current_scope->commentable ) : ?>
 	<label class="checkbox">
-		<input data-trigger="SearchOption" <?= $search_comments ? 'checked' : ''?> type="checkbox" name="search_comments" value="1" ><?= @text('COM-SEARCH-OPTION-COMMENTS') ?>
+		<input data-trigger="SearchOption" <?= $search_comments ? 'checked' : ''?> type="checkbox" name="search_comments" value="1" >
+		<?= @text('COM-SEARCH-OPTION-COMMENTS') ?>
     </label>
     <?php endif;?>
-</div>
+</fieldset>
 <?php endif;?>
+
 <div class="an-entities" id="an-entities-main">
 <?php if(isset($keywords)): ?>
 	<?php if(count($items)) :?>

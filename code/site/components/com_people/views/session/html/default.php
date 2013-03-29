@@ -35,7 +35,9 @@
 			<?php endif; ?>
 			
 			<div class="form-actions">
-				<input type="submit" name="Submit" class="btn btn-large" value="<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>" />
+				<button type="submit" name="Submit" class="btn btn-large"/>
+					<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>
+				</button>
 			</div>
 		</fieldset>
 
