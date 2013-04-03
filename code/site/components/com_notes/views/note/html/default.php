@@ -6,14 +6,14 @@
 
 <div class="an-story an-entity an-record an-removable">
     <div class="story-avatar">
-        <?= @avatar($post->author) ?>
+        <?= @avatar($note->author) ?>
     </div>      
     <div class="story-container">
         <div class="story-body">
-            <?= @content($post->body) ?>
+            <?= @content($note->body) ?>
         </div>
         <div class="story-comments">
-            <?= @helper('ui.comments', $post) ?>  
+            <?= @helper('ui.comments', $note) ?>  
         </div> 
     </div>
 </div>
