@@ -162,7 +162,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     {        
         $component = $this->option;
         
-        if ( !empty($component) ) 
+        if ( !empty($component) && JComponentHelper::isEnabled($component) ) 
         {
             $result = JComponentHelper::renderComponent($component);
             
