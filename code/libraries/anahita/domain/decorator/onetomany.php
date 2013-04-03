@@ -103,7 +103,7 @@ class AnDomainDecoratorOnetomany extends AnObjectDecorator
 	 * @param  array $conditions
 	 * @return AnDomainEntityAbstract 
 	 */
-	public function find(array $conditions)
+	public function find($conditions)
 	{
 		$conditions[$this->_property] = $this->_root;	
 			
@@ -184,7 +184,7 @@ class AnDomainDecoratorOnetomany extends AnObjectDecorator
      * @param  array    The function arguments
      * @return mixed The result of the function
      */
-    public function __call($method, array $arguments)
+    public function __call($method, $arguments)
     {
         $object = $this->getObject();        
         $parts  = KInflector::explode($method);
