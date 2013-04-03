@@ -109,7 +109,7 @@ class LibBaseControllerService extends LibBaseControllerResource
      */
     protected function _actionDelete(KCommandContext $context)
     {
-        $context['status'] = KHttpResponse::CREATED;
+        $context['status'] = KHttpResponse::NO_CONTENT;
         $entity = $this->getItem()->delete();
         return $entity;
     }        
