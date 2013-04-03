@@ -191,70 +191,35 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
     /**
      * Set a URL for browser redirection.
      *
-     * @param array $redriect Redirect options
-     *              ['url'=>'string','message'=>'string','type'=>'string']
+     * @param string $location The location of the redirect
+     * @param string $message  The redirect header message
+     * @param int    $code     The redirect header code
      * 
      * @return void
      */
-    public function setRedirect($redirect)
-    {        
-    	if ( is_string($redirect) ) {
-    		$redirect = array('url'=>$redirect);
-    	}
-    	
-        $redirect = new KConfig($redirect);
+    public function setRedirect($location, $message = null, $code = KHttpResponse::SEE_OTHER)
+    {
+        if (empty($location)) {
+            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
+        }
         
-        $redirect->append(array(
-            'message'  => '',
-            'type'     => null
-        ));
+        if (!is_string($location) && !is_numeric($location) && !is_callable(array($location, '__toString')))
+        {
+            throw new \UnexpectedValueException(
+                    'The Response location must be a string or object implementing __toString(), "'.gettype($location).'" given.'
+            );
+        }
 
-        $route = $redirect->url;
-        
-        if ( !is_array($route) ) {
-        	$parts = array();
-        	parse_str(trim($route), $parts);
-        	$route = $parts;
-        }        
-        
-        $parts = $route;    	
-        $route = array();
-	    
-	    //Check to see if there is component information in the route if not add it
-	    if(!isset($parts['option'])) {
-	        $route['option'] = 'com_'.$this->getIdentifier()->package;
-	    }
-
-	    //Add the view information to the route if it's not set
-	    if(!isset($parts['view'])) {
-	    	$route['view'] = $this->_request->view ? $this->_request->view : $this->getIdentifier()->name;
-	    }	    
-
-	    //Add the format information to the route only if it's not 'html'
-	    if(!isset($parts['format']) && $this->_request->format ) {
-	    	$route['format'] = $this->_request->format;
-	    }	    
-	    
-	    if ( $route['format'] == 'html' ) {
-	    	unset($route['format']);
-	    }
-
-	    $parts = array_merge($route, $parts);
-	    
-        $redirect->url = $this->getService('application')
-        					->getRouter()
-        					->build('index.php?'.http_build_query($parts));
-        
-        $this->_redirect = $redirect;
-        
+        $this->_redirect->code         = $code;
+        $this->_redirect->message      = $message;        
+        $this->_redirect->location     = (string)$location;
         return $this;
     }  
             
     /**
      * Returns an array with the redirect url, the message and the message type
      *
-     * @return KConfig Named array containing url, message and messageType, or null 
-     * if no redirect was set
+     * @return KConfig Named array containing url, and redirect code
      */
     public function getRedirect()
     {
@@ -301,7 +266,6 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
            return $this->display();
         } catch(Exception $e) {
             trigger_error('Exception in '.get_class($this).' : '.$e->getMessage(), E_USER_WARNING);
-            throw $e;
         }
     }
     
