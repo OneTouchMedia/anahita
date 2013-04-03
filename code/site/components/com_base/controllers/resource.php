@@ -56,7 +56,8 @@ class ComBaseControllerResource extends LibBaseControllerResource
 	{
 		$config->append(array(
             'viewer'        => get_viewer(),
-		    'language'      => 'com_'.$this->getIdentifier()->package
+		    'language'      => 'com_'.$this->getIdentifier()->package,
+		    'behaviors'     => array('com://site/application.controller.behavior.message')
 		));
 				
 		parent::_initialize($config);
