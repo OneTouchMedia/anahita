@@ -79,4 +79,6 @@ KServiceIdentifier::addLocator(KService::get('koowa:service.locator.plugin'));
 KService::setAlias('koowa:database.adapter.mysqli', 'com://admin/default.database.adapter.mysqli');
 KService::setAlias('anahita:domain.store.database', 'com:base.domain.store.database');
 KService::setAlias('anahita:domain.space',          'com:base.domain.space');
+
+KLoader::loadIdentifier('com://admin/application.aliases');
 ?>
