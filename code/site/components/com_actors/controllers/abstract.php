@@ -42,6 +42,8 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         $this->getCommandChain()
             ->enqueue( $this->getService('anahita:command.event'), KCommand::PRIORITY_LOWEST);
           
+        $this->registerCallback(array('after.delete','after.add'), array($this, 'redirect'));
+        
         //set filter state  
         $this->getState()
                 ->insert('filter');            
@@ -116,24 +118,6 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         }
                 
         return $this->setList($entities)->getList();
-    }
-
-    /**
-     * Post Action. Creates an actor and then redirect the user to the setting page
-     * 
-     * @param KCommandContext $context Context parameter
-     * 
-     * @return AnDomainEntityAbstract
-     */
-    protected function _actionPost(KCommandContext $context)
-    {
-        $result = parent::_actionPost($context);
-        
-        if ( is($result, 'AnDomainEntityAbstract')  ) {
-          //  $this->setRedirect( $result->getURL().'&get=settings');
-        }
-        
-        return $result;
     }
     
     /**
@@ -223,8 +207,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         foreach($apps as $app) {
             $this->getService('anahita:event.dispatcher')->addEventSubscriber($app->getDelegate());
         }
-        $result  = parent::_actionDelete($context);        
-        $this->setRedirect('index.php?option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
+        $result  = parent::_actionDelete($context);
         return $result;
     }
     
@@ -277,5 +260,30 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         }
         
         $this->getItem()->allowFollowRequest = (bool)$data->allowFollowRequest;
+    }
+    
+    /**
+     * Set the necessary redirect
+     *
+     * @param KCommandContext $context
+     *
+     * @return void
+     */
+    public function redirect(KCommandContext $context)
+    {
+        $url = null;
+        
+        if ( $context->action == 'delete' ) {
+            //if deleted then go to back to the general page
+            $url = 'option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name);
+        }
+        //after add always go to the setting
+        elseif ( $context->action = 'add' ) {
+            $url = $context->result->getURL().'&get=settings';
+        }
+        
+        if ( $url ) {
+            $this->setRedirect(JRoute::_($url));
+        }
     }
 }
