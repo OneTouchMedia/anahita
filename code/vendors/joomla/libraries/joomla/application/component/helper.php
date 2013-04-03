@@ -33,7 +33,7 @@ class JComponentHelper
 	 * @param 	boolean	$string	If set and a component does not exist, the enabled attribue will be set to false
 	 * @return	object A JComponent object
 	 */
-	function &getComponent( $name, $strict = false )
+	static function &getComponent( $name, $strict = false )
 	{
 		$result = null;
 		$components = JComponentHelper::_load();
@@ -60,7 +60,7 @@ class JComponentHelper
 	 * @param 	boolean	$string	If set and a component does not exist, false will be returned
 	 * @return	boolean
 	 */
-	function isEnabled( $component, $strict = false )
+	static function isEnabled( $component, $strict = false )
 	{
 		global $mainframe;
 
@@ -75,7 +75,7 @@ class JComponentHelper
 	 * @param string $name The component name
 	 * @return object A JParameter object
 	 */
-	function &getParams( $name )
+	static function &getParams( $name )
 	{
 		static $instances;
 		if (!isset( $instances[$name] ))
@@ -86,85 +86,75 @@ class JComponentHelper
 		return $instances[$name];
 	}
 
-	function renderComponent($name = null, $params = array())
+	static function renderComponent($name, $params = array())
 	{
 		global $mainframe, $option;
-
-		if(empty($name)) {
-			// Throw 404 if no component
-			JError::raiseError(404, JText::_("Component Not Found"));
-			return;
-		}
-
-		$scope = $mainframe->scope; //record the scope
-		$mainframe->scope = $name;  //set scope to component name
-
-		// Build the component path
-		$name = preg_replace('/[^A-Z0-9_\.-]/i', '', $name);
-		$file = substr( $name, 4 );
-
+		
 		// Define component path
 		define( 'JPATH_COMPONENT',					JPATH_BASE.DS.'components'.DS.$name);
 		define( 'JPATH_COMPONENT_SITE',				JPATH_SITE.DS.'components'.DS.$name);
 		define( 'JPATH_COMPONENT_ADMINISTRATOR',	JPATH_ADMINISTRATOR.DS.'components'.DS.$name);
 
+		if ( !file_exists(JPATH_COMPONENT) ) {
+		    JError::raiseError( 404, JText::_( 'Component Not Found' ) );
+		}
+
+		$file = substr( $name, 4 );
+		
 		// get component path
 		if ( $mainframe->isAdmin() && file_exists(JPATH_COMPONENT.DS.'admin.'.$file.'.php') ) {
 			$path = JPATH_COMPONENT.DS.'admin.'.$file.'.php';
 		} else {
 			$path = JPATH_COMPONENT.DS.$file.'.php';
 		}
+		
+        $identifier = KService::getIdentifier("com:$file.aliases");
+        $identifier->application = $mainframe->isAdmin()  ? 'admin' : 'site';        
+        $lang =& JFactory::getLanguage();
+        $lang->load($name);
+        KLoader::loadIdentifier($identifier);
         
-        //if component not found
-        if ( !JComponentHelper::isEnabled( $name ) ) {
-            JError::raiseError( 404, JText::_( 'Component Not Found' ) );
-        }
-        
-        //load aliases        
-        if ( file_exists(JPATH_COMPONENT)  ) {
-            // Load common language files
-            $lang =& JFactory::getLanguage();
-            $lang->load($name);            
-            KLoader::loadIdentifier('com://site/'.$file.'.aliases');
-        }
-                
         //new way of doing it
-        if ( file_exists(JPATH_COMPONENT) && !file_exists($path) ) {
+        if ( !file_exists($path) ) 
+        {
             $dispatcher = ComBaseDispatcher::getInstance();
             return $dispatcher->dispatch();
         }
-        
-		// If component disabled throw error
-		elseif ( !file_exists($path) ) {
-			JError::raiseError( 404, JText::_( 'Component Not Found' ) );
-		}
-
-		// Handle template preview outlining
-		$contents = null;
-		
-		//getting the task for old components
-		$task = JRequest::getString( 'task' );
-		
-		// Execute the component
-		ob_start();
-		require_once $path;
-		$contents = ob_get_contents();
-		ob_end_clean();
-
-		// Build the component toolbar
-		jimport( 'joomla.application.helper' );
-		if (($path = JApplicationHelper::getPath( 'toolbar' )) && $mainframe->isAdmin()) 
-		{
-		    // Get the task again, in case it has changed 
-		    $task = JRequest::getString( 'task' );
-		    
-			// Make the toolbar
-			include_once( $path );
-		}
-
-		$mainframe->scope = $scope; //revert the scope
-
-		return $contents;
+        else 
+        {
+            $contents = self::_renderComponent($path);
+                      
+            // Build the component toolbar
+            jimport( 'joomla.application.helper' );
+            if (($path = JApplicationHelper::getPath( 'toolbar' )) && $mainframe->isAdmin())
+            {
+                // Get the task again, in case it has changed
+                $task = JRequest::getString( 'task' );
+            
+                // Make the toolbar
+                include_once( $path );
+            }
+                        
+            return $contents;            
+        }
+	}
+	
+	/**
+	 * Render the contents of a component
+	 * 
+	 * @param string $path
+	 * 
+	 * @return string
+	 */
+	static protected function _renderComponent($path)
+	{
+	    //getting the task for old components
+	    $task = JRequest::getString( 'task' );
+	    ob_start();
+	    require_once $path;
+	    $contents = ob_get_contents();
+	    ob_end_clean();
+	    return $contents;	    
 	}
 
 	/**
@@ -173,7 +163,7 @@ class JComponentHelper
 	 * @access	private
 	 * @return	array
 	 */
-	function _load()
+	static function _load()
 	{
 		static $components;
 

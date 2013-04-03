@@ -35,8 +35,11 @@ class JRoute
 	 * 		-1: Make URI unsecure using the global unsecure site URI
 	 * @return The translated humanly readible URL
 	 */
-	function _($url, $xhtml = true, $ssl = null)
+	function _($url, $fqr = false)
 	{
+	    return KService::get('application')
+	        ->getRouter()
+	        ->build($url, $fqr);
 		// Get the router
 		$app	= &JFactory::getApplication();
 		$router = &$app->getRouter();
