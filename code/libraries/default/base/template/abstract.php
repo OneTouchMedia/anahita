@@ -186,10 +186,11 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	 * 
 	 * @param KServiceIdentifier $template Template Identifier
 	 * @param array              $data     Template data
+	 * @param boolean $process	If TRUE process the data using a tmpl stream. Default TRUE.
 	 *    
 	 * @return KTemplateAbstract
 	 */
-	public function loadIdentifier($template, $data = array())
+	public function loadIdentifier($template, $data = array(), $process = true)
 	{
 		//Identify the template
 	    $identifier = $this->getIdentifier($template);
@@ -202,7 +203,7 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 			array_unshift($this->_search_paths, $path);
 	    }
 	    //load the template
-	    return $this->loadTemplate($identifier->name, $data);
+	    return $this->loadTemplate($identifier->name, $data, $process);
 	}
 	
 	/**
@@ -210,8 +211,9 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	 *
 	 * @param string $template Template name
 	 * @param array  $data     Template data
-	 * 
 	 * @param boolean $process	If TRUE process the data using a tmpl stream. Default TRUE.
+	 * 
+	 * @return string
 	 */
 	public function loadTemplate($template, $data = array(), $process = true)
 	{				
@@ -230,9 +232,10 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	 *
 	 * @param	string	Name of the helper, dot separated including the helper function to call
 	 * @param	mixed	Parameters to be passed to the helper
+	 * 
 	 * @return 	string	Helper output
 	 */
-	public function renderHelper()
+	public function renderHelper($identifier, $config = array())
 	{
 		$args		 = func_get_args();
 		$identifier  = array_shift($args);
@@ -261,7 +264,7 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	 * @param	mixed	Parameters to be passed to the helper
 	 * @return 	KTemplateHelperInterface
 	 */
-	public function getHelper($helper)
+	public function getHelper($helper, $config = array())
 	{
 	    $name = (string) $helper;
 	    if ( !isset($this->_helpers[$name]) )
@@ -274,7 +277,7 @@ abstract class LibBaseTemplateAbstract extends KTemplateAbstract
 	            register_default(array('identifier'=>$identifier, 'prefix'=>$this));
 	            $helper = $identifier;
 	        }
-	        $this->_helpers[$name] = parent::getHelper($helper);	        
+	        $this->_helpers[$name] = parent::getHelper($helper, $config);	        
 	    }
 	    return $this->_helpers[$name];	
 	}		
