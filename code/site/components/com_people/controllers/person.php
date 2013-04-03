@@ -26,14 +26,7 @@
  * @link       http://www.anahitapolis.com
  */
 class ComPeopleControllerPerson extends ComActorsControllerDefault
-{
-	/**
-	 * Flag to whether an activation is required or not
-	 * 
-	 * @var boolean
-	 */
-	protected $_activation_required;
-	
+{	
 	/**
 	 * Constructor.
 	 *
@@ -45,11 +38,10 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	{
 		parent::__construct($config);
 		
-		$this->_activation_required = $config->activation_required;
-		
-		if ( $this->_activation_required ) {
-			$this->registerCallback('after.add', array($this, 'mailActivationLink'));
-		}		
+		if ( $this->activationRequired() ) {
+		    $this->registerCallback('after.add', array($this, 'mailActivationLink'));
+		}
+		$this->registerCallback('after.add', array($this, 'notifyAdminsNewUser'));
 	}
 		
     /**
@@ -63,8 +55,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      */
 	protected function _initialize(KConfig $config)
 	{	
-		$config->append(array(
-			'activation_required' => get_config_value('users.useractivation'),
+		$config->append(array(			
 			'behaviors'			  => array('validatable','com://site/mailer.controller.behavior.mailer'),
 		    'login_callback'      => array($this, 'login')
 		));
@@ -138,9 +129,8 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
                 ->addValidation('email',   'uniqueness')
                 ;
                 
-        if ( $person->validate() === false ) {      	
-            $context->setError(new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST));
-            return false;
+        if ( $person->validate() === false ) {
+            throw new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST);
         }
 
         $person->reset();
@@ -158,15 +148,11 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $date =& JFactory::getDate();
         $user->set('registerDate', $date->toMySQL());
         
-        if ( $this->_activation_required ) 
+        if ( $this->activationRequired() ) 
         {
             jimport('joomla.user.helper');
             $user->set('activation', JUtility::getHash( JUserHelper::genRandomPassword()) );
-            $user->set('block', '1');
-            $context->append(array(
-				'headers' => array(
-					'X-User-Activation-Required' => true
-			)));
+            $user->set('block', '1');            
         }
         
         $user->save();
@@ -174,8 +160,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         
         //if person is null then user has not been saved
         if ( !$person ) {
-            $context->setError(new KControllerException('Unexpected error when saving user'));
-            return false;   
+            throw new KControllerException('Unexpected error when saving user');
         }
         
         //set the portrait image
@@ -190,16 +175,6 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
                         
         return $person;
         
-    }
-    
-    /**
-     * Return whether the action is required or not
-     * 
-     * @return boolean
-     */
-    public function activationRequired()
-    {
-    	return $this->_activation_required;	
     }
     
     /**
@@ -227,8 +202,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         }
                 
         if ( $person->validate() === false ) {
-            $context->setError(new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST));
-            return false;
+            throw new AnErrorException($person->getErrors(), KHttpResponse::BAD_REQUEST);
         }
         
         $user = JFactory::getUser($person->userId);
@@ -250,29 +224,18 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         }
         
         if ( !$user->save() ) {
-            $context->setError(new KControllerException('Unexpected error when saving user'));
+            throw new KControllerException('Unexpected error when saving user');
             return false;               
         }
         
         if ( !$person->save() ) {
-            $context->setError(new KControllerException('Unexpected error when saving user'));
-            return false;            
+            throw new KControllerException('Unexpected error when saving user');
         }
         
         $context->status = KHttpResponse::RESET_CONTENT;
          
         return $person;      
     }
-
-    /**
-     * (non-PHPdoc)
-     * @see ComActorsControllerAbstract::_actionPost()
-     */
-    protected function _actionPost(KCommandContext $context)
-    {
-    	$result = parent::_actionPost($context);
-    	return $result;
-    }   
      
     /**
      * Mail an activation link
@@ -286,12 +249,40 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 		$person = $context->result;
 		$this->user = $person->getUserObject();
 		$this->mail(array(
-    				'to' 		=> 'ash@peerglobe.com',
-    				'subject'	=> 'Activate your account',
+    				'to' 		=> $this->user->email,
+    				'subject'	=> JText::_('COM-PEOPLE-ACTIVATION-SUBJECT'),
     				'template'	=> 'account_activate'
 		));
-		//redirect only happens if it's html
-		$this->setRedirect(array('url'=>'view=session','message'=>'activation link has been sent'));
+		$context->headers['X-User-Activation-Required'] = true;
+		$this->setRedirect(JRoute::_('option=com_people&view=session'));
+    }
+    
+    /**
+     * Notify admins for a new user
+     *
+     * @param KCommandContext $context The context parameter
+     *
+     * @return void
+     */    
+    public function notifyAdminsNewUser(KCommandContext $context)
+    {        
+        $person = $context->result;
+        $this->user = $person->getUserObject();
+        $this->mailAdmins(array(            				
+            'subject'	=> JText::_('COM-PEOPLE-NEW-USER-NOTIFICATION-SUBJECT'),
+            'template'	=> 'new_user'
+        ));
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ComActorsControllerAbstract::redirect()
+     */
+    public function redirect(KCommandContext $context)
+    {
+        if ( $context->action != 'add' ) {
+            return parent::redirect($context);
+        }
     }
     
     /**

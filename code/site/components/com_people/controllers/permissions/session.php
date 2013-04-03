@@ -27,11 +27,41 @@
  */
 class ComPeopleControllerPermissionSession extends LibBaseControllerPermissionDefault
 { 
+    /**
+     * Can read existing session
+     * 
+     * @return boolean
+     */
+    public function canRead()
+    {    
+        return true;
+    }
+    
+    /**
+     * Can delete existing session
+     * 
+     * @return boolean
+     */
+    public function canDelete()
+    {
+        return true;
+    }
+    
+    /**
+     * Can create new session
+     * 
+     * @return boolean
+     */
+    public function canAdd()
+    {
+        return true;           
+    }
+    
 	/**
 	 * (non-PHPdoc)
 	 * @see LibBaseControllerPermissionAbstract::canExecute()
 	 */
-	public function canExecute($action)
+	public function _canExecute($action)
 	{
 		return true;
 	}	

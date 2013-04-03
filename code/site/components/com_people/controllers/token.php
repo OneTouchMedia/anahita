@@ -96,8 +96,7 @@ class ComPeopleControllerToken extends ComBaseControllerResource
             $this->user = $user;
         }
         else {
-            $context->setError(new KControllerException('Invalid Email Address', KHttpResponse::NOT_FOUND));
-            return false;
+            throw new KControllerException('Invalid Email Address', KHttpResponse::NOT_FOUND);
         }
     }
     
@@ -117,8 +116,6 @@ class ComPeopleControllerToken extends ComBaseControllerResource
                     'subject'  => sprintf(JText::_('COM-PEOPLE-PASSWORD-RESET-SUBJECT'), JFactory::getConfig()->getValue('sitename')),
                     'template' => $this->user->block ? 'account_activate' : 'password_reset'
             ));
-            	
-            $this->setRedirect('layout=email_sent');
         }
     }    
 }

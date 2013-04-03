@@ -35,6 +35,13 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
     protected $_can_register;
     
     /**
+     * Flag to whether an activation is required or not
+     *
+     * @var boolean
+     */
+    protected $_activation_required;
+        
+    /**
      * Constructor.
      *
      * @param KConfig $config An optional KConfig object with configuration options.
@@ -45,7 +52,8 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
     {
         parent::__construct($config);
         
-        $this->_can_register = $config->can_register;
+        $this->_can_register        = $config->can_register;        
+        $this->_activation_required = $config->activation_required;
     }
         
     /**
@@ -60,7 +68,8 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-            'can_register' => get_config_value('users.allowUserRegistration', true)
+            'activation_required' => get_config_value('users.useractivation'),                
+            'can_register' => (bool)get_config_value('users.allowUserRegistration', true)
         ));
     
         parent::_initialize($config);
@@ -88,6 +97,41 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
         }
         
         return parent::canRead();
+    }    
+
+    /**
+     * Return whether the action is required or not
+     *
+     * @return boolean
+     */
+    public function activationRequired()
+    {
+        return $this->_activation_required;
+    }
+    
+    /**
+     * Set if an activation is required
+     * 
+     * @param boolean $activation_required
+     * 
+     * @return void
+     */
+    public function setActivationRequired($activation_required)
+    {
+        $this->_activation_required = $activation_required;
+    }
+    
+    /**
+     * Set if the controller allows to register
+     * 
+     * @param boolean $can_register The value whether the user can register or not 
+     * 
+     * @return void
+     */
+    public function setCanRegister($can_register)
+    {
+        $this->_can_register = $can_register;
+        return $this;
     }
     
     /**
