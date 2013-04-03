@@ -35,6 +35,13 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	protected $_template_view;
 	
 	/**
+	 * Mailer test options
+	 * 
+	 * @var KConfig
+	 */
+	protected $_test_options;
+	
+	/**
 	 * Constructor.
 	 *
 	 * @param KConfig $config An optional KConfig object with configuration options.
@@ -46,6 +53,8 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 		parent::__construct($config);
 		
 		$this->_template_view = $config->template_view;
+		
+		$this->_test_options  = $config->test_options;
 	}
 		
 	/**
@@ -60,6 +69,11 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
+		    'test_options'  => array(
+		        'enabled'   => JDEBUG,
+		        'email'     => get_config_value('mailer.redirect_email'),
+		        'log'       => JFactory::getConfig()->getValue('tmp_path').'/emails.html'       
+            ),
 	        'template_view' => 'com://site/mailer.view.template'
 		));
 	
@@ -93,6 +107,59 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	}
 	
 	/**
+	 * Retun the mail into a string
+	 * 
+	 * @return string
+	 */
+	public function renderMail($config = array())
+	{
+	    $config = new KConfig($config);
+	    
+	    $data   = $this->getState()->toArray();
+	    
+	    if ( $this->getState()->getItem() ) {
+	        $data[$this->_mixer->getIdentifier()->name] = $this->getState()->getItem();
+	    }
+	    
+	    if ( $this->getState()->getList() ) {
+	        $data[KInflector::pluralize($this->_mixer->getIdentifier()->name)] = $this->getState()->getList();
+	    }
+	    
+	    $config->append(array(
+	            'data' => $data
+	    ));	  
+	      
+	    if ( $config->body ) {
+	        $output = $config->body;
+	    } else {
+	        $output = $this->getEmailTemplateView()
+	        ->layout($config->template)
+	        ->config($config)
+	        ->display($config['data'])
+	        ;
+	    }
+
+	    return $output;
+	}
+	
+	/**
+	 * Replaces to with the admin emails
+	 * 
+	 * @param array $config
+	 * 
+	 * @see ComMailerControllerBehaviorMaile::mail
+	 */
+	public function mailAdmins($config = array())
+	{
+	    $admins = $this->getService('repos://site/users.user')
+	        ->fetchSet(array('usertype'=>'Super Administrator'));
+	    
+	    $config['to'] = $admins->email;
+	    
+	    return $this->mail($config);
+	}
+	
+	/**
 	 * Send an email
 	 * 
 	 * @param array $config An array of config
@@ -105,36 +172,35 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 */
 	public function mail($config = array())
 	{
-		$config = new KConfig($config);
-		
-		$data   = $this->getState()->toArray();
-		
-		if ( $this->getState()->getItem() ) {
-			$data[$this->_mixer->getIdentifier()->name] = $this->getState()->getItem(); 
-		}
+	    $config = new KConfig($config);
+	    $emails	= (array)$config['to'];
+	    
+	    if ( $this->_test_options->enabled ) {
+	        $emails = $this->_test_options->email;
+	    }
+	    
+		$output = $this->renderMail($config);
 
-		if ( $this->getState()->getList() ) {
-			$data[KInflector::pluralize($this->_mixer->getIdentifier()->name)] = $this->getState()->getList();
-		}
-		
 		$config->append(array(
-			'data' => $data	
-		));
-					
-		$emails	= (array)$config['to'];
-		$output = $this->getEmailTemplateView()
-					->layout($config->template)
-					->config($config)
-					->display($config['data'])
-			;
+		    'is_html' => true        
+        ));
+		
 		//@TODO what the hell is this. use template filter 
 		//also what if the mailer is not HTML ??
-		$output = nl2br($output);	
-		$mailer = JFactory::getMailer();
-		$mailer->setSubject($config->subject);
-		$mailer->setBody($output);
-		$mailer->isHTML(true);
-		$mailer->addRecipient($emails);
-		$mailer->Send();
+		if ( !empty($emails) )
+		{
+		    $output = nl2br($output);
+		    $mailer = JFactory::getMailer();
+		    $mailer->setSubject($config->subject);
+		    $mailer->setBody($output);
+		    $mailer->isHTML($config->is_html);
+		    $mailer->addRecipient($emails);
+		    $mailer->Send();		    
+		}
+		
+		if ( $this->_test_options->enabled && 
+		        $this->_test_options->log ) {
+		    file_put_contents($this->_test_options->log, $output);
+		}
 	}
 }
