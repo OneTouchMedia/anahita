@@ -80,14 +80,6 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
             
             $type    = $result === false ? 'error' : 'success';            
             $message = $this->_makeStatusMessage($context->action, $type);
-            
-            if ( $result === true ) 
-            {
-                //succesfull commit
-                if ( empty($context->status) ) {
-                    $context->status = $this->getResponseStatusCode($context->action);
-                }
-            }
 
             //no need to set the context as we want to redirect back
             //previous place
@@ -112,24 +104,6 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
     public function commit()
     {
         return $this->getRepository()->getSpace()->commitEntities($this->_failed_commits);
-    }
-
-    /**
-     * Get a response status for an action
-     *
-     * @param string $action The action name to get a response code for
-     *
-     * @return int
-     */
-    protected function getResponseStatusCode($action)
-    {
-        switch($action)
-        {
-            case 'add'         : return KHttpResponse::CREATED; break;
-            case 'delete'      : return KHttpResponse::NO_CONTENT; break;
-            case 'edit'        : return KHttpResponse::RESET_CONTENT; break;
-            default            : return KHttpResponse::OK; break;
-        }
     }
         
     /**
