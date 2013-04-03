@@ -47,6 +47,8 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
         //add medium related states
         $this->getState()
                 ->insert('filter')->insert('grid')->insert('order');
+        
+        $this->registerCallback('after.delete', array($this, 'redirect'));
 	}
 	
 	/**
@@ -114,19 +116,23 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
 	    
         return $entities;
 	}
-		
-	/** 
-	 * Delete Action
+	
+	/**
+	 * Set the necessary redirect
 	 * 
-	 * @param KCommandContext $context Context Parameter
+	 * @param KCommandContext $context
 	 * 
 	 * @return void
 	 */
-	protected function _actionDelete(KCommandContext $context)
-	{		
-		$redirect_url = array('view'=>KInflector::pluralize($this->getIdentifier()->name), 'oid'=>$this->getItem()->owner->id);		
-		parent::_actionDelete($context);
-		$this->setRedirect($redirect_url);
+	public function redirect(KCommandContext $context)
+	{
+	    if ( $context->action == 'delete' ) 
+	    {
+	        $url['oid']    = $this->getItem()->owner->id;
+	        $url['view']   = KInflector::pluralize($this->getIdentifier()->name);
+	        $url['option'] = $this->getIdentifier()->package;	        
+	        $this->setRedirect(JRoute::_($url));
+	    }
 	}
 	
 	/**
