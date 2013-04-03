@@ -133,7 +133,7 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 	 * 
 	 * @see KObject::__call()
 	 */
-    public function __call($method, array $arguments)
+    public function __call($method, $arguments)
     {
         $parts = KInflector::explode($method);
         

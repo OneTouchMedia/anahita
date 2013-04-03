@@ -89,7 +89,7 @@ abstract class AnDomainEntitysetAbstract extends AnObjectSet
 	 * @param array  $arguments
 	 * @return mixed
 	 */
-	public function __call($method, $arguments = array())
+	public function __call($method, $arguments)
 	{
         $parts = KInflector::explode($method);
         
