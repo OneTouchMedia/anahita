@@ -110,11 +110,12 @@ class JRouterSite extends KObject
     /**
      * Builds a SEF URL
      * 
-     * @param string $url URL to build
+     * @param string  $url URL to build
+     * @param boolean $fqr Full query resolution
      * 
      * @return void
      */
-	function build($query = '')
+	function build($query = '', $fqr = false)
 	{
 	    $query = str_replace('index.php?', '', $query);	    
         $uri = clone $this->_clonable_url;
@@ -124,6 +125,10 @@ class JRouterSite extends KObject
         if ( isset($query['format']) ) {            
             $uri->format = $query['format'];                        
             unset($query['format']);
+        }
+        
+        if ( $uri->format == 'html' ) {
+            $uri->format = null;
         }
         
         $parts = array();
@@ -147,6 +152,13 @@ class JRouterSite extends KObject
         array_unshift($parts, KRequest::base()->path);        
         $path  = implode('/', $parts);
         $uri->path = $path;
+        if ( $fqr )
+        {
+            foreach(array('host','scheme','port','user','pass') as $part) 
+            {
+                $uri->$part = KRequest::url()->$part; 
+            }            
+        }        
         return $uri;        
 	}
 
