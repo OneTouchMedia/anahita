@@ -237,6 +237,37 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
     	return $user;
     }
     
+    /**
+     * Return a juser object
+     * 
+     * @return boolean
+     */
+    public function getJUserObject()
+    {
+        $user       = clone JFactory::getUser();
+        $authorize  =& JFactory::getACL();
+        if ( $this->persisted() ) {         
+            $user->set('id', $this->id);
+        }
+        $user->set('name', $this->name);
+        $user->set('username', $this->username);
+        $user->set('email', $this->email);
+        if ( $this->_password )
+        {
+            $user->set('password',  $this->getPassword());
+            $user->set('password2', $this->getPassword());
+            $user->set('password_clear', $this->getPassword());
+        }
+        $user->set('usertype', 'Registered');
+        $user->set('gid', $authorize->get_group_id( '', 'Registered', 'ARO' ));
+        if ( !$this->persisted() ) 
+        {
+            $date =& JFactory::getDate();
+            $user->set('registerDate', $date->toMySQL());
+        }
+        return $user;
+    }
+    
 	/**
 	 * Return whether this person is a guest
 	 * 

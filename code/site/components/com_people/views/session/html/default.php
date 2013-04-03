@@ -1,7 +1,9 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
-
+<?php 
+@service('application.dispatcher')->tmpl = 'component'
+?>
 <div class="row">
-	<div class="offset3 span6">
+	<div class="offset3 span6">	
 		<form action="<?=@route()?>" method="post" class="well">
 		<fieldset>
 			<legend><?= @text('COM-PEOPLE-SESSION-TITLE') ?></legend>
@@ -12,7 +14,21 @@
 			<?php echo KService::get('com://site/connect.template.helper.service')->renderLogins() ?>
 			</div>
 			<?php endif; ?>
-			
+			<?php 
+			//if there's a login error code then translate the codes
+			//into error messages
+			?>
+            <?php if ( !empty($flash['error_code']) ) : ?>
+            <?php 
+                switch($flash['error_code']) 
+                {
+                    case 401 : $message = 'COM-PEOPLE-AUTHENTICATION-FAILED';break;
+                    case 403 : $message = 'COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED';break;
+                    default  : $message = 'COM-PEOPLE-AUTHENTICATION-FAILED-UNKOWN';break;
+                }
+            ?>
+            <?= @message(@text($message), array('type'=>'error')) ?>
+            <?php endif ?>
 			<div class="control-group">			
 				<div class="controls">
 					<input class="input-block-level" name="username" placeholder="<?= @text('COM-PEOPLE-SESSION-PLACEHOLDER-USERNAME-EMAIL')?>" id="username" type="text" alt="username" size="18" />
@@ -25,14 +41,14 @@
 				</div>
 			</div>
 			
-			<?php if(JPluginHelper::isEnabled('system', 'remember')) : ?>
+			
 			<div id="form-login-remember" class="control-group">
 				<label class="checkbox">
 					<input type="checkbox" name="remember" value="yes" alt="<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>" />
 					<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>
 				</label>
 			</div>
-			<?php endif; ?>
+			
 			
 			<div class="form-actions">
 				<button type="submit" name="Submit" class="btn btn-large"/>

@@ -26,22 +26,22 @@
 				</div>
 			</div>
 			
-			<?php if(JPluginHelper::isEnabled('system', 'remember')) : ?>
+			 
 			<div id="form-login-remember" class="control-group">
 				<label class="checkbox">
 					<input type="checkbox" name="remember" value="yes" alt="<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>" />
 					<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>
 				</label>
 			</div>
-			<?php endif; ?>
+			
 
 			<a href="<?= @route('view=token') ?>">
 			<?= @text('COM-PEOPLE-SESSION-FORGOT-PASSWORD'); ?>
 			</a>
 			
-			<?php if ( !empty($this->return) ) : ?>
-			<input type="hidden" name="return" value="<?= $this->return; ?>" />
-			<?php endif;?>
+    		<?php if ( !empty($return) ) : ?>
+    			<input type="hidden" name="return" value="<?= $return; ?>" />
+    		<?php endif;?>
 		</form>
     </popup:body>
     

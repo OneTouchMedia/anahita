@@ -79,18 +79,8 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 		//and generate a correct message
 		if ( $this->getController()->getIdentifier()->name == 'session' ) 
 		{
-			switch($exception->getCode()) 
-			{
-				case KHttpResponse::UNAUTHORIZED :
-					$message = 'COM-PEOPLE-AUTHENTICATION-FAILED';break;
-				case KHttpResponse::FORBIDDEN : 
-					$message = 'COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED';break;
-				default : 
-					$message = 'COM-PEOPLE-AUTHENTICATION-FAILED-UNKOWN';break;
-			}
-			
 			$this->getService('application')
-					->redirect($this->_login_url, JText::_($message));
+			    ->redirect($this->_login_url);
 							
 			return false;
 		}
@@ -101,13 +91,14 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 			{
 				if ( $context->action == 'read' && $this->getRequest()->layout == 'add' )
 				{
-				    if ( JFactory::getUser()->id ) {
+				    if ( JFactory::getUser()->id ) 
+				    {
 				        $url = $this->getService('application.router')->build('index.php?'.get_viewer()->getURL());
 				        $this->getService('application')->redirect($url);
 				    }
-					else {
-					    $this->getService('application')
-							->redirect($this->_login_url, JText::_('COM-PEOPLE-REGISTRATION-CLOSED'), 'error');
+					else 
+					{
+					    $this->getService('application')->redirect($this->_login_url);
 					}
 					return false;					
 				}
@@ -136,10 +127,9 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	            else {
 	                $url = $this->_login_redirect_url;
 	            }
-	            $url = $this->getService('application.router')->build($url);
-	            $this->getService('application')->redirect($url);
+	            $this->getService('application')->redirect(JRoute::_($url));
 	            return false;	            
-	        }     
+	        }
 	    }
 	    	    
 	    return parent::_actionDispatch($context);
@@ -152,7 +142,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	 * (non-PHPdoc)
 	 * @see ComBaseDispatcher::_actionForward()
 	 */
-	protected function _actionForward(KCommandContext $context)
+	protected function __actionForward(KCommandContext $context)
 	{
 	    //if creating a new person login the person in
 	    if ( $this->format == 'html' )
@@ -165,7 +155,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	                    !$this->getController()->activationRequired() ) 
 	            {
 	                $this->getController()->login();
-	                $this->getController()->setRedirect(array('url'=>$this->_login_redirect_url));
+	                $this->getController()->setRedirect(JRoute::_($this->_login_redirect_url));
 	            }
 	        }
 	    }    
@@ -177,7 +167,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 			if ( $context->status == KHttpResponse::CREATED ) 
 			{
 			    if ( $this->format == 'html' ) {
-			        $this->getController()->setRedirect(array('url'=>$this->_login_redirect_url));
+			        $this->getController()->setRedirect(JRoute::_($this->_login_redirect_url));
 			    } 
 			    else {
 			        $context->result = $this->getController()->display();

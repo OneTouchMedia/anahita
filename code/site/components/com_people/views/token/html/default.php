@@ -18,7 +18,6 @@
 				</button>
 			</div>
 		</fieldset>
-		<?php echo JHTML::_( 'form.token' ); ?>
 		</form>
 	</div>
 </div>

@@ -38,7 +38,7 @@ class ComPeopleRouter extends ComActorsRouterDefault
      * 
      * @return  array   The URL attributes to be used by the application.
      */    
-    public function parse($segments)
+    public function parse(&$segments)
     {
     	$query = array();
     	
