@@ -121,12 +121,12 @@ class ComBaseControllerToolbarDefault extends ComBaseControllerToolbarAbstract
         $btn_1_id   = uniqid();
         $btn_2_id   = uniqid();
 
-        $action_key     = 'action';
-        if ( is($entity, 'ComBaseDomainEntityComment') ) {
-            $action_key = 'comment[action]';
-        }
+        $action_key     = '_action';
         
         $action_value   = $voted ? 'unvote' : 'vote';
+        if ( is($entity, 'ComBaseDomainEntityComment') ) {
+            $action_value .= 'comment';
+        }
         $label          = $voted ? JText::_('LIB-AN-ACTION-UNVOTE') : JText::_('LIB-AN-ACTION-VOTE');
         $command->setName($action_value);        
         $command->append(array('label' =>$label));

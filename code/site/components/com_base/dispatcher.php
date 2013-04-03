@@ -189,14 +189,8 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      * @return mixed
      */
 	protected function _actionForward(KCommandContext $context)
-	{	    
+	{	    	    
 	    $data = $context->data;
-
-	    if ( $this->getController()->isIdentifiable()
-	            && $context->result instanceof KObject ) 
-	    {
-	        $this->getController()->setItem($context->result);
-	    }
 
         if ( $data->return ) 
         {

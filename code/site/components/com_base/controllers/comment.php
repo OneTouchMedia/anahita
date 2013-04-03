@@ -69,7 +69,7 @@ class ComBaseControllerComment extends ComBaseControllerService
 	{
 		$data = $context->data;
 		$body = $data->body;
-		$this->setItem($this->parent->addComment($body))->getItem();
+		return $this->setItem($this->parent->addComment($body))->getItem();
 	}
 	
 	/**
@@ -120,24 +120,25 @@ class ComBaseControllerComment extends ComBaseControllerService
 	/**
 	 * Generic executation authorization
 	 * 
-     * @param KCommandContext $context The CommandChain Context
+     * @param strin $action The action to execute
      *
      * @return boolean
 	 */
-	public function canExecute(KCommandContext $context)
+	public function canExecute($action)
 	{        
 		$parent  = $this->getParent();
 		
-        $comment = $this->getItem();		
+        $comment = $this->getItem();
+        		
 		//either one of them has to exists
 		if ( !pick($parent, $comment) )
 			return false;		
 		
-		if ( !$parent->authorize('access') ) {
+		if ( $parent && !$parent->authorize('access') ) {
 			return false;	
 		}
         
-		return parent::canExecute($context);
+		return parent::canExecute($action);
 	}
     
 	/**
@@ -157,7 +158,8 @@ class ComBaseControllerComment extends ComBaseControllerService
 	 */
 	public function canEdit()
 	{	   
-	    return $this->getItem()->authorize('edit');
+	    return $this->getItem() && 
+	        $this->getItem()->authorize('edit');
 	}
 		
 	/**
@@ -167,6 +169,7 @@ class ComBaseControllerComment extends ComBaseControllerService
 	 */
 	public function canDelete()
 	{	    
-	    return $this->getItem()->authorize('delete');
+	    return  $this->getItem() && 
+	        $this->getItem()->authorize('delete');
 	}
 }

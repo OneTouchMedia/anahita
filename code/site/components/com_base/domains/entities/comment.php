@@ -63,7 +63,7 @@ class ComBaseDomainEntityComment extends ComBaseDomainEntityNode
 	 */
 	public function getURL()
 	{
-		return $this->parent->getURL().'&comment[id]='.$this->id;
+		return $this->parent->getURL().'&cid='.$this->id;
 	}
 	
     /**

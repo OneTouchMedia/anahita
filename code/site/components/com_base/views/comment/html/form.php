@@ -1,15 +1,17 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
 <?php 
-$url 	= empty($comment) ? $parent->getURL() : $comment->getURL();
+$url 	= empty($comment) ?  $parent->getURL() : $comment->getURL();
+$action = empty($comment)  ? 'addcomment' : 'editcomment';
 $editor = !isset($editor) ? false : $editor;
+if ( $editor ) {
+    $url .= '&comment[editor]=1';
+}
 ?>
 
-<form data-behavior="FormValidator" data-formvalidator-evaluate-Fields-on-change="false" data-formvalidator-evaluate-Fields-on-blur="false" class="an-comment-form form-stacked" method="post" action="<?= @route($url) ?>">
+<form data-behavior="FormValidator" data-formvalidator-evaluate-Fields-on-change="false" data-formvalidator-evaluate-Fields-on-blur="false" 
+        class="an-comment-form form-stacked" method="post" action="<?= @route($url) ?>">
 			
-		<input type="hidden" name="comment[pid]"    value="<?= $parent->id ?>" />
-		<?php if($editor) : ?>
-		<input type="hidden" name="comment[editor]" value="1" />
-		<?php endif;?>
+		<input type="hidden" name="_action"    value="<?= $action ?>" />
 		<div class="comment-form-avatar">
 		<?php if (isset($comment)) : ?>
 		<?= @avatar($comment->author)  ?>
@@ -27,7 +29,7 @@ $editor = !isset($editor) ? false : $editor;
 				<?php $body = isset($comment) ? $comment->getBody() : ''?>
 				<?= @editor(array('name'=>'comment[body]', 'content'=>$body, 'html'=>array('cols'=>50, 'rows'=>5, 'class'=>'input-xxlarge','data-validators'=>'required maxLength:5000', 'id'=>'an-comment-body-'.$id)))?>
 				<?php else : ?>
-				<textarea name="comment[body]" cols="50" rows="3" class="input-block-level" data-validators="required maxLength:5000"><?= isset($comment) ? stripslashes($comment->getBody()) : ''?></textarea>
+				<textarea name="body" cols="50" rows="3" class="input-block-level" data-validators="required maxLength:5000"><?= isset($comment) ? stripslashes($comment->getBody()) : ''?></textarea>
 				<?php endif;?>
 				</div>
 			</div>
