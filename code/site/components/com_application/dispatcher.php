@@ -136,8 +136,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             $this->_application->triggerEvent('onAfterDispatch', array($result));
         }
         else {
-            $context->setError(new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND));
-            return false;
+            throw new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND);
         }
         
         return $result;
@@ -256,9 +255,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
                 $this->_application->redirect($url, JText::_('You must login first') );
             }
             else {
-                $context->setError(
-                    new KDispatcherException(JText::_('ALERTNOTAUTH'), KHttpResponse::METHOD_NOT_ALLOWED)
-                );
+                throw new KDispatcherException(JText::_('ALERTNOTAUTH'), KHttpResponse::METHOD_NOT_ALLOWED);
             }
             
             return false;
@@ -286,30 +283,30 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         //no need to create session when using CLI (command line interface)
         
-        $this->_application = JFactory::getApplication('site', array('session'=>PHP_SAPI !== 'cli'));
-        
-        $this->getService()->set('application', $this->_application);
-        $this->getService()->set('application.router', $this->_application->getRouter());        
-        
-        //set the session handler to none for
-        if ( PHP_SAPI == 'cli' ) {
-            JFactory::getConfig()->setValue('config.session_handler','none');
-        }
-        
+        $this->_application = JFactory::getApplication('site', array('session'=>PHP_SAPI !== 'cli'));        
+
         global $mainframe;
         
-        $mainframe = $this->_application; 
-                 
+        $mainframe = $this->_application;
+         
         $error_reporting =  $this->_application->getCfg('error_reporting');
         
         define('JDEBUG', $this->_application->getCfg('debug'));
         
         //taken from nooku application dispatcher
         if ($error_reporting > 0)
-        {            
+        {
             error_reporting( $error_reporting );
             ini_set('display_errors',1);
             ini_set('display_startup_errors',1);
+        }
+                
+        $this->getService()->set('application', $this->_application);
+        $this->getService()->set('application.router', $this->_application->getRouter());        
+        
+        //set the session handler to none for
+        if ( PHP_SAPI == 'cli' ) {
+            JFactory::getConfig()->setValue('config.session_handler','none');
         }
                         
         //set the default timezone to UTC
