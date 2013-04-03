@@ -96,7 +96,23 @@ class ComBaseControllerBehaviorOwnable extends KControllerBehaviorAbstract
 		$parts = explode('.', $name);
         
 		if ( $parts[0] == 'before' ) {
-			return $this->_fetchOwner($context);
+			$this->_fetchOwner($context);
+		}
+		
+	    parent::execute($name, $context);
+    }
+   	
+    /**
+     * Set the owner to the data before controller
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return boolean
+     */
+    protected function _beforeControllerAdd(KCommandContext $context)
+    {
+        if  ( $this->getRepository()->hasBehavior('ownable') ) {
+            $context->data['owner'] = $this->actor;
 		}
     }
    	

@@ -90,18 +90,6 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
         
 	    parent::_initialize($config);
 	}
-
-	/**
-	 * Sets the owner of the medium
-	 * 
-	 * (non-PHPdoc)
-	 * @see LibBaseControllerService::_actionAdd()
-	 */
-	protected function _actionAdd(KCommandContext $context)
-	{
-	   $context->data['owner'] = $this->actor;
-	   return parent::_actionAdd($context); 
-	}
 	
 	/** 
 	 * Browse Action
