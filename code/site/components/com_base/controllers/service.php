@@ -58,6 +58,7 @@ class ComBaseControllerService extends LibBaseControllerService
 		$config->append(array(
             'viewer'        => get_viewer(),
             'language'      => 'com_'.$this->getIdentifier()->package ,
+		    'behaviors'     => array('com://site/application.controller.behavior.message'),		        
             'toolbars'      => array($this->getIdentifier()->name,'menubar','actorbar'),
             'request'       => array(
                 'limit'     => 20,
