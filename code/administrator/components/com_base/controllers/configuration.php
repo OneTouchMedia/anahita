@@ -58,6 +58,28 @@ class ComBaseControllerConfiguration extends ComBaseControllerResource
     }
     
     /**
+     * Saves a configuration
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return 
+     */
+    protected function _actionSave(KCommandContext $context)
+    {
+        $context->append(array('data'=>array('params'=>array())));
+        //find or create a new component        
+        $component = $this->getService('repos://admin/components.component')
+            ->findOrAddNew(array('option'=>'com_'.$this->getIdentifier()->package), 
+                    array('data'=>array(
+                         'name' => ucfirst($this->getIdentifier()->package)   
+                    )));
+        $params = new JParameter('');
+        $params->loadArray((array)$context->data['params']);
+        $component->params = $params->toString();
+        $component->save();        
+    }
+    
+    /**
      * Method to set a view object attached to the controller
      *
      * @param mixed $view An object that implements KObjectIdentifiable, an object that 
