@@ -176,7 +176,7 @@ class PlgSystemAnahita extends JPlugin
 			$person = KService::get('com://site/people.helper.person')->createFromUser( JFactory::getUser($user['id']) );
 		}
 		
-		$person->save();
+		$person->saveEntity();
 		
 		return true;
 	}	
