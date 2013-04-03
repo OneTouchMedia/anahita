@@ -28,6 +28,22 @@
 abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 {
     /**
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+        
+        $this->unregisterCallback('after.dispatch' , array($this, 'forward'));
+        
+        $this->registerCallback('after.post' ,       array($this, 'forward'));
+    }
+        
+    /**
      * Initializes the options for the object
      *
      * Called from {@link __construct()} as a first step of object instantiation.
@@ -48,20 +64,73 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
      * @see KDispatcherAbstract::_actionDispatch()
      */
     protected function _actionDispatch(KCommandContext $context)
-    {
-	    $action        = KRequest::get('post.action', 'cmd', strtolower(KRequest::method()));
-        	    
-	    $context->data = new KConfig();
-	    	    
-	    if(KRequest::method() != KHttpRequest::GET) {
-            $context->data = KRequest::get(strtolower(KRequest::method()), 'raw', array());
-        }
+    {        
+        //Load the component aliases
+        $component   = $this->getController()->getIdentifier()->package;
+        $application = $this->getController()->getIdentifier()->application;
+        $this->getService('koowa:loader')->loadIdentifier('com://'.$application.'/'.$component.'.aliases');
         
-        $result = $this->getController()->execute($action, $context);
-        	    
+        //Execute the component method
+        $method = strtolower(KRequest::method());
+        $result = $this->execute($method, $context);
+        
     	return $result;
     }
     
+    /**
+     * Get action
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return void
+     */
+    protected function _actionGet(KCommandContext $context)
+    {
+        $result = $this->getController()->execute('get', $context);
+        return $result;
+    }
+    
+    /**
+     * Get action
+     *
+     * @param KCommandContext $context
+     *
+     * @return void
+     */
+    protected function _actionPost(KCommandContext $context)
+    {
+        $context->append(array(
+           'data' => KRequest::get('post', 'raw', array())     
+        ));
+                
+        //backward compatiblity
+        if ( $context->data['action'] ) {
+            $context->data['_action'] = $context->data['action'];
+        }
+        
+        $action        = 'post';
+        if ( $context->data['_action'] ) 
+        {
+            $action = $context->data['_action'];
+            if(in_array($action, array('browse', 'read', 'display'))) {
+                throw new KControllerException('Action: '.$action.' not allowed');
+            }
+        }
+        return $this->getController()->execute($action, $context);
+    }    
+    
+    /**
+     * Get action
+     *
+     * @param KCommandContext $context
+     *
+     * @return void
+     */
+    protected function _actionDelete(KCommandContext $context)
+    {
+        return $this->getController()->execute('delete', $context);
+    }
+        
 	/**
 	 * Set the default controller to LibBaseControllerResource
 	 * 
@@ -76,72 +145,96 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 			register_default(array('identifier'=>$this->_controller, 'default'=>array($default,'LibBaseControllerService')));
 		}
 	}
-		
-	/**
-	 *  In Default App the forward condition is set to
-	 * 	if context->result is a string or false don't forward
-	 *  if request is HTTP or AJAX with context->redirect_ajax is set then redirect
-	 *  ignore AJAX reuqest (in socialengien we never forward an ajax request)
-	 * 
-	 */
-	protected function _actionForward(KCommandContext $context)
-	{
-        //only forward for HTML formats
-        if ( $this->format != 'html' ) {
-            return $context->result;    
-        }
-               	    
-		$redirect = $this->getController()->getRedirect();
-        
-        $redirect->append(array(
-            'type' => 'success'            
-        ));
-                
-        if ( empty($redirect->url) ) 
-        {
-            if ( $context->data->return )            
-                $redirect['url'] = base64_decode($context->data->return);                                    
-            else 
-                $redirect['url'] = (string)KRequest::referrer();
-        }
-		
-		//if a the result of disatched is string then
-		//dispaly the returned value	
-		if ( is_string($context->result) ) 
-		{
-			if ( KRequest::type() == 'HTTP') {
-				JFactory::getApplication()->enqueueMessage($redirect['message'], $redirect['type']);
-			} else {
-				//set the redirect message in the header
-				JResponse::setHeader('Redirect-Message', 	   $redirect['message']);
-				JResponse::setHeader('Redirect-Message-Type',  $redirect['type']);				
-			}
-			//set the status to ok if there's a result
-			$context->status = KHttpResponse::OK;
-			return $context->result;
-		}
-				
-		if (KRequest::type() == 'HTTP' && !empty($redirect['url']) ) 
-		{
-			JFactory::getApplication()
-					->redirect($redirect['url'], $redirect['message'], $redirect['type']);
-		} else {
-			JResponse::setHeader('Redirect-Message', 	   $redirect['message']);
-			JResponse::setHeader('Redirect-Message-Type',  $redirect['type']);			
-		}
-	}
-
+	
 	/**
 	 * Renders a controller view
+	 *
+	 * @param KCommandContext $context The context parameter
+	 * 
+	 * @return string
+	 */	
+	protected function _actionForward(KCommandContext $context)
+	{	    
+	    $data  = $context->data;
+        
+	    $context->append(array(
+            'html_redirect' => KRequest::get('server.HTTP_REFERER', 'url')
+	    ));	    	    
+	    
+	    $context->append(array(
+	        'render_after_post'  => is_string($context->result),
+	        'forward_after_post' => ($this->format == 'json' || KRequest::type() == 'AJAX') && 
+	                        ($context->status == KHttpResponse::RESET_CONTENT || $context->status == KHttpResponse::CREATED),
+	        'auto_redirect_after_post'     => KRequest::type() == 'HTTP' 
+	                                && $this->format == 'html' 
+	                                && !$this->getController()->getRedirect()->location          
+	    ));
+
+	    if ( $context->render_after_post ) 
+	    {
+	        $this->getController()->getRedirect()->code = null;
+	        return $context->result;
+	    }
+	    elseif ( $context->forward_after_post === true )
+	    {
+	        //don't do any redirect
+	        $this->getController()->getRedirect()->code = null;
+	        
+	        $context->result = $this->getController()
+	                //set the view to single
+	                ->view($this->getController()->getIdentifier()->name)
+    	            //render the item
+	                ->execute('display', $context);
+	            ;
+	       return $context->result;
+	    }
+	    elseif ( $context->auto_redirect_after_post &&
+	            $context->html_redirect ) {
+	        $this->getController()->setRedirect($context->html_redirect); 
+	    }
+	}
+	
+	/**
+	 * Renders a controller view
+	 * 
+	 * @param KCommandContext $context The context parameter
 	 * 
 	 * @return string
 	 */
 	protected function _actionRender(KCommandContext $context)
 	{
-		if ( $context->result === false )
-			return false;
-			
-		return parent::_actionRender($context);
+	    $redirect = $this->getController()->getRedirect();
+	    
+	    //if the redirect code i
+	    if ( $redirect->location && 
+	            $redirect->code >= 300 && $redirect->code < 400 ) 
+	    {
+    	    $context->status              = $redirect->code;
+    	    $context->status_message      = $redirect->message;
+    	    $context->headers['Location'] = (string)$redirect->location;    	    
+	    }
+	    
+	    //if there's a content set the content type
+	    if(is_string($context->result)) {
+	        header('Content-Type: '.$this->getController()->getView()->mimetype);
+	    }
+	    
+        //Headers
+	    if($context->headers)
+	    {
+	        foreach($context->headers as $name => $value) {
+	            header($name.' : '.$value);
+	        }
+	    }
+
+	    //Status
+        if($context->status) {
+            header(KHttpResponse::getHeader($context->status, $context->status_message, KRequest::protocol()));
+        }
+                
+	    if(is_string($context->result)) {
+		     return $context->result;
+		}
 	}
 	
 }
