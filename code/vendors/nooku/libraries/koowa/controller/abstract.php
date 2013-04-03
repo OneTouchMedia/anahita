@@ -131,6 +131,9 @@ abstract class KControllerAbstract extends KObject
            $command = $action;
         }
        
+        $context->append(array('headers'=>array()));
+        
+        try {
         //Execute the action
         if($this->getCommandChain()->run('before.'.$command, $context) !== false) 
         {
@@ -147,6 +150,10 @@ abstract class KControllerAbstract extends KObject
             else  $context->result = $this->$method($context);
                 
             $this->getCommandChain()->run('after.'.$command, $context);
+        }
+        //@TODO temporary until we move to the response object
+        } catch(KException $e) {
+            $context->setError($e);
         }
         
         //Handle exceptions
