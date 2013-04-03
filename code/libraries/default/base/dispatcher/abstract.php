@@ -186,7 +186,12 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
     	            //render the item
 	                ->execute('display', $context);
 	            ;
-	       return $context->result;
+	        //we can not send back content with reset content
+	        if ( $context->status == KHttpResponse::RESET_CONTENT) {
+	            $context->status = KHttpResponse::OK;
+	        }
+	        
+            return $context->result;
 	    }
 	    elseif ( $context->auto_redirect_after_post &&
 	            $context->html_redirect ) {
