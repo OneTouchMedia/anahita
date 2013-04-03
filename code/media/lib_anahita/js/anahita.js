@@ -198,6 +198,14 @@ Class.refactor(Spinner, {
 				data	: this.options.data
 			});
 			form.submit();
+		},
+		onFailure : function(xhr) 
+		{
+			this.previous.apply(this, arguments);
+			var method = 'on' + this.status;
+			if ( this.options[method] ) {
+				this.options[method].apply(this, [this]);
+			}
 		}
 	});
 	
@@ -654,36 +662,85 @@ Class.refactor(Form.Validator.Inline, {
 /**
  * Form Remote Validator 
  */
-Form.Validator.add('validate-remote', {
-	successMsg : function(element, props) {
-		var validation = element.retrieve('remote:validation') || {};		
-		return  validation.successMsg || props.successMsg;
-	},	
-	errorMsg: function(element, props) {
-	    var validation = element.retrieve('remote:validation') || {};	    
-	    return  validation.errorMsg || props.errorMsg;
-	},
-	test 	: function(element, props) {		
-		if ( Form.Validator.getValidator('IsEmpty').test(element) )
+(function() {
+	
+	Class.refactor(Form.Validator, {
+		pendingRequest  : 0,
+		aRequestFailed  : false,
+		validate: function(event) 
+		{
+			var result = this.previous(event);
+			event.preventDefault();
+			var intervalID = (function() {				
+				if ( this.pendingRequest == 0 ) {
+					clearInterval(intervalID);
+					if ( !this.aRequestFailed )
+						event.target.submit();
+				}
+			}).periodical(5, this);
+		}
+	});
+	Form.Validator.add('validate-remote', {
+		successMsg : function(element, props) {
+			var validation = element.retrieve('remote:validation:result:'+element.get('value')) || {};		
+			return  validation.successMsg || props.successMsg;
+		},	
+		errorMsg: function(element, props) {
+		    var validation = element.retrieve('remote:validation:result:'+element.get('value')) || {};	    
+		    return  validation.errorMsg || props.errorMsg;
+		},
+		test 	: function(element, props) {		
+			if ( Form.Validator.getValidator('IsEmpty').test(element) )
+				return true;
+			var form = element.form;
+			var validator = form.get('validator');
+			var key = 'remote:validation:result:'+ element.get('value');			
+			var result;
+			if ( result = element.retrieve(key) ) 
+			{				
+				var ret =  result.status < 300;
+				if ( !ret ) {
+					validator.aRequestFailed = true;
+				}
+				return ret;
+			}
+			
+			if ( request = element.retrieve('remote:validation:request') ) {				
+				if ( request.key == key ) {
+					return;
+				}
+			}
+			
+			var request = new Request({
+				url    : props.url || element.form.get('action'),
+				method : 'post',
+				data   : {action:'validate','key':props.key || element.get('name'),'value':element.get('value')},
+				onRequest : function(){
+				    //element.spin();
+				},
+				onComplete : function() 
+				{
+				    //element.unspin();
+					var value = this.options.data.value;
+					element.store('remote:validation:request', null);
+					var result = JSON.decode(this.getHeader('Validation') || '{}');
+					result.status = this.status;
+					console.log(this.key);
+				    element.store(this.key, result);
+				    element.form.get('validator').pendingRequest--;
+				    element.form.get('validator').validateField(element);				    
+				},
+				async : true
+			})	
+			request.key = key;
+			validator.pendingRequest++;			
+			element.store('remote:validation:request', request);
+			request.post();
 			return true;
-		var request = new Request({
-			url    : props.url || element.form.get('action'),
-			method : 'post',
-			data   : {action:'validate','key':props.key || element.get('name'),'value':element.get('value')},
-			onRequest : function(){
-			    element.spin();
-			},
-			onComplete : function() {
-			    element.unspin();
-			    element.store('remote:validation', JSON.decode(this.getHeader('Validation') || '{}'));
-			},
-			async : false
-		}).post();
-		
-		element.store('validation:request', request);
-		return request.status < 300
-	}
-});
+		}
+	});	
+})();
+
 
 
 /**
