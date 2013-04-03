@@ -113,16 +113,13 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      */
     protected function _actionDispatch(KCommandContext $context)
     {
-    	//if the viewer is not logged in then 
-    	//redirect to the loggin page
     	try 
     	{
     		$result = parent::_actionDispatch($context);
     	} 
         catch(KException $exception) 
     	{
-    		if ( $this->format == 'html' ) 
-    		{
+    		if ( $this->format == 'html' ) {
     			$result = $this->_handleDispatchException($context, $exception);
     		} 
     		else throw $exception;
@@ -142,12 +139,12 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     protected function _handleDispatchException(KCommandContext $context, KException $exception)
     {
     	$viewer = get_viewer();
-    	
+
     	//if format html then redirect to login
     	if ( $viewer->guest() && KRequest::type() == 'HTTP' )
     	{
     		//first lets see if the controller can render the error page
-    		$template  = $this->getController()->getView()->getTemplate();   
+    		$template  = $this->getController()->getView()->getTemplate();
     		$layouts   = array('_error_'.$exception->getCode(),'_error_default');
     		foreach($layouts as $layout) 
     		{
@@ -192,25 +189,20 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      * @return mixed
      */
 	protected function _actionForward(KCommandContext $context)
-	{
-        //If content is reset then return the content of the controller
-        if ( ($this->format == 'json' || KRequest::type() == 'AJAX' )
-            && ( $context->status == KHttpResponse::RESET_CONTENT ||
-                 $context->status == KHttpResponse::CREATED)
-        ) 
+	{	    
+	    $data = $context->data;
+
+	    if ( $this->getController()->isIdentifiable()
+	            && $context->result instanceof KObject ) 
+	    {
+	        $this->getController()->setItem($context->result);
+	    }
+
+        if ( $data->return ) 
         {
-            if (  $this->getController()->isIdentifiable() &&
-                  $context->result instanceof KObject)
-            {
-                $context->result = $this->getController()
-                    //set the view to single
-                    ->view($this->getController()->getIdentifier()->name)
-                    //set the item
-                    ->setItem($context->result)
-                    //render the item
-                    ->execute('get', $context);
-                ;
-            }
+            $context->append(array(
+                'html_redirect' => base64_decode($data->return)
+            ));
         }        
         
 		return parent::_actionForward($context);
@@ -244,11 +236,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      * @return string
      */
     protected function _actionRender(KCommandContext $context)
-    {
-        $view  = $this->getController()->getView();
-        
-        header('Content-Type: '.$view->mimetype);
-                       
+    {                                       
         if ( $this->format == 'html' && KRequest::type() == 'HTTP' ) {
             $this->_setPageTitle();
         }
