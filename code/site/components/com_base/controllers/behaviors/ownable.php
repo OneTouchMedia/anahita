@@ -156,10 +156,9 @@ class ComBaseControllerBehaviorOwnable extends KControllerBehaviorAbstract
             $context->data['owner'] = $actor;  
             
             if ( !$actor ) {
-                $context->setError(new KControllerException(
+                throw new KControllerException(
                     'Owner Not Found', KHttpResponse::NOT_FOUND
-                ));
-                return false;
+                );
             }                      
         }
         
