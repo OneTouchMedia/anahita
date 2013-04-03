@@ -128,11 +128,11 @@ class ComNotificationsControllerNotification extends ComBaseControllerService
     /**
      * Checks if this controller can be executed by the viewer
      * 
-     * @param KCommandContext $context The CommandChain Context
-     *
+     * @param string $action The action being executed
+     * 
      * @return boolean
      */
-    public function canExecute(KCommandContext $context)
+    public function canExecute($action)
     {       
         if ( !$this->actor )
             return false;
@@ -147,6 +147,6 @@ class ComNotificationsControllerNotification extends ComBaseControllerService
         if ( $this->actor->authorize('administration') === false )
             return false;
             
-        return $this->__call('canExecute', array($context));    
+        return parent::canExecute($action);    
     }
 }
