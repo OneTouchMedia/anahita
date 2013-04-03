@@ -71,53 +71,36 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
         {
             //if there are not any commitable
             //skip
-            if ( count($this->getRepository()->getSpace()->getCommitables()) == 0 ) 
-                return;         
+            if ( count($this->getRepository()->getSpace()->getCommitables()) == 0 ) { 
+                return;
+            }
             
             //do a commit
             $result = $this->commit();
             
-            $type    = $result ? 'success' : 'error';            
+            $type    = $result === false ? 'error' : 'success';            
             $message = $this->_makeStatusMessage($context->action, $type);
             
             if ( $result === true ) 
             {
                 //succesfull commit
                 if ( empty($context->status) ) {
-                    $context->status = $this->getActionStatus($context->action);
+                    $context->status = $this->getResponseStatusCode($context->action);
                 }
             }
 
             //no need to set the context as we want to redirect back
             //previous place
             //seting contex error causes an exceptio be thrown
-            
+                        
             //set the redirect message of the contrller
             if ( !empty($message) )
             {
-                $context->caller->getRedirect()->type    = $type;
-                $context->caller->getRedirect()->message = $message;
+//                 $this->_mixer
+//                     ->setFlash('commit_message', array('type'=>$type, 'message'=>$message));
             }
             
             return $result;
-        }
-    }
-
-    /**
-     * Get a response status for an action
-     *
-     * @param string $action The action name to get a response code for
-     * 
-     * @return int
-     */
-    public function getActionStatus($action)
-    {
-        switch($action)
-        {
-            case 'add'         : return KHttpResponse::CREATED; break;
-            case 'delete'      : return KHttpResponse::NO_CONTENT; break;
-            case 'edit'        : return KHttpResponse::RESET_CONTENT; break;
-            default            : return KHttpResponse::OK; break;
         }
     }
     
@@ -131,6 +114,24 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
         return $this->getRepository()->getSpace()->commitEntities($this->_failed_commits);
     }
 
+    /**
+     * Get a response status for an action
+     *
+     * @param string $action The action name to get a response code for
+     *
+     * @return int
+     */
+    protected function getResponseStatusCode($action)
+    {
+        switch($action)
+        {
+            case 'add'         : return KHttpResponse::CREATED; break;
+            case 'delete'      : return KHttpResponse::NO_CONTENT; break;
+            case 'edit'        : return KHttpResponse::RESET_CONTENT; break;
+            default            : return KHttpResponse::OK; break;
+        }
+    }
+        
     /**
      * Render a message for an action
      *
@@ -146,8 +147,28 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
         $messages[]  = strtoupper('LIB-AN-MESSAGE-'.$this->_mixer->getIdentifier()->name.'-'.$action.'-'.$type);
         $messages[]  = strtoupper('LIB-AN-MESSAGE-'.$action.'-'.$type);
         $messages[]  = 'LIB-AN-PROMPT-COMMIT-'.strtoupper($type);
-        $message = translate($messages, false);
+        $message = translate($messages);
         return $message;
+    }
+    
+    /**
+     * Return an array of commit errors
+     * 
+     * @return array
+     */
+    public function getCommitErrors()
+    {
+        $errors = array();
+        
+        if ( $this->_failed_commits ) 
+        {
+            foreach($this->_failed_commits as $entity) 
+            {
+                $errors[(string)$entity->getIdentifier()] = array_values($entity->getErrors()->toArray());                
+            }    
+        }
+        
+        return $errors;
     }
     
     /**
