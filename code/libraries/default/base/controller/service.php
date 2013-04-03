@@ -71,10 +71,10 @@ class LibBaseControllerService extends LibBaseControllerResource
      */
     protected function _actionAdd(KCommandContext $context)
     {
-        return $this
-                ->setItem($this->getRepository()->getEntity()->setData($context->data))
-                ->getItem();
-        ;
+        $context['status'] = KHttpResponse::CREATED;
+        $entity = $this->getRepository()->getEntity()->setData($context['data']);
+        $this->setItem($entity);
+        return $this->getItem();
     }
     
     /**
@@ -86,7 +86,8 @@ class LibBaseControllerService extends LibBaseControllerResource
      */
     protected function _actionEdit(KCommandContext $context)
     {
-        return $this->getItem()->setData($context->data);
+        $context['status'] = KHttpResponse::RESET_CONTENT;
+        return $this->getItem()->setData($context['data']);
     }
     
     /**
@@ -108,8 +109,8 @@ class LibBaseControllerService extends LibBaseControllerResource
      */
     protected function _actionDelete(KCommandContext $context)
     {
+        $context['status'] = KHttpResponse::CREATED;
         $entity = $this->getItem()->delete();
-        $this->setRedirect('index.php?option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
         return $entity;
     }        
 }
