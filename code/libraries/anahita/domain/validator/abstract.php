@@ -326,7 +326,8 @@ abstract class AnDomainValidatorAbstract extends KObject
         }
         
         if ( $property->isAttribute() && $property->isScalar() && isset($options['max'])) {
-            $value = LibBaseTemplateHelperText::truncate($value, array('length'=>$options['max'], 'consider_html'=>true, 'ending'=>''));
+            $helper = new LibBaseTemplateHelperText(new KConfig());
+            $value  = $helper->truncate($value, array('length'=>$options['max'], 'consider_html'=>true, 'ending'=>''));
         }
         
         return $value;        
@@ -434,8 +435,11 @@ abstract class AnDomainValidatorAbstract extends KObject
         //@TODO this causes no-incremental primary keys
         //to pass the validation. Need a new serial type the represet 
         //incremental identity property
-        if ( $entity->getEntityState() == AnDomain::STATE_NEW && $property === $entity->getEntityDescription()->getIdentityProperty() )
+        if ( $property === $entity->getEntityDescription()
+                    ->getIdentityProperty() && !$entity->persisted() ) 
+        {
             return true;
+        }
         
         if ( $property->isAttribute() )
         {
