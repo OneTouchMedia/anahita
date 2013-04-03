@@ -32,7 +32,7 @@ class AnDomainStoreDatabase extends KObject implements AnDomainStoreInterface
 	 * 
 	 * @var array
 	 */
-	protected $_columns;
+	protected $_columns = array();
 	
 	/**
 	 * Database adapter  
