@@ -377,8 +377,9 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	{
 		$property = $this->getEntityDescription()->getProperty($name);
 				
-		if ( !$property ) 
+		if ( !$property instanceof AnDomainPropertyAbstract ) { 
 			return parent::set($name, $value);
+		}
 		
 		//if a value is mixin then get its mixer
 		if ( $value instanceof KMixinAbstract )
@@ -668,8 +669,6 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	 */	
     public function setData($property, $value = null )
     {  	
-    	$property = KConfig::unbox($property);
-    	
     	if(is_array($property)) 
     	{
     		$description	= $this->getEntityDescription();
@@ -697,8 +696,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
         	$description = $this->getEntityDescription();      	
         	$property 	 = $description->getProperty($property);
         	
-        	if ( !$property ) 
-        	{
+        	if ( !$property instanceof AnDomainPropertyAbstract ) {
         		$this->set($name, $value);
         		return $this;
         	}
