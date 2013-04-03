@@ -128,7 +128,6 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
 		$data 	    = $context->data;
 		$this->getItem()->components->insert($data->app);
 		$this->commit();
-		die;
 	}
 	
 	/**
@@ -139,11 +138,10 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
      * @return void
 	 */
 	protected function _actionRemoveapp(KCommandContext $context)
-	{	
+	{
 		$data 	    = $context->data;		
 		$this->getItem()->components->extract($data->app);
 		$this->commit();
-		die;		
 	} 
     
     /**
@@ -185,10 +183,9 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
     {
         $data = $context->data;
         
-        if ( $this->getItem() ) 
-        {            
+        if ( $this->getItem() ) {            
             $this->getState()->requester = $this->getItem()->requesters->fetch($data->requester);   
-        }              
+        }
     } 
     
     /**
