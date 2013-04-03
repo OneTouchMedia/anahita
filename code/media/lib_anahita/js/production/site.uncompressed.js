@@ -19897,17 +19897,20 @@ Class.refactor(Form.Validator.Inline, {
 	Class.refactor(Form.Validator, {
 		pendingRequest  : 0,
 		aRequestFailed  : false,
-		validate: function(event) 
+		dvalidate: function(event) 
 		{
-			var result = this.previous(event);
-			event.preventDefault();
-			var intervalID = (function() {				
-				if ( this.pendingRequest == 0 ) {
-					clearInterval(intervalID);
-					if ( !this.aRequestFailed )
-						event.target.submit();
-				}
-			}).periodical(5, this);
+			var result = this.previous(event);			
+			if ( event && event.target )
+			{
+				event.preventDefault();
+				var intervalID = (function() {				
+					if ( this.pendingRequest == 0 ) {
+						clearInterval(intervalID);
+						if ( !this.aRequestFailed )
+							event.target.submit();
+					}
+				}).periodical(5, this);				
+			}
 		}
 	});
 	Form.Validator.add('validate-remote', {
