@@ -58,7 +58,7 @@ class AnDomainQueryHelper
      * @param $columns
      * @return array 
      */
-    public function parseColumns($query, $columns)
+    static public function parseColumns($query, $columns)
     {
     	if (  $columns instanceof AnDomainResourceColumn )
     	{
