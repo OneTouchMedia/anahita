@@ -240,10 +240,9 @@ class LibBaseControllerBehaviorIdentifiable extends KControllerBehaviorAbstract
             
             if ( empty($entity) || !count($entity)) 
             {
-                $context->setError(new KControllerException(
+                throw new KControllerException(
                     'Resource Not Found', KHttpResponse::NOT_FOUND
-                ));
-                return false;                       
+                );
             }
             
             $this->setItem($entity);
