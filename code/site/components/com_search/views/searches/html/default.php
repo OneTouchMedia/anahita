@@ -1,5 +1,7 @@
 <?php defined('KOOWA') or die; ?>
 
+<script src="com_search/js/search.js" />
+
 <module position="sidebar-a" style="none">
 <?php if ( !empty($keywords)) : ?>
 <?= @template('scopes') ?>

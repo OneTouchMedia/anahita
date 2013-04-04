@@ -4,7 +4,7 @@
 	var submit_form = function() 
 	{
 		search_options['layout'] = 'results_scopes';		
-		console.log(search_options);
+		//console.log(search_options);
 		var url = search_form.get('action').toURI().setData(search_options);		
 		search_form.ajaxRequest({
 			url : url.toString(),
@@ -39,18 +39,20 @@
 	}});	
 	
 	Delegator.register('click','ChangeScope', function(event, el, api) {
-			event.stop();
-			el.getParent('ul').getElements('li').removeClass('active');
-			el.getParent('li').addClass('active');
-			search_options = {scope:el.get('href').toURI().getData('scope')};
-			console.log(search_options);
-			el.ajaxRequest({
-				data : search_options,
-				evalScripts : false,
-				onSuccess : function() {				
-					document.getElement('.an-entities-wrapper')
-						.set('html', this.response.html)
-				}
-			}).send();
+			
+		event.stop();			
+		el.getParent('ul').getElements('li').removeClass('active');
+		el.getParent('li').addClass('active');
+		search_options = {scope:el.get('href').toURI().getData('scope')};
+		
+		el.ajaxRequest({
+			data : search_options,
+			spinnerTarget : el,
+			evalScripts : false,
+			onSuccess : function() {				
+				document.getElement('.an-entities-wrapper')
+					.set('html', this.response.html)
+			}
+		}).send();
 	});	
 })()
