@@ -4,7 +4,7 @@
 ?>
 <div class="row">
 	<div class="offset3 span6">	
-		<form action="<?=@route()?>" method="post" class="well">
+		<form action="<?=@route()?>" method="post">
 		<fieldset>
 			<legend><?= @text('COM-PEOPLE-SESSION-TITLE') ?></legend>
 			
@@ -51,7 +51,7 @@
 			
 			
 			<div class="form-actions">
-				<button type="submit" name="Submit" class="btn btn-large"/>
+				<button type="submit" name="Submit" class="btn btn-large btn-primary"/>
 					<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>
 				</button>
 			</div>
