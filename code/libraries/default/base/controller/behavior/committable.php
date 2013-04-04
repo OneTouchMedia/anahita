@@ -78,18 +78,14 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
             //do a commit
             $result = $this->commit();
             
-            $type    = $result === false ? 'error' : 'success';            
-            $message = $this->_makeStatusMessage($context->action, $type);
-
-            //no need to set the context as we want to redirect back
-            //previous place
-            //seting contex error causes an exceptio be thrown
-                        
-            //set the redirect message of the contrller
-            if ( !empty($message) )
+            if ( $result === false ) 
             {
-//                 $this->_mixer
-//                     ->setFlash('commit_message', array('type'=>$type, 'message'=>$message));
+                if ( $this->isIdentifiable() && $this->getItem() )
+                {
+                     if ( $this->getItem()->getErrors()->count() ) {
+                         throw new AnErrorException($this->getItem()->getErrors(), KHttpResponse::BAD_REQUEST);
+                     }   
+                }
             }
             
             return $result;
