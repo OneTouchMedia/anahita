@@ -121,7 +121,7 @@ class ComBaseControllerService extends LibBaseControllerService
 	protected function _actionPost($context)
 	{
 		if ( $context->action == 'save' )
-			$this->setRedirect('index.php?option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
+			$this->setRedirect('option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
 		
 		$data = $context->data;
 
@@ -157,8 +157,8 @@ class ComBaseControllerService extends LibBaseControllerService
 	protected function _actionCancel(KCommandContext $context)
 	{
 		//Create the redirect
-		$this->setRedirect('index.php?option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));	
-	}	
+		$this->setRedirect('option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));	
+	}
 	
 	/**
 	 * Create a new entity

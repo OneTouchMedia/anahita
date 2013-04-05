@@ -75,8 +75,8 @@ class ComBaseControllerConfiguration extends ComBaseControllerResource
                     )));
         $params = new JParameter('');
         $params->loadArray((array)$context->data['params']);
-        $component->params = $params->toString();
-        $component->save();        
+        $component->params = $params->toString();        
+        $component->save();
     }
     
     /**

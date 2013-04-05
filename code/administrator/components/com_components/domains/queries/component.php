@@ -32,9 +32,12 @@ class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponen
 	 * 
 	 * @return void
 	 */
-	protected function _beforeQueryBuild()
+	protected function _beforeQueryBuild(KCommandContext $context)
 	{
 		parent::_beforeQueryBuild();
-		$this->option($this->getService('com://admin/components.domain.set.assignablecomponent')->option);
+		
+		if ( $context->query_operation & AnDomain::OPERATION_FETCH ) {
+		    $this->option($this->getService('com://admin/components.domain.set.assignablecomponent')->option);
+		}		
 	}
 }
