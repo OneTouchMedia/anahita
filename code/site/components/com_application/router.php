@@ -96,10 +96,13 @@ class JRouterSite extends KObject
 	        $url->query['format'] = $url->format;
 	    }
 	    $segments   = explode('/', trim($url->path,'/'));
-	    $segments   = array_filter($segments);	    	    	    
+	    $segments   = array_filter($segments);
 	    $component  = count($segments) ? array_shift($segments) : 'menu';
+	    $url->query = array_merge(array('option'=>'com_'.$component), $url->query);
+	    $component  = str_replace('com_','',$url->query['option']);
 	    $query      = $this->getComponentRouter($component)->parse($segments);	   
 	    $url->query = array_merge($url->query, array('option'=>'com_'.$component), $query);
+	    
 	    //legacy reasons
 	    if ( empty($url->query['Itemid']) ) {
 	        $url->query['Itemid'] = null;
