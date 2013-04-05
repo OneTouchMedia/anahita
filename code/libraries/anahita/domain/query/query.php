@@ -892,6 +892,19 @@ class AnDomainQuery extends KObject implements KCommandInterface
 			$context = $this->getRepository()->getCommandContext();
 			$context->caller = $this;
 			$context->query  = $query;
+	        switch($this->operation['type'])
+		    {
+		        case AnDomainQuery::QUERY_SELECT_DEFAULT :
+		        case AnDomainQuery::QUERY_SELECT  :
+                    $context->query_operation = AnDomain::OPERATION_FETCH;
+		            break;
+		        case AnDomainQuery::QUERY_UPDATE :
+		            $context->query_operation = AnDomain::OPERATION_UPDATE;
+		            break;
+                case AnDomainQuery::QUERY_DELETE :
+                    $context->query_operation = AnDomain::OPERATION_DELETE;
+                    break;
+		    }
 			$chain->run('before.build', $context);
 			$context->result = AnDomainQueryBuilder::getInstance()->build($query);
 			$chain->run('after.after', $context);		
