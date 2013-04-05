@@ -572,9 +572,18 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	        }	        	        	        
 	    } 
 	    
-	    //if an entity is not loaded then reset it
-	    else {
-	        $this->reset();
+	    else 
+	    {
+	        //if a persisted entity can not be loaded then
+	        //it must mean the data doesn't exists in the store
+	        //can we assume then the data has been somehow deleted ?
+	        //if that's the case then we need to set the state to destroyed	        
+	        if ( $this->persisted() ) {
+                    $this->getRepository()->getSpace()
+			            ->setEntityState($this, AnDomain::STATE_DESTROYED);        
+	        } else {
+	            $this->reset();
+	        }
 	    }
 	    
 	    return $this;
