@@ -1,8 +1,7 @@
 <?php defined('KOOWA') or die ?>
 
-<?php if ( $actor->authorize('action', 'com_notes:post:add') ) : ?>
 <div id="post-composer">
-	<form id="post-composer-form" action="<?= @route('option=com_notes&view=post&oid='.$actor->id) ?>" method="POST" data-formvalidator-options="'evaluateFieldsOnBlur':true">
+	<form id="post-composer-form" action="<?= @route() ?>" method="POST" data-formvalidator-options="'evaluateFieldsOnBlur':true">
 		<textarea class="input-block-level" data-validators="minLength:1 maxLength:<?= POST_MAX_LIMIT ?>" id="composer-textarea"  name="body" overtext="<?= @text('COM-NOTES-SHARE-PROMPT') ?>"></textarea>
 	    <input type="hidden" name="composed" value="1" />
 		<div class="post-actions">
@@ -58,4 +57,3 @@
 		</div>
 	</form>
 </div>
-<?php endif; ?>
