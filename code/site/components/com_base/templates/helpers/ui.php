@@ -182,7 +182,7 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
         }
         
 		if ( isset($attributes['href']) ){
-		    $attributes['href'] = LibBaseHelperUrl::getRoute($attributes['href']);
+		    $attributes['href'] = JRoute::_($attributes['href']);
 		}
 				
 		$html = $this->getService('com:base.template.helper.html');
