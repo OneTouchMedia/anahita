@@ -8,10 +8,13 @@
 		<fieldset>
 			<legend><?= @text('COM-PEOPLE-SESSION-TITLE') ?></legend>
 			
-			<?php KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service')?>
-			<?php if ( class_exists('ComConnectTemplateHelperService', true) ): ?>
+			<?php 
+			$connect = KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service');			
+			?>
+			<?php ?>
+			<?php if ( $connect ): ?>
 			<div class="connect-service-actions">
-			<?php echo KService::get('com://site/connect.template.helper.service')->renderLogins() ?>
+			<?= $this->renderHelper('com://site/connect.template.helper.service.renderLogins')?>			
 			</div>
 			<?php endif; ?>
 			<?php 
