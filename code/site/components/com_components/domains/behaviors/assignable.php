@@ -219,6 +219,16 @@ class ComComponentsDomainBehaviorAssignable extends LibBaseDomainBehaviorEnablea
 	}
 	
 	/**
+	 * Retunr an empty array 
+	 * 
+	 * @return array
+	 */
+	public function getPermissions()
+	{
+	    return array();
+	}
+	
+	/**
 	 * Description of the app when assigned to a profile
 	 * 
 	 * @return string
