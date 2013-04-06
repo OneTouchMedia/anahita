@@ -57,8 +57,7 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
                 'subscribable',
 				'modifiable',
 				'followable',
-			    'storable',
-				'portraitable',
+			    'storable',				
 				'describable',
 				'authorizer',
 				'dictionariable',
@@ -67,9 +66,15 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 			    'enableable'                
 			)
 		));
-        
+				
         $config->behaviors->append(array(
-//            'taggable'    => array('parse_hashtag'=>true)
+              'portraitable' => array(
+                      'sizes' => array(
+                              'small'  => '80xauto',
+                              'medium' => '160xauto',
+                              'large'  => '480xauto',
+                              'square' => 56 ))                
+//            'taggable'     => array('parse_hashtag'=>true)
         ));
 		
 		parent::_initialize($config);
@@ -102,7 +107,7 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 		} else {			
 			$filename = $this->component.'/avatars/'.$size.$this->filename;				
 		}
-
+        
 		return $filename;
 	}
 	
