@@ -76,6 +76,8 @@ class ComActorsViewSettingsHtml extends ComBaseViewHtml
 				continue;
 			}
 			
+			if ( !count($component->getPermissions()) ) continue;
+			
 			foreach($component->getPermissions() as $identifier => $actions ) 
 			{
 				if ( strpos($identifier,'.') === false ) {
