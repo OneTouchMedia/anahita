@@ -36,7 +36,7 @@ class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponen
 	{
 		parent::_beforeQueryBuild();
 		
-		if ( $context->query_operation & AnDomain::OPERATION_FETCH ) {
+		if ( $this->getOperation() & AnDomain::OPERATION_FETCH ) {
 		    $this->option($this->getService('com://admin/components.domain.set.assignablecomponent')->option);
 		}		
 	}

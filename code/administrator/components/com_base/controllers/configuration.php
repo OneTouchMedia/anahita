@@ -41,7 +41,9 @@ class ComBaseControllerConfiguration extends ComBaseControllerResource
         $config->append(array(
             'toolbars' => array('menubar')
         ));   
-
+        
+        $this->_action_map['post'] = 'save';
+        
         parent::_initialize($config);
     }
     
