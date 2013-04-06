@@ -877,7 +877,25 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	{
 	    return KService::get($this->getRepository()->getEntitySet(), array('query'=>clone $this, 'repository'=>$this->getRepository()));
 	}
-		
+
+	/**
+	 * Retun AnDomain operation based on the query operation
+	 * 
+	 * @return int
+	 */
+	public function getOperation()
+	{
+	    switch($this->operation['type'])
+	    {
+	        case AnDomainQuery::QUERY_UPDATE :
+	            return AnDomain::OPERATION_UPDATE;
+	        case AnDomainQuery::QUERY_DELETE :
+	            return AnDomain::OPERATION_DELETE;
+	        default :
+	            return AnDomain::OPERATION_FETCH;	            
+	    }
+	}
+	
 	/**
 	 * Return the query in a string format
 	 *
@@ -886,25 +904,12 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	public function __toString()
 	{
 		try {
-			$chain = clone $this->getRepository()->getCommandChain();			
+			$chain = clone $this->getRepository()->getCommandChain();
 			$query = clone $this;
 			$chain->enqueue($query);
 			$context = $this->getRepository()->getCommandContext();
 			$context->caller = $this;
 			$context->query  = $query;
-	        switch($this->operation['type'])
-		    {
-		        case AnDomainQuery::QUERY_SELECT_DEFAULT :
-		        case AnDomainQuery::QUERY_SELECT  :
-                    $context->query_operation = AnDomain::OPERATION_FETCH;
-		            break;
-		        case AnDomainQuery::QUERY_UPDATE :
-		            $context->query_operation = AnDomain::OPERATION_UPDATE;
-		            break;
-                case AnDomainQuery::QUERY_DELETE :
-                    $context->query_operation = AnDomain::OPERATION_DELETE;
-                    break;
-		    }
 			$chain->run('before.build', $context);
 			$context->result = AnDomainQueryBuilder::getInstance()->build($query);
 			$chain->run('after.after', $context);		
