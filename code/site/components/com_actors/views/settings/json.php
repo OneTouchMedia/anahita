@@ -75,8 +75,10 @@ class ComActorsViewSettingsJson extends ComBaseViewJson
                     $app->component => array('name'=>$app->component,'enabled'=>$app->enabledForActor($this->_state->getItem()))
             ));
         }
+
+        $data['followRequests'] = $this->_state->getItem()->requesters->toArray();
+        $data['apps']     = array_values($config->toArray());
                 
-        $data = array_values($config->toArray());        
         return json_encode($data);
     }
        
