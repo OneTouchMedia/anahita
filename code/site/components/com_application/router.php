@@ -120,7 +120,9 @@ class JRouterSite extends KObject
      */
 	function build($query = '', $fqr = false)
 	{
-	    $query = str_replace('index.php?', '', $query);	    
+	    if ( is_string($query) ) {
+	        $query = str_replace('index.php?', '', $query);
+	    }	    
         $uri = clone $this->_clonable_url;
         $uri->setQuery($query);
         $query = $uri->query;
