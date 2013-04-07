@@ -65,7 +65,8 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         $config->append(array(
             'behaviors' => array(
             	'com://site/search.controller.behavior.searchable',
-                'publisher',
+                'com://site/stories.controller.behavior.publisher',
+                'com://site/notifications.controller.behavior.notifier',                                    
                 'followable',
                 'administrable',
                 'ownable',
@@ -133,7 +134,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         
         if ( $entity->isPortraitable() && KRequest::has('files.portrait') ) {
             $file = KRequest::get('files.portrait', 'raw'); 
-            $entity->setPortraitImage(array('url'=>$file['tmp_name'], 'mimetype'=>$file['type']));             
+            $entity->setPortrait(array('url'=>$file['tmp_name'], 'mimetype'=>$file['type']));             
         }
         
         return $entity;
@@ -153,7 +154,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         if ( $entity->isPortraitable() && KRequest::has('files.portrait') ) 
         {         
             $file = KRequest::get('files.portrait', 'raw'); 
-            $this->getItem()->setPortraitImage(array('url'=>$file['tmp_name'], 'mimetype'=>$file['type']));
+            $this->getItem()->setPortrait(array('url'=>$file['tmp_name'], 'mimetype'=>$file['type']));
             if ( !empty($file['size']) ) {
                 $story = $this->createStory(array(
                    'name'   => 'avatar_edit',
