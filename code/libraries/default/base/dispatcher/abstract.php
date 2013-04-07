@@ -69,9 +69,17 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
         $component   = $this->getController()->getIdentifier()->package;
         $application = $this->getController()->getIdentifier()->application;
         $this->getService('koowa:loader')->loadIdentifier('com://'.$application.'/'.$component.'.aliases');
+                
+        //if a command line the either do get or 
+        //post depending if there are any action
+        if ( PHP_SAPI == 'cli' ) {
+            $method = KRequest::get('post.action', 'cmd', 'get');
+        } 
         
-        //Execute the component method
-        $method = strtolower(KRequest::method());
+        else {
+            $method = strtolower(KRequest::method());
+        }
+        
         $result = $this->execute($method, $context);
         
     	return $result;
