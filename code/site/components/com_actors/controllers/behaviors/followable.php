@@ -124,7 +124,6 @@ class ComActorsControllerBehaviorFollowable extends KControllerBehaviorAbstract
         return $this->getItem();
 	}
     
-    
     /**
      * The viewers blocks the actor
      *
