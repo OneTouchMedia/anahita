@@ -79,7 +79,7 @@ class ComNotificationsMailer extends KObject
 	        foreach($notifications as $notification)
     	        $notification->status = ComNotificationsDomainEntityNotification::STATUS_SENT;    
             //change the notification status
-            $space->commit();
+            $space->commitEntities();
             //send the notification
     		foreach($notifications as $notification) {
     			$this->sendNotification($notification);
@@ -92,7 +92,7 @@ class ComNotificationsMailer extends KObject
 	            throw $e;  
 	    }
 	    
-	    $space->commit();
+	    $space->commitEntities();
 	}
 	
 	/**
