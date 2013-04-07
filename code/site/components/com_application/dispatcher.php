@@ -95,11 +95,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _actionRun(KCommandContext $context)
     {
         
-        //befire authorizing route        
-        $this->registerCallback('before.authorize', array($this, 'route'));
-        
         //before dispatching then authorizer
-        $this->registerCallback('before.dispatch', array($this, 'authorize'));
+        $this->registerCallback('before.dispatch', array($this, 'route'));
         
         //render the result
         $this->registerCallback('after.dispatch', array($this, 'render'));
@@ -228,41 +225,6 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     }
     
     /**
-     * Authorize a request
-     * 
-     * @param KCommandContext $context Command chain context
-     * 
-     * @return boolean
-     */
-    protected function _actionAuthorize(KCommandContext $context)
-    {
-        $menus  =& $this->_application->getMenu();        
-        $user   =& JFactory::getUser();
-        
-        $aid    = $user->get('aid');
-        $itemid = $this->Itemid;
-        
-        if( !$menus->authorize($itemid, $aid)  )
-        {
-            //@TODO this is so useless and could create
-            //sense of false security.
-            if ( !$aid ) 
-            {
-                // Redirect to login                 
-                $url  = 'index.php?option=com_user&view=login';
-                $url .= '&return='.base64_encode(KRequest::url());
-
-                $this->_application->redirect($url, JText::_('You must login first') );
-            }
-            else {
-                throw new KDispatcherException(JText::_('ALERTNOTAUTH'), KHttpResponse::METHOD_NOT_ALLOWED);
-            }
-            
-            return false;
-        }
-    }
-    
-    /**
      * Loads the application
      * 
      * @return void
@@ -307,6 +269,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         //set the session handler to none for
         if ( PHP_SAPI == 'cli' ) {
             JFactory::getConfig()->setValue('config.session_handler','none');
+            JFactory::getConfig()->setValue('config.cache_handler','file');
         }
                         
         //set the default timezone to UTC
@@ -333,7 +296,8 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         }
         
         //if cli just print the error and exit
-        if ( PHP_SAPI == 'cli' ) {
+        if ( PHP_SAPI == 'cli' ) 
+        {
             print "\n";
             print $error."\n";
             print debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
