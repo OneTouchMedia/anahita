@@ -266,80 +266,79 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     		return;
     	}
 			
-    	if ( isset($this->_materialized[$key]) ) {
+    	$property = $this->_description->getProperty($key);
+    	
+    	if ( isset($this->_materialized[$property->getName()]) ) {
     		return;
     	}
     		
-    	if ( $property = $this->_description->getProperty($key) )
-    	{    
-    		$repository  = $this->_entity->getRepository();
-
-    		//if a property is serialzable but not materizable
-    		//then the data must be missing
-    		if ( $property->isSerializable() && 
-    		        !$property->isMaterializable($this->_row)
-    		        )
-    		{
-    		    //lazy load the value alogn with all the entities whose
-    		    //$key value is missing    		    
-    		    $repository->getCommandChain()->disable();
-    		    $repository->getStore()->getCommandChain()->disable();
-    		    $entities = $repository->getEntities();
-    		    $query    = $repository->getQuery();
-    		    $keys     = array();
-    		    foreach($entities as $entity)
-    		    {
-    		        if ( $entity->persisted() )
-    		        {
-    		            $data = $entity->getIdentifyingData();
-    		            $key   = current(array_keys($data));
-    		            $value = current($data);
-    		            $keys[$key][] = $value;
-    		        }
-    		    }
-    		    
-    		    foreach($keys as $key => $values) {
-    		        $query->where($key,'IN',$values,'OR');
-    		    }
-    		   
-    		    $result = $repository->fetch($query, AnDomain::FETCH_ROW_LIST);
-    		    
-    		    foreach($result as $data)
-    		    {
-    		        $keys   = $repository->getDescription()->getKeyValues($data);
-    		        $entity = $repository->find($keys, false);
-    		        if ( $entity ) {
-    		            $entity->setRowData($data);
-    		        }
-    		    }
-    		        		    
-    		    $repository->getCommandChain()->enable();
-    		    $repository->getStore()->getCommandChain()->enable();    		    
-    		}
-    		
-    		$value	= $property->materialize($this->_row, $this->_entity);
-			
-    		$this->_setPropertyValue($key, $value);
-			    		
-    		//when materilize a proxy property
-    		//materilize the same proeprty in all the entities
-    		//of the repository to allow for lazy loading 
-    		if ( $property->isRelationship() )
-        		if ( $property->isOneToOne() || $property->isManyToOne() )
-        		{
-        	    	//prevents calling the block multiple time
-    		    	//as it tries to instantiate the same property for 
-    		    	//all the entities
-    		    	if ( !self::_isLocked($repository) ) {
-    		    		self::_lock($repository, true);
-    		    		$entities = $repository->getEntities();
-    		    		foreach($entities as $entity) {
-    		    			$entity->get($key);
-    		    		}
-    		    		self::_lock($repository, false);
-    		    	}
-        		}
+    	$repository  = $this->_entity->getRepository();
+    	
+    	//if a property is serialzable but not materizable
+    	//then the data must be missing
+    	if ( $property->isSerializable() &&
+    	        !$property->isMaterializable($this->_row)
+    	)
+    	{
+    	    //lazy load the value alogn with all the entities whose
+    	    //$key value is missing
+    	    $repository->getCommandChain()->disable();
+    	    $repository->getStore()->getCommandChain()->disable();
+    	    $entities = $repository->getEntities();
+    	    $query    = $repository->getQuery();
+    	    $keys     = array();
+    	    foreach($entities as $entity)
+    	    {
+    	        if ( $entity->persisted() )
+    	        {
+    	            $data = $entity->getIdentifyingData();
+    	            $key   = current(array_keys($data));
+    	            $value = current($data);
+    	            $keys[$key][] = $value;
+    	        }
+    	    }
+    	
+    	    foreach($keys as $key => $values) {
+    	        $query->where($key,'IN',$values,'OR');
+    	    }
+    	    	
+    	    $result = $repository->fetch($query, AnDomain::FETCH_ROW_LIST);
+    	
+    	    foreach($result as $data)
+    	    {
+    	        $keys   = $repository->getDescription()->getKeyValues($data);
+    	        $entity = $repository->find($keys, false);
+    	        if ( $entity ) {
+    	            $entity->setRowData($data);
+    	        }
+    	    }
+    	
+    	    $repository->getCommandChain()->enable();
+    	    $repository->getStore()->getCommandChain()->enable();
     	}
+    	
+    	$value	= $property->materialize($this->_row, $this->_entity);
+    		
+    	$this->_setPropertyValue($property->getName(), $value);
+    	 
+    	//when materilize a proxy property
+    	//materilize the same proeprty in all the entities
+    	//of the repository to allow for lazy loading
+    	if ( $property->isRelationship() )
+    	    if ( $property->isOneToOne() || $property->isManyToOne() )
+    	    {
+    	        //prevents calling the block multiple time
+    	        //as it tries to instantiate the same property for
+    	        //all the entities
+    	        if ( !self::_isLocked($repository) ) {
+    	    		    		self::_lock($repository, true);
+    	    		    		$entities = $repository->getEntities();
+    	    		    		foreach($entities as $entity) {
+    	    		    		    $entity->get($key);
+    	    		    		}
+    	    		    		self::_lock($repository, false);
+    	        }
+    	    }
     }
     
     /**
