@@ -252,28 +252,19 @@ class AnDomainQuery extends KObject implements KCommandInterface
 			$constraint = strtoupper($constraint);
 			$condition  = strtoupper($condition);
 
-			$list = $value instanceof KObjectSet || is_array($value) || $value instanceof AnDomainQuery;
-			
-			if ( $list )
-			{
+			$list = $value instanceof KObjectSet || is_array($value);
+			//if the values are empty then don't bother adding it			
+			if ( $list && !count($value) ) {
+			     return;   
+			}
+						
+			//fix the contstraint 
+			if ( $list || $value instanceof AnDomainQuery ) {
 				if ( $constraint == '=' )
 					$constraint = 'IN';
 				elseif ( $constraint == '<>' )
 					$constraint = 'NOT IN';
-			} 
-			elseif ( $constraint == 'CONTAINS' ) 
-			{
-			    deprecated('CONTAINS is deprecated. Use IN');
-				$value = (array) $value;
-				$constraint = 'IN';
 			}
-			elseif ( $constraint == 'NOT CONTAINS' ) 
-			{
-			    deprecated('NOT CONTAINS is deprecated. Use NOT IN');
-				$value = (array) $value;
-				$constraint = 'NOT IN';
-			}			
-			
 			
 			$where['constraint'] = $constraint;	
 			$where['value']      = $value;
