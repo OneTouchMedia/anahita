@@ -326,6 +326,8 @@ class AnDomainStoreDatabase extends KObject implements AnDomainStoreInterface
 				$column->type 		= isset($this->_typemap[$type]) ? $this->_typemap[$type] : 'string';
 				$column->default    = $field['Default'];
                 $column->required   = $field['Null'] == 'NO';
+                $column->primary    = $field['Key'] == 'PRI';
+                $column->unique     = $field['Key'] == 'UNI';
 				$columns[$column->name]	= $column;
 			}
 
