@@ -331,7 +331,8 @@ abstract class AnDomainDescriptionAbstract
 	}
 
 	/**
-	 * Set a property as a key
+	 * Add a property that can uniquely identifies a property. This property is
+	 * set to required and its value be unique
 	 *
 	 * @param AnDomainPropertyKeyable $property The property to be used as the key
 	 * 
@@ -410,20 +411,21 @@ abstract class AnDomainDescriptionAbstract
 	 */
 	public function setIdentityProperty($property)
 	{
-		if ( is_string($property) ) 
-		{
-			$property = $this->getProperty($property);
-			
-			if ( !$property )
-				return;
+		if ( is_string($property) ) {
+			$property = $this->getProperty($property);			
 		}
 		
-		$this->addIdentifyingProperty($property);
-		
-		//don't allow direct write
-		$property->setWriteAccess(AnDomain::ACCESS_PRIVATE);
-		
-		$this->_identity_property = $property;
+		if ( $property )
+		{
+		    //an identitying property can be used as 
+		    //an identifying property
+		    $this->addIdentifyingProperty($property);
+		    
+		    //don't allow direct write
+		    $property->setWriteAccess(AnDomain::ACCESS_PRIVATE);
+		    
+		    $this->_identity_property = $property;
+		}
 				
 		return $this;
 	}
