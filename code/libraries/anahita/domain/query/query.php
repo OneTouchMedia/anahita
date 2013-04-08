@@ -515,7 +515,7 @@ class AnDomainQuery extends KObject implements KCommandInterface
 			$where 	  = array_pop(array_values($this->where));
 			if ( isset($where['property']) ) {
 				$property = $where['property'];
-				$keys 	  = $this->getRepository()->getDescription()->getKeys();
+				$keys 	  = $this->getRepository()->getDescription()->getIdentifyingProperties();
 				if ( isset($keys[$property]) && isset($where['constraint']) && $where['constraint'] == '=' && !is_array($where['value'])) {
 					$key[$property] = $where['value'];
 				}				

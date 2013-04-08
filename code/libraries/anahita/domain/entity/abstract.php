@@ -301,7 +301,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
      */
     public function getIdentifyingData()
     {
-        $keys  = array_keys($this->getEntityDescription()->getKeys());
+        $keys  = array_keys($this->getEntityDescription()->getIdentifyingProperties());
         $data  = array();
         foreach($keys as $key) 
         {
@@ -548,7 +548,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	                $properties[] = $property->getName();
 	            }
 	        }
-	        $keys		= array_keys($this->getEntityDescription()->getKeys());	        	       
+	        $keys		= array_keys($this->getEntityDescription()->getIdentifyingProperties());	        	       
 	        $properties = array_diff($properties, $keys);
 	    }
 	    
@@ -1114,7 +1114,7 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 		$data = array('identifier'=>$identifier);
 		$data['hash']  = $this->getHandle();
 		$data['state'] = $this->getEntityState();;
-		$data['keys']  = implode(',', array_keys($this->getEntityDescription()->getKeys()));
+		$data['keys']  = implode(',', array_keys($this->getEntityDescription()->getIdentifyingProperties()));
 		$data['required']      = array();
 		foreach($properties as $name => $property)
 		{ 

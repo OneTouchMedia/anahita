@@ -558,7 +558,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  		 		
  		$found = null;
  		//there's a key in the needle then it must be a unique entity
- 		if ( count(array_intersect_key($this->_description->getKeys(), $needle)) > 0 ) 
+ 		if ( count(array_intersect_key($this->_description->getIdentifyingProperties(), $needle)) > 0 ) 
  		{
 	 		$found = $this->_space->findEntity($this->_description, $needle);
  		} 
@@ -681,7 +681,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 		$keys 	  	  = array();
 		$description  = $this->_description;
 
-		$keys   = $description->getKeyValues($data);
+		$keys   = $description->getIdentifyingValues($data);
 		
 		if ( empty($keys) ) {
 		    throw new AnDomainRepositoryException('Trying to create an entity witout any identiftying keys');

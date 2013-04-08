@@ -306,7 +306,7 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     	
     	    foreach($result as $data)
     	    {
-    	        $keys   = $repository->getDescription()->getKeyValues($data);
+    	        $keys   = $repository->getDescription()->getIdentifyingValues($data);
     	        $entity = $repository->find($keys, false);
     	        if ( $entity ) {
     	            $entity->setRowData($data);

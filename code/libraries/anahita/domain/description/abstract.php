@@ -76,7 +76,7 @@ abstract class AnDomainDescriptionAbstract
 	 * 
 	 * @var array
 	 */
-	protected $_keys = array();
+	protected $_identifying_properties = array();
 	
 	/**
 	 * Entity identifier
@@ -337,15 +337,28 @@ abstract class AnDomainDescriptionAbstract
 	 * 
 	 * @return void
 	 */
-	public function setKey($property)
+	public function addIdentifyingProperty($property)
 	{
 		if ( $property->isSerializable() )
-			$this->_keys[$property->getName()] = $property;
+			$this->_identifying_properties[$property->getName()] = $property;
 			
 		//the proeprty as required
 		$property->setRequired(true);
 		
 		return $this;
+	}
+	
+	/**
+	 * Removes a proeprty as key
+	 *
+	 * @param AnDomainPropertyKeyable $property The property to be used as the key
+	 *
+	 * @return void
+	 */	
+	public function removeIdentifyingProperty($property)
+	{
+	    unset($this->_identifying_properties[$property->getName()]);
+	    return $this;
 	}
 	
 	/**
@@ -359,17 +372,17 @@ abstract class AnDomainDescriptionAbstract
 	}
 	
 	/**
-	 * Materialize an array of key values from a row data
+	 * Materialize an array of identifying values from a row data
 	 * 
 	 * @param array $data Row data
 	 * 
 	 * @return array
 	 */
-	public function getKeyValues(array $data)
+	public function getIdentifyingValues(array $data)
 	{
 	    $keys   = array();
 	    
-	    foreach($this->getKeys() as $key)
+	    foreach($this->getIdentifyingProperties() as $key)
 	    {
 	        if ( $key->isMaterializable($data) ) {
 	            $keys[$key->getName()] = $key->materialize($data, null);
@@ -384,9 +397,9 @@ abstract class AnDomainDescriptionAbstract
 	 * 
 	 * @return array
 	 */
-	public function getKeys()
+	public function getIdentifyingProperties()
 	{        
-		return $this->_keys;		
+		return $this->_identifying_properties;		
 	}
 	
 	/**
@@ -405,7 +418,7 @@ abstract class AnDomainDescriptionAbstract
 				return;
 		}
 		
-		$this->setKey($property);
+		$this->addIdentifyingProperty($property);
 		
 		//don't allow direct write
 		$property->setWriteAccess(AnDomain::ACCESS_PRIVATE);
