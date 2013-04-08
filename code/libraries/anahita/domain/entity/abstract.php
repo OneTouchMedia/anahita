@@ -101,9 +101,8 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 		
 		$this->getService($config->repository, KConfig::unbox($config));
 		
-		//if there are no keys throws exception
-		if ( !count($this->getEntityDescription()->getKeys()) ) {
-		    throw new AnDomainDescriptionException('Entity '.$this->getIdentifier().' needs at least one key');		        
+		if ( !$this->getEntityDescription()->getIdentityProperty() ) {
+		    throw new AnDomainDescriptionException('Entity '.$this->getIdentifier().' need an identity property');
 		}
 	}
 	
@@ -519,10 +518,15 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	 */
 	public function load($properties = array())
 	{	
+	    $keys   = $this->getIdentifyingData();
+	    
+	    if ( empty($keys) ) {
+	        throw new AnDomainEntityException('Trying to load an entity without any identifying data');
+	    }
+	    
 	    //prevent from creating two differne entities	    	    
 	    if ( !$this->_persisted ) 
-	    {
-	        $keys   = $this->getIdentifyingData();
+	    {	        
 	        //if found another entity 
 	        $entity = $this->getRepository()->find($keys, false);
 	        if ( $entity && $entity !== $this ) 
