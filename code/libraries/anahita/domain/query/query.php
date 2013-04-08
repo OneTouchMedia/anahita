@@ -897,6 +897,9 @@ class AnDomainQuery extends KObject implements KCommandInterface
 		try {
 			$chain = clone $this->getRepository()->getCommandChain();
 			$query = clone $this;
+			if ( $query->disable_chain ) {
+			    $chain->disable();
+			}
 			$chain->enqueue($query);
 			$context = $this->getRepository()->getCommandContext();
 			$context->caller = $this;
