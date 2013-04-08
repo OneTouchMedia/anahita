@@ -143,7 +143,7 @@ abstract class AnDomainDescriptionAbstract
 		}
 
 		$this->_inheritance_column      = $config->inheritance_column;		
-		$this->_identity_property       = $config->identity_property;		
+				
 		$this->_entity_identifier       = $this->_repository->getIdentifier($config->entity_identifier);
 		
 		//an object can only be abstract if it's 
@@ -151,6 +151,20 @@ abstract class AnDomainDescriptionAbstract
 		if ( $this->_inheritance_column ) {
 		    $this->_abstract_identifier = $config->abstract_identifier;
 		}
+
+		if ( !$config->identity_property )
+		{
+		    $columns = $this->_repository->getResources()->main()->getColumns();
+		    foreach($columns as $column)
+		    {
+		        if ( $column->primary ) {
+		            $config->identity_property = KInflector::variablize($column->name);
+		            break;
+		        }
+		    }
+		}
+				
+		$this->_identity_property       = $config->identity_property;
 		
 		//try to generate some of the propreties
         //from the database columns
@@ -194,9 +208,9 @@ abstract class AnDomainDescriptionAbstract
    	    	   
 		$config->append(array(
 		    'auto_generate'            => false,
-			'identity_property'        => 'id',
+			'identity_property'        => null,
 			'aliases'	 		       => array()
-		));		
+		));
 	}	
 
 	/**
@@ -383,8 +397,10 @@ abstract class AnDomainDescriptionAbstract
 	 */
 	public function setIdentityProperty($property)
 	{
-		if ( is_string($property) ) {
+		if ( is_string($property) ) 
+		{
 			$property = $this->getProperty($property);
+			
 			if ( !$property )
 				return;
 		}
