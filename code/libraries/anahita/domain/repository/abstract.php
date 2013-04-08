@@ -312,20 +312,13 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	 */
 	public function destroy($condition)
 	{
-		if ( empty($condition) ) {
-			$condition = array($this->getDescription()->getIdentityProperty()->getName()=>array());	
+		if ( !empty($condition) )
+		{
+		    $query = AnDomainQuery::getInstance($this, $condition);
+		    $this->getCommandChain()->disable();
+		    $this->getStore()->delete($this, $query);
+		    $this->getCommandChain()->enable();		    
 		}
-        
-        $context = $this->getCommandContext();
-        $context->operation = AnDomain::OPERATION_DESTROY;        
-        $context->query     = AnDomainQuery::getInstance($this, $condition);
-                
-		if( $this->getCommandChain()->run('before.destroy', $context) !== false )
-        {
-		   $this->getStore()->delete($this, $context->query);
-           
-           $this->getCommandChain()->run('after.destroy', $context);           
-        }
 	}
 	
 	/**
@@ -337,8 +330,10 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	 */
 	public function update($values, $conditions = array())
 	{
+	    $this->getCommandChain()->disable();
 	    $query  = AnDomainQuery::getInstance($this, $conditions)->update($values);
 	    $this->getStore()->execute($query);
+	    $this->getCommandChain()->enable();
 	}
 	
 	/**
