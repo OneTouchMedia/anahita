@@ -59,10 +59,12 @@ class ComBaseDomainEntityNode extends AnDomainEntityDefault
 		    'abstract_identifier' => 'com:base.domain.entity.node', //node is an abstract entity, can not be stored in database
 		    'inheritance_column'  => 'type',
 			'resources'	    => array(array('alias'=>$this->getIdentifier()->name, 'name'=>'anahita_nodes')),
+		    'identity_property' => 'id',
 			'attributes'    => array(
 				'id'   		=> array('key'=>true, 'type'=>'integer', 'read'=>'public'),				
 				'component'		=> array('required'=>true,'read'=>'public')
-			)
+			),
+		   'behaviors' => array('node')
 		));
 		
 		parent::_initialize($config);
