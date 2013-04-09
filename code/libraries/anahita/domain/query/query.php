@@ -201,6 +201,13 @@ class AnDomainQuery extends KObject implements KCommandInterface
 
 		$this->_prefix   = $config->resource_prefix;
 		$this->_state 	 = $config->state;
+		
+		if ( $config['query_options'] instanceof Closure ) {
+		    $config['query_options']($this);
+		} else {
+		    AnDomainQueryHelper::applyFilters($this, $config['query_options']);
+		}
+		
 	}
 	
     /**
@@ -216,6 +223,7 @@ class AnDomainQuery extends KObject implements KCommandInterface
 		$config->append(array(
 			'repository'		 => $this->getIdentifier()->name,
 			'resource_prefix'    =>  '#__',
+		    'query_options'      => array(),
 			'state'		         => array(
 				'instance_of'	      => array(),
 				'disable_chain'		  => false
@@ -892,7 +900,7 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	 *
 	 * @return string
 	 */
-	public function __toString()
+	final public function __toString()
 	{
 		try 
 		{		    
@@ -907,9 +915,23 @@ class AnDomainQuery extends KObject implements KCommandInterface
 		        $context = $this->getRepository()->getCommandContext();
 		        $context->caller = $this;
 		        $context->query  = $query;
-		        $chain->run('before.build', $context);
+		        switch($this->operation['type'])
+		        {
+		            case AnDomainQuery::QUERY_UPDATE :
+		               $command = 'update';break;
+		            case AnDomainQuery::QUERY_DELETE :
+		               $command = 'delete';break;
+		            default :
+		               $command = 'select';break;
+		        }
+		        $chain->run('before.'.$command, $context);
+		        $context->result = $query->build(); 
+		        $chain->run('after.'.$command, $context);
+		        return $context->result;
+		    } else {
+		        return $query->build();
 		    }
-			return $query->build();
+			
 		} 
 		catch(Exception $e) {
 			trigger_error($e->getMessage());
