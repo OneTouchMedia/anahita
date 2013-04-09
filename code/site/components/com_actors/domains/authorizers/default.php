@@ -51,7 +51,7 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
 	        }
 	    }
 		
-		return $ret;
+		return (bool)$ret;
 		
 	}
 	
@@ -74,14 +74,14 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         {
             case LibBaseDomainBehaviorPrivatable::GUEST :
             case LibBaseDomainBehaviorPrivatable::REG :
-                return true;
+                $ret = true;
             case LibBaseDomainBehaviorPrivatable::FOLLOWER :                
-                return $this->_entity->isFollowable() && $this->_entity->leading($this->_viewer);
+                $ret = $this->_entity->isFollowable() && $this->_entity->leading($this->_viewer);
             default :
-                return $this->_entity->authorize('administration');            
+                $ret = $this->_entity->authorize('administration');
         }
-        
-        
+
+        return (bool)$ret;
     }
         
 	/**
@@ -105,7 +105,7 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         elseif  ( $this->_entity->isFollowable() && $this->_entity->blocking($this->_viewer) )
             $ret = false;                
         else
-            $ret = $this->_entity->allows($this->_viewer, 'access');
+            $ret = (bool)$this->_entity->allows($this->_viewer, 'access');
             
         return $ret;
 		
@@ -149,14 +149,16 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         	$component = $this->getService('repos://site/components.component')
         						->fetch(array('component'=>$component));
 
-        	$ret = $component->authorize('action', 
-        				array('actor'	 => $this->_entity,         					  
-        					  'action'	 => $parts[1],
-        					  'resource' => $parts[0],
-        				));
-        	
-        	if ( $component ) {
-        		
+        	if ( $component )
+        	{
+        	    if ( $component->authorize('action',
+        	            array('actor'	 => $this->_entity,
+        	                  'action'   => $parts[1],
+        	                  'resource' => $parts[0],
+        	            )) === false ) {
+        	        
+        	        return false;
+        	    }
         	}
         }
         
@@ -176,7 +178,7 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         //viewer can only follow actor if and only if
         //viewer is leadable and actor is followable           
         if ( $this->_entity->isFollowable() && !$this->_viewer->isLeadable() )
-            return null;
+            return false;
                     
         if ( $this->_viewer->eql($this->_entity) )
             return false;
@@ -184,8 +186,8 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         if ( is_guest($this->_viewer) )
             return false;
             
-	    if ( !$this->_entity->authorize('access', $context) )
-	    {            
+	    if ( $this->_entity->authorize('access', $context) === false )
+	    {
 	        if ( $this->_entity->isLeadable() && $this->_entity->following($this->_viewer) )
 	            return true;
 	        else
@@ -212,7 +214,7 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         //viewer can only follow actor if and only if
         //viewer is leadable and actor is followable           
         if ( $this->_entity->isFollowable() && !$this->_viewer->isLeadable() )
-            return null;
+            return false;
              
         if ( !$this->_entity->allowFollowRequest )
             return false; 
