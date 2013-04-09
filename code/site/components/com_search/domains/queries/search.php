@@ -70,10 +70,9 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 	 * 
 	 * @return void
 	 */
-	protected function _beforeQueryBuild()
+	protected function _beforeQuerySelect()
 	{
-		$keywords  = $this->_state->search_term;
-		$query 	  = $this;
+		$keywords  = $this->search_term;
 		
 		if ( $keywords )
 		{
@@ -90,7 +89,7 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 		
 			if ( !empty($operation) )
 			{
-				$clause = $query->clause('OR');
+				$clause = $this->clause('OR');
 				foreach($keywords as $keyword) {
 					$clause->where('CONCAT(IF(node.name IS NULL,"",node.name), IF(node.body IS NULL,"",node.body)) LIKE @quote(%'.$keyword.'%)',$operation);
 				}
