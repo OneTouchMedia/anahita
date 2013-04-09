@@ -411,6 +411,8 @@ abstract class AnDomainDescriptionAbstract
 	 */
 	public function setIdentityProperty($property)
 	{
+	    $this->_identity_property = null;
+	    
 		if ( is_string($property) ) {
 			$property = $this->getProperty($property);			
 		}
