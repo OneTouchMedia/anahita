@@ -40,7 +40,7 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
      * @param  KCommandContext $context
      * @return void
      */
-    protected function _beforeQueryBuild(KCommandContext $context)
+    protected function _beforeQuerySelect(KCommandContext $context)
     {
         $query = $context->query;
         
