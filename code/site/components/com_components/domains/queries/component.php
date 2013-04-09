@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponent
+class ComComponentsDomainQueryComponent extends AnDomainQuery
 {
 	/**
 	 * Adds a condition for list of components that are assigned to actor
@@ -44,14 +44,6 @@ class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponen
 			 ->where('(@col(assignments.actortype) = @quote('.$actortype.') AND @col(assignments.access IN (2,1) ))', 'OR')
 		;
 		return $this;
-	}
-	
-	/**
-	 * 
-	 */
-	protected function _beforeQueryBuild()
-	{
-		parent::_beforeQueryBuild();	
 	}
 }
 
