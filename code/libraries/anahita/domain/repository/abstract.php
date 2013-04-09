@@ -289,10 +289,10 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 					$keys = array($this->_description->getIdentityProperty()->getName() => $entity->getIdentityId());
 					if ( $operation & AnDomain::OPERATION_UPDATE) 
 					{
-						$context->result = count($context->data) ? $store->update($this, $keys, $context->data) : true;
+						$context->result = count($context->data) ? $this->update($context->data, $keys) : true;
 					} else 
 					{
-						$context->result = $store->delete($this, $keys);
+						$context->result = $this->destroy($keys);
 					}
 			}
 			
@@ -303,8 +303,10 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	}
 	
 	/**
-	 * Destroy all the entities from a repository withouth instantiating them using the passed
-	 * $criteria
+	 * Destroy all the entities from a repository withouth instantiating them.
+	 * 
+	 * This method disables the chain in order to ensure the query is not modified by the
+	 * behaviors for unexpected results 
 	 * 
 	 * @param mixed $condition A condition object. Can be an array or domain query object
 	 * 
@@ -313,26 +315,28 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	public function destroy($condition)
 	{
 		if ( !empty($condition) )
-		{
-		    $query = AnDomainQuery::getInstance($this, $condition);
+		{		    
 		    $this->getCommandChain()->disable();
-		    $this->getStore()->delete($this, $query);
-		    $this->getCommandChain()->enable();		    
+		    $this->getStore()->delete($this, $condition);
+		    $this->getCommandChain()->enable();
 		}
 	}
 	
 	/**
-	 * Updates a set of entities without instantiating them 
+	 * Updates a set of entities without instantiating them. 
+	 * 
+	 * This method disables the chain in order to ensure the query is not modified by the
+	 * behaviors for unexpected results 
 	 *
 	 * @param array|string        $values     The update values. Can be an array of key/value pairs or just an update string
 	 * @param array|AnDomainQuery $conditions An array of conditions or a domain query
+	 * 
 	 * @return void
 	 */
 	public function update($values, $conditions = array())
 	{
-	    $this->getCommandChain()->disable();
-	    $query  = AnDomainQuery::getInstance($this, $conditions)->update($values);
-	    $this->getStore()->execute($query);
+	    $this->getCommandChain()->disable();	    
+	    $this->getStore()->update($this, $conditions, $values);
 	    $this->getCommandChain()->enable();
 	}
 	
