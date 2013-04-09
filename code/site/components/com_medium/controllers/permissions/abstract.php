@@ -81,7 +81,8 @@ abstract class ComMediumControllerPermissionAbstract extends LibBaseControllerPe
 		if ( $actor )
 		{
 			$action  = 'com_'.$this->_mixer->getIdentifier()->package.':'.$this->_mixer->getIdentifier()->name.':add';
-			return $actor->authorize('action',$action);
+			$ret = $actor->authorize('action',$action);
+			return $ret !== false;
 		}
 		 
 		return false;
