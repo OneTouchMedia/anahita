@@ -56,12 +56,14 @@ class ComComponentsDomainSetAssignableComponent extends KObject implements KServ
 			if ( !$cached ) {
 				$assignables = array();
 				$names = array();
-				foreach($components as $component) {
-					if ( $component->isAssignable() ) {
+				foreach($components as $component) 
+				{
+					if ( $component->isAssignable() ) 
+					{
 						$names[] = $component->component;
 						$assignables[] = $component;
 					}
-				}				
+				}
 				$components = $assignables;	
 				$registry['assignable-components'] = $names;
 			}

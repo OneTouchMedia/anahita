@@ -14,6 +14,8 @@
  * @link       http://www.anahitapolis.com
  */
 
+KService::get('koowa:loader')->loadIdentifier('com://site/components.domain.behavior.assignable');
+
 /**
  * Component query
  *
@@ -25,19 +27,17 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComComponentsDomainQueryComponent extends LibComponentsDomainQueryComponent
+class ComComponentsDomainQueryComponent extends AnDomainQuery
 {
 	/**
 	 * Provides option to return assignable/nonassigable components
 	 * 
 	 * @return void
 	 */
-	protected function _beforeQueryBuild(KCommandContext $context)
-	{
-		parent::_beforeQueryBuild();
-		
-		if ( $this->getOperation() & AnDomain::OPERATION_FETCH ) {
-		    $this->option($this->getService('com://admin/components.domain.set.assignablecomponent')->option);
-		}		
+	protected function _beforeQuerySelect(KCommandContext $context)
+	{		
+	    if ( $this->assignable ) {
+	        $this->option($this->getService('com://admin/components.domain.set.assignablecomponent')->option);
+	    }        				
 	}
 }

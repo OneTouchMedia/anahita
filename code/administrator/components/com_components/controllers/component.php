@@ -57,6 +57,19 @@ class ComComponentsControllerComponent extends ComBaseControllerService
     }
 
     /**
+     * Only bring assignable components
+     * 
+     * (non-PHPdoc)
+     * @see ComBaseControllerService::_actionBrowse()
+     */
+    protected function _actionBrowse($context)
+    {
+        $components = parent::_actionBrowse($context);
+        $components->assignable(true);
+        return $components;
+    }
+    
+    /**
      * orders
      */    
     protected function _actionOrder(KCommandContext $context)
