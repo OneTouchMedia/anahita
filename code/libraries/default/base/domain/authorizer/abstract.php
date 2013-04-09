@@ -47,7 +47,7 @@ abstract class LibBaseDomainAuthorizerAbstract extends KObject
 	 */
 	const AUTH_PASSED   = true;
 	const AUTH_FAILED	= false;
-	const AUTH_NOT_IMPLEMENTED = null;
+	const AUTH_NOT_IMPLEMENTED = -9999;
 		
     /**
      * Executes an authorization action with the passed arguments
@@ -61,13 +61,15 @@ abstract class LibBaseDomainAuthorizerAbstract extends KObject
 	{
 		$method = '_'.KInflector::variablize('authorize.'.$action);
 		
+		$result = self::AUTH_NOT_IMPLEMENTED;
+		
 		if ( method_exists($this, $method) ) 
 		{
 			$this->_entity = $context->mixer;
 			$this->_viewer = $context->viewer;
-			return $this->$method($context);
+			$result = $this->$method($context);
 		}
 		
-		return self::AUTH_NOT_IMPLEMENTED;
+		return $result;
 	}
 }
