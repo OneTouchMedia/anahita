@@ -132,6 +132,26 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     }
     
     /**
+     * Enables the cahce
+     * 
+     * @return void
+     */
+    public function enable()
+    {
+        $this->_enable = true;
+    }
+    
+    /**
+     * Enables the cahce
+     *
+     * @return void
+     */
+    public function disable()
+    {
+        $this->_enable = false;
+    }    
+    
+    /**
      * Empty the cache
      * 
      * @param AnDomainQuery $query
