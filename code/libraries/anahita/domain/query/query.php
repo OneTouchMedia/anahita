@@ -894,25 +894,38 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	 */
 	public function __toString()
 	{
-		try {
-			$chain = clone $this->getRepository()->getCommandChain();
-			$query = clone $this;
-			if ( $query->disable_chain ) {
-			    $chain->disable();
-			}
-			$chain->enqueue($query);
-			$context = $this->getRepository()->getCommandContext();
-			$context->caller = $this;
-			$context->query  = $query;
-			$chain->run('before.build', $context);
-			$context->result = AnDomainQueryBuilder::getInstance()->build($query);
-			$chain->run('after.after', $context);		
-			return $context->result;
-		} catch(Exception $e) {
+		try 
+		{		    
+		    $query  = clone $this;
+		    //if the chain is not disabled then
+		    //allows the registered command chains
+		    //to modify the query based on its state 		    
+		    if ( !$query->disable_chain ) 
+		    {
+		        $chain = clone $this->getRepository()->getCommandChain();
+		        $chain->enqueue($query);
+		        $context = $this->getRepository()->getCommandContext();
+		        $context->caller = $this;
+		        $context->query  = $query;
+		        $chain->run('before.build', $context);
+		    }
+			return $query->build();
+		} 
+		catch(Exception $e) {
 			trigger_error($e->getMessage());
 		}
 	}
-		
+
+	/**
+	 * Builds the query and return the string
+	 * 
+	 * @return string
+	 */
+	public function build()
+	{
+	    return AnDomainQueryBuilder::getInstance()->build($this);
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see KCommandInterface::execute()
