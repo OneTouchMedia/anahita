@@ -62,7 +62,7 @@ class ComActorsDomainEntityComponent extends ComComponentsDomainEntityComponent
 		$config->append(array(
 	        'story_aggregation' => array(),
 			'behaviors' => array(
-				'assignable'=>array(),
+				//'assignable'=>array(),
 				'searchable'=>array('class'=>'ComActorsDomainEntityActor','type'=>'actor')
 			)
 		));
