@@ -6,7 +6,7 @@
     </popup:header>
     
     <popup:body>
-    	<form action="<?=@route()?>" method="post">
+    	<form id="modal-login-form" action="<?=@route()?>" method="post">
 			<?php KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service')?>
 			<?php if ( class_exists('ComConnectTemplateHelperService', true) ): ?>
 			<div class="connect-service-actions">
@@ -33,8 +33,7 @@
 					<?= @text('COM-PEOPLE-SESSION-REMEMBER-ME'); ?>
 				</label>
 			</div>
-			
-
+	
 			<a href="<?= @route('view=token') ?>">
 			<?= @text('COM-PEOPLE-SESSION-FORGOT-PASSWORD'); ?>
 			</a>
@@ -46,7 +45,7 @@
     </popup:body>
     
     <popup:footer>
-        <button data-trigger="Submit" data-submit-form="#modal-login-form" name="Submit" class="btn btn-large btn-primary">
+        <button data-behavior="Submit" data-submit-form="#modal-login-form" name="Submit" class="btn btn-large btn-primary">
         	<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>
         </button>    
     </popup:footer>
