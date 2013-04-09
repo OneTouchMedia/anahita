@@ -63,18 +63,6 @@ class ComStoriesControllerStory extends ComBaseControllerService
         
 		parent::_initialize($config);
 	}
-
-    /**
-     * Checks if _actionBrowse
-     * 
-     * @return boolean
-     */
-    public function canBrowse()
-    {
-        if ( !$this->actor ) {
-            return false;   
-        }
-    }
     
     /**
      * Browse action
@@ -98,21 +86,10 @@ class ComStoriesControllerStory extends ComBaseControllerService
 		else {
 			$query->owner($this->actor);
 		}
-	   
-		$components   =	 $this->getService('repos://site/components.component')->fetchSet();		
-        $keys         =  new KConfig();
-		
-        if ( count($components) && false  ) 
-        {
-    		foreach($apps as $app) 
-            {
-    			$context = new KCommandContext();
-    			$app->getDelegate()->setStoryOptions($context);
-    			$keys->append(array(
-    				$app->component => pick($context->summarize, array())
-    			));
-    		}
-        }
+
+        $query->aggregateKeys($this->getService('com://site/stories.domain.aggregations'));
+        
+        $query->order('creationTime','desc');
         
         if ( $this->component ) {
             $query->clause()->component( (array)KConfig::unbox($this->component) );
@@ -125,9 +102,7 @@ class ComStoriesControllerStory extends ComBaseControllerService
         if ( $this->subject ) {    
             $query->clause()->where('subject.id','IN', (array)KConfig::unbox($this->subject));   
         }        
-        
-        $query->aggregateKeys($keys);
-        
+
         return $this->setList($query->toEntitySet())
                     ->getList();
 	}

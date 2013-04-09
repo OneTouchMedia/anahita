@@ -27,6 +27,27 @@
  */
 class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent 
 {	
+    /**
+     * Story aggregation
+     * 
+     * @var array
+     */
+    protected $_story_aggregation;
+    
+    /**
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+        
+        $this->_story_aggregation = $config['story_aggregation'];
+    }
+        
 	/**
 	 * Initializes the default configuration for the object
 	 *
@@ -39,6 +60,7 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
+		    'story_aggregation' => array(),        
 			'behaviors' => array(
 					'assignable'=>array(),
 					'searchable'=>array('class'=>'ComMediumDomainEntityMedium','type'=>'post')
@@ -61,6 +83,23 @@ class ComMediumDomainEntityComponent extends ComComponentsDomainEntityComponent
 			$registry->offsetSet($key, self::_getDefaultPermissions($this));
 		}
 		return $registry->offsetGet($key);
+	}
+	
+	/**
+	 * Called on when the stories are being aggregated
+	 *
+	 * @param KEvent $event
+	 *
+	 * @return boolean
+	 */
+	public function onStoryAggregation(KEvent $event)
+	{
+		if ( !empty($this->_story_aggregation) ) 
+	    {
+	        $event->aggregations->append(array(
+	            $this->component => $this->_story_aggregation
+            ));
+	    }
 	}
 	
 	/**

@@ -40,7 +40,7 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
      * @param  KCommandContext $context
      * @return void
      */
-    protected function _beforeRepositoryFetch(KCommandContext $context)
+    protected function _beforeQueryBuild(KCommandContext $context)
     {
         $query = $context->query;
         
@@ -166,13 +166,13 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
             
         }
         $node_ids    = array_unique($node_ids);
-        $query       = $this->getService('repos:base.comment')->getQuery()->where('parent.id','IN',$node_ids);
+        $query       = $this->getService('repos://site/base.comment')->getQuery()->where('parent.id','IN',$node_ids);
         $author_ids  = $query->fetchValues('author.id');
         $node_ids    = array_unique(array_merge($node_ids, $author_ids, $comment_ids));
                 
         
         //we don't any behavior messes around with the fetched stories              
-        $query  = $this->getService('repos:base.node')->getQuery()->id($node_ids)->disableChain();
+        $query  = $this->getService('repos://site/base.node')->getQuery()->id($node_ids)->disableChain();
         $query->columns('*');
         $nodes = $query->fetchSet();
         $nodes = AnHelperArray::indexBy($nodes, 'id');
