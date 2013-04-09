@@ -48,6 +48,7 @@ class LibComponentsDomainEntityComponent extends AnDomainEntityDefault
 				'orderable',
 				'authorizer'	
 			),
+		    'query_options' => array('where'=>array('parent'=>0)),
 			'aliases' => array(
 				'component' => 'option'		
 			 ),
