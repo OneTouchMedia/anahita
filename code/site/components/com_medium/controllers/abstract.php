@@ -71,7 +71,9 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
                 'order'     => null
             ),
 	        'behaviors' => array(
-	        	'com://site/search.controller.behavior.searchable',	        		
+	        	'com://site/search.controller.behavior.searchable',	
+                'com://site/stories.controller.behavior.publisher',
+	            'com://site/notifications.controller.behavior.notifier',	                        		
                 'composable',
                 'publisher',
                 'commentable',                
