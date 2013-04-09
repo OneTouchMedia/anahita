@@ -129,8 +129,7 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     public function load($properties)
     {		
         $keys = $this->_entity->getIdentifyingData();
-        
-        $this->_entity->getRepository()->getStore()->getCommandChain()->disable();
+                
 		$this->_entity->getRepository()->getCommandChain()->disable();
 		 
 		$query = $this->_entity->getRepository()->getQuery()
@@ -149,7 +148,6 @@ class AnDomainEntityData extends KObject implements ArrayAccess
 		}
 
 		$this->_entity->getRepository()->getCommandChain()->enable();
-		$this->_entity->getRepository()->getStore()->getCommandChain()->enable();
 		
 		return !empty($data);
     }
@@ -282,8 +280,7 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     	{
     	    //lazy load the value alogn with all the entities whose
     	    //$key value is missing
-    	    $repository->getCommandChain()->disable();
-    	    $repository->getStore()->getCommandChain()->disable();
+    	    $repository->getCommandChain()->disable();    	    
     	    $entities = $repository->getEntities();
     	    $query    = $repository->getQuery();
     	    $keys     = array();
@@ -313,8 +310,7 @@ class AnDomainEntityData extends KObject implements ArrayAccess
     	        }
     	    }
     	
-    	    $repository->getCommandChain()->enable();
-    	    $repository->getStore()->getCommandChain()->enable();
+    	    $repository->getCommandChain()->enable();    	    
     	}
     	
     	$value	= $property->materialize($this->_row, $this->_entity);
