@@ -47,7 +47,7 @@ abstract class LibBaseDomainAuthorizerAbstract extends KObject
 	 */
 	const AUTH_PASSED   = true;
 	const AUTH_FAILED	= false;
-	const AUTH_NOT_IMPLEMENTED = -9999;
+	const AUTH_NOT_IMPLEMENTED = null;
 		
     /**
      * Executes an authorization action with the passed arguments
