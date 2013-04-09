@@ -118,6 +118,8 @@ class JComponentHelper
         if ( !file_exists($path) ) 
         {
             $dispatcher = ComBaseDispatcher::getInstance();
+            KService::setAlias('component.dispatcher', $dispatcher->getIdentifier());
+            KService::set('component.dispatcher', $dispatcher);
             return $dispatcher->dispatch();
         }
         else 
