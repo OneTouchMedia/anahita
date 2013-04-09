@@ -26,7 +26,7 @@
  * @link       http://www.anahitapolis.com
  */
 class ComMediumDomainAuthorizerComponent extends LibBaseDomainAuthorizerDefault
-{
+{    
 	/**
 	 * Authorizes whether the viewer can pubilsh anything within this component or not
 	 * 
@@ -36,14 +36,20 @@ class ComMediumDomainAuthorizerComponent extends LibBaseDomainAuthorizerDefault
 	 */
 	protected function _authorizeAction(KCommandContext $context)
 	{
-		$method = '_authoize'.ucfirst($context->action).ucfirst($context->resource);
+		$method = '_authorize'.ucfirst($context->action);
+		$ret    = self::AUTH_NOT_IMPLEMENTED;
 		if ( method_exists($this, $method) ) {
-			$ret = $this->$method($context);
-		} else {
-			if ( $context->actor ) {
-				//check if it's enabled and assigned		
+			$ret = $this->$method($context->resource);
+		} else 
+		{
+			if ( $context->actor ) 
+			{
+			    //check if it's enabled and assigned
+			    if ( $this->_entity->isAssignable() ) {
+			        $ret = $this->_entity->activeForActor($context->actor);
+			    }
 			}
 		}
-		return false;
+		return $ret;
 	}
 }
