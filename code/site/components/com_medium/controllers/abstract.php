@@ -75,7 +75,6 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
                 'com://site/stories.controller.behavior.publisher',
 	            'com://site/notifications.controller.behavior.notifier',	                        		
                 'composable',
-                'publisher',
                 'commentable',                
                 'votable',
                 'privatable',

@@ -53,7 +53,7 @@ class ComBaseControllerComment extends ComBaseControllerService
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
-		    'behaviors' => array('publisher','parentable','votable'),
+		    'behaviors' => array('com://site/stories.controller.behavior.publisher','parentable','votable'),
 		));
 	
 		parent::_initialize($config);
@@ -120,7 +120,7 @@ class ComBaseControllerComment extends ComBaseControllerService
 	/**
 	 * Generic executation authorization
 	 * 
-     * @param strin $action The action to execute
+     * @param string $action The action to execute
      *
      * @return boolean
 	 */
