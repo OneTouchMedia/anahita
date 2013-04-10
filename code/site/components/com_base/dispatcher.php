@@ -113,16 +113,28 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      */
     protected function _actionDispatch(KCommandContext $context)
     {
+        $result = parent::_actionDispatch($context);
+        return $result;
     	try 
     	{
     		$result = parent::_actionDispatch($context);
     	} 
         catch(KException $exception) 
     	{
-    		if ( $this->format == 'html' ) {
-    			$result = $this->_handleDispatchException($context, $exception);
-    		} 
-    		else throw $exception;
+    	    if ( $this->format == 'html' ) 
+    	    {
+    	        //first lets see if the controller can render the error page
+    	        $template  = $this->getController()->getView()->getTemplate();
+    	        $layouts   = array('_error_'.$exception->getCode(),'_error_default');
+    	        foreach($layouts as $layout)
+    	        {
+    	            if ( $template->findTemplate($layout) ) {
+    	                $exception->content = $template->loadTemplate($layout);    	         
+    	            }
+    	        }
+    	    }
+    	    
+    	    throw $exception;    		
     	}
   
     	return $result;
@@ -178,29 +190,6 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
         
         throw $exception;
     }
-    
-  	/**
-  	 * Forward Action
-  	 * 
-  	 * Forwards a HTTP request
-  	 * 
-  	 * @param KCommandContext $context Context parameter
-     * 
-     * @return mixed
-     */
-	protected function _actionForward(KCommandContext $context)
-	{	    	    
-	    $data = $context->data;
-
-        if ( $data->return ) 
-        {
-            $context->append(array(
-                'html_redirect' => base64_decode($data->return)
-            ));
-        }        
-        
-		return parent::_actionForward($context);
-	}
 	
   	/**
   	 * Import component assets automatically 
