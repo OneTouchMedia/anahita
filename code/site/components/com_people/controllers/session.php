@@ -38,21 +38,37 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {
         parent::__construct($config);
         
-        $this->_action_map['post'] = 'add';
-    }   
+        $this->registerCallback('after.add', array($this, 'redirect'), 
+                array('url'=>$config->redirect_to_after_login));
+        
+        $this->registerCallback('after.delete', array($this, 'redirect'),
+                array('url'=>$config->redirect_to_after_logout));        
+    }
     
     /**
     * Initializes the default configuration for the object
     *
+    * you can set the redirect url for when a user is logged in
+    * as follow
+    * 
+    * <code>
+    * KService::setConfig('com://site/people.controller.session', array(
+    *  'redirect_to_after_login'  => 'mynewurl'
+    *  'redirect_to_after_logout' => 'mynewurl'        
+    * )); 
+    * </code>
+    *    
     * Called from {@link __construct()} as a first step of object instantiation.
     *
     * @param KConfig $config An optional KConfig object with configuration options.
-    *
+    * 
     * @return void
     */
     protected function _initialize(KConfig $config)
-    {
+    {       
         $config->append(array(
+            'redirect_to_after_login'  => 'option=com_dashboard&view=dashboard',
+            'redirect_to_after_logout' => '',   
             //by default the format is json
             'request'   => array('format'=>'json')            
         ));
@@ -69,11 +85,37 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      */
     protected function _actionRead(KCommandContext $context)
     {
-    	$person = $this->getService('repos://site/people.person')->fetch(array('userId'=>JFactory::getUser()->id));
+    	$person = $this->getService('repos://site/people.person')->find(array('userId'=>JFactory::getUser()->id));
     	$this->_state->setItem($person);
+    	if ( isset($_SESSION['return']) ) {
+    	    $this->_state->append(array('return'=>$_SESSION['return']));
+    	}
     	return $person;
     }
 
+    /**
+     * Post method
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return void
+     */
+    protected function _actionPost(KCommandContext $context)
+    {
+        try 
+        {
+            $result = $this->execute('add', $context);
+            return $result;
+        } 
+        catch(KControllerException $e) 
+        {
+            if ( $this->format != 'html' ) {
+                throw $e;
+            }
+            $this->setRedirect(JRoute::_('option=com_people&view=session'));
+        }
+    }
+    
     /**
      * Creates a new session
      * 
@@ -166,13 +208,6 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             $_SESSION['return'] = $data->return;
         }
         
-        if ( isset($_SESSION['return']) ) 
-        {
-            $data->append(array(
-                    'return' => $_SESSION['return']
-            ));            
-        }
-        
         jimport('joomla.user.authentication');
            
         $authenticate = & JAuthentication::getInstance();
@@ -184,11 +219,6 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             $_SESSION['return'] = null;
             $this->login((array)$authentication);
             $context->status = KHttpResponse::CREATED;
-            $url             = JRoute::_('option=com_people&view=person');
-            if ( $data->return ) {
-                $url = base64_decode($data->return);
-            }
-            $this->setRedirect($url);
         }
         else 
         {
@@ -210,5 +240,22 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         //we don't care if a useris logged in or not just delete
         $context->status = KHttpResponse::NO_CONTENT;
         JFactory::getApplication()->logout();
-    }    
+    }  
+
+    /**
+     * Redirect a user after login
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return void
+     */
+    public function redirect(KCommandContext $context)
+    {
+        $url  = JRoute::_($context->url);
+        $data = $context->data;
+        if ( $data->return ) {
+            $url=  base64_decode($data->return);
+        }
+        $this->setRedirect($url);
+    }
 }
