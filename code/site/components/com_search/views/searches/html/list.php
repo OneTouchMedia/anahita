@@ -1,13 +1,14 @@
 <?php defined('KOOWA') or die; ?>
 
-<?php if ( $current_scope && ($current_scope->commentable || $current_scope->ownable) ) : ?>
+<?php if ( $current_scope && ($current_scope->commentable || $current_scope->ownable) && $items->getTotal() ) : ?>
 <fieldset>
-	<legend><?= @text('COM-SEARCH-OPTIONS') ?></legend>
+	<legend><?= sprintf(@text('COM-SEARCH-RESULTS-FOUND-'.$current_scope->type), $items->getTotal())?></legend>
 	<?php if ( $current_scope && $current_scope->commentable ) : ?>
 	<label class="checkbox">
 		<input data-trigger="SearchOption" <?= $search_comments ? 'checked' : ''?> type="checkbox" name="search_comments" value="1" >
 		<?= @text('COM-SEARCH-OPTION-COMMENTS') ?>
     </label>
+	
     <?php endif;?>
 </fieldset>
 <?php endif;?>
