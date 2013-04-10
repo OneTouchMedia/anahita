@@ -38,7 +38,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {
         parent::__construct($config);
         
-        $this->registerCallback('after.add', array($this, 'redirect'), 
+        $this->registerCallback('after.login', array($this, 'redirect'), 
                 array('url'=>$config->redirect_to_after_login));
         
         $this->registerCallback('after.delete', array($this, 'redirect'),
@@ -166,7 +166,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     				$lifetime = time() + AnHelperDate::yearToSeconds();
     				setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
 			}
-    			    			
+			$context = $this->getCommandContext();
+			$context->result = true;
+			$this->getCommandChain()->run('after.login', $context);
 			return true;
     		
 		} else 
@@ -253,7 +255,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {
         $url  = JRoute::_($context->url);
         $data = $context->data;
-        if ( $data->return ) {
+        if ( $data && $data->return ) {
             $url=  base64_decode($data->return);
         }
         $this->setRedirect($url);
