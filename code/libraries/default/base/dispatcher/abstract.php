@@ -136,7 +136,12 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
      */
     protected function _actionDelete(KCommandContext $context)
     {
-        return $this->getController()->execute('delete', $context);
+        $result = $this->getController()->execute('delete', $context);
+                
+        if ( $this->format == 'json' && $context->status == KHttpResponse::NO_CONTENT ) {
+            $this->getController()->getRedirect()->code = null;
+        }
+        return $result;        
     }
         
 	/**
@@ -170,7 +175,7 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 	    ));	    	    
 	    
 	    $context->append(array(
-	        'render_after_post'  => is_string($context->result),
+	        'render_after_post'  => is_string($context->result) || ($this->format == 'json' && $context->status == KHttpResponse::NO_CONTENT),
 	        'forward_after_post' => ($this->format == 'json' || KRequest::type() == 'AJAX') && 
 	                        ($context->status == KHttpResponse::RESET_CONTENT || $context->status == KHttpResponse::CREATED),
 	        'auto_redirect_after_post'     => KRequest::type() == 'HTTP' 
