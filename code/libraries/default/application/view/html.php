@@ -89,20 +89,14 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
         if ( $this->content instanceof KException ) 
         {
         	$error   = $this->content;
-
-        	if ( empty($error->content) )
-        	{
-        		$layout  = $error->getCode();
-        		
-        		if ( !$this->getTemplate()->findPath('errors/'.$layout.'.php') ) {
-        			$layout = 'default';
-        		}
-        		
-        		$this->content = $this->getTemplate()->loadTemplate('errors/'.$layout, array('error'=>$error))->render();        		
-        	} else 
-        	{
-        		$this->content = $error->content;
-        	}            
+            
+        	$layout  = $error->getCode();
+                    		
+            if ( !$this->getTemplate()->findPath('errors/'.$layout.'.php') ) {
+                $layout = 'default';
+            }
+            
+            $this->content = $this->getTemplate()->loadTemplate('errors/'.$layout, array('error'=>$error))->render();         
             
             if ( JDEBUG ) 
             {
