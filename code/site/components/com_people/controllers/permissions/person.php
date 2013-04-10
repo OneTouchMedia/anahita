@@ -86,10 +86,10 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
         //if there's a 
         if ( $this->token ) 
         {
-           $user = $this->getService('repos://site/users.user')->fetch(array('activation'=>$this->token));
+           $user = $this->getService('repos://site/users.user')->find(array('activation'=>$this->token));
            if ( $user ) 
            {
-               $this->setItem($this->getRepository()->fetch(array('userId'=>$user->id)));               
+               $this->setItem($this->getRepository()->find(array('userId'=>$user->id)));               
                $user->activation = null;
                $user->block = false;
                $user->save();
