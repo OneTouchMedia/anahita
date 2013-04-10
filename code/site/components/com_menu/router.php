@@ -59,16 +59,26 @@ class ComMenuRouter extends ComBaseRouterDefault
         $menu = &JSite::getMenu();
         if ( !empty($segments) ) {
             $route  = implode('/', $segments);
-            $item	= $menu->getItems('route', $route, true);
+            $items	= $menu->getItems('route', $route);
         } else {
-            $item   = $menu->getItems('home', true, true);
+            $items  = $menu->getItems('home', true);
         }
 
-		if ( !empty($item) ) {
-			$vars = $item->query;
-			$vars['Itemid'] = $item->id;
-		}
+        if ( !empty($items) )
+        {
+            foreach($items as $item) 
+            {
+                if ( $item->type == 'component') 
+                {
+                    $vars = $item->query;
+                    $vars['Itemid'] = $item->id;
+                    break;
+                }
+            }    
+        }
+        		
 		$vars = array_merge(array('option'=>null), $vars);
+		
 		return $vars;
     }    
 }
