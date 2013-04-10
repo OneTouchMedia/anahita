@@ -45,7 +45,13 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
     {
         parent::__construct($config);
         
-        $this->_flash      = KRequest::get('session.flash', 'raw', new KConfig());        
+        if ( KRequest::has('session.flash') )
+        {
+            $this->_flash = $_SESSION['flash'];
+        } else {
+            $this->_flash = new KConfig();
+        }
+                
         unset($_SESSION['flash']);
         $config->mixer->getState()->flash = $this->_flash;
     }
