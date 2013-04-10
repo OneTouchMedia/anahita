@@ -52,7 +52,10 @@
 				</label>
 			</div>
 			
-			
+    		<?php if ( !empty($return) ) : ?>
+    			<input type="hidden" name="return" value="<?= $return; ?>" />
+    		<?php endif;?>
+    					
 			<div class="form-actions">
 				<button type="submit" name="Submit" class="btn btn-large btn-primary"/>
 					<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>
