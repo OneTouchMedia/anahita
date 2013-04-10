@@ -33,6 +33,6 @@ class ComPeopleControllerPermissionToken extends LibBaseControllerPermissionDefa
 	 */
 	public function canExecute($action)
 	{
-		return true;
+	    return JFactory::getUser()->id == 0;
 	}	
 }
