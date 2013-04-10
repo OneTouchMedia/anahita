@@ -236,13 +236,21 @@ class LibBaseControllerBehaviorIdentifiable extends KControllerBehaviorAbstract
             else
                 $mode = AnDomain::FETCH_ENTITY;
                    
-            $entity = $this->getRepository()->fetch($scope, $mode);
+            $query  = $this->getRepository()->getQuery();
+            $query->where($scope);
+            
+            $entity = $this->getRepository()->fetch($query, $mode);
             
             if ( empty($entity) || !count($entity)) 
             {
-                throw new KControllerException(
-                    'Resource Not Found', KHttpResponse::NOT_FOUND
-                );
+                $exception = new KControllerException('Resource Not Found', KHttpResponse::NOT_FOUND);
+                
+                //see if the entity exits or not
+                if ( $query->disableChain()->fetch() ) {
+                    $exception = new KControllerException('Method Not Allowed', KHttpResponse::METHOD_NOT_ALLOWED);
+                }
+                
+                throw $exception;
             }
             
             $this->setItem($entity);
