@@ -88,8 +88,8 @@ class JRouterSite extends KObject
 	        $url->format = null;
 	    }	    	    
 	    $path  = substr_replace($path, '', 0, strlen(KRequest::base()));	    	    
-	    $path  = str_replace('index.php', '', $path);
-	    $path  = trim($path, '/');
+	    $path  = preg_replace('/index\/?.php/', '', $path);
+	    $path  = trim($path, '/');	    
 	    $url->path   = $path;
 	    $url->format = $url->format ? $url->format : pick(KRequest::format(), 'html');	    
 	    if(!empty($url->format) ) {
