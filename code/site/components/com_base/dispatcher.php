@@ -113,8 +113,6 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
      */
     protected function _actionDispatch(KCommandContext $context)
     {
-        $result = parent::_actionDispatch($context);
-        return $result;
     	try 
     	{
     		$result = parent::_actionDispatch($context);
@@ -123,14 +121,13 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     	{
     	    if ( $this->format == 'html' ) 
     	    {
-    	        //first lets see if the controller can render the error page
-    	        $template  = $this->getController()->getView()->getTemplate();
-    	        $layouts   = array('_error_'.$exception->getCode(),'_error_default');
-    	        foreach($layouts as $layout)
+    	        if ( $context->html_redirect )
     	        {
-    	            if ( $template->findTemplate($layout) ) {
-    	                $exception->content = $template->loadTemplate($layout);    	         
+    	            if ( $context->html_redirect === true ) {
+    	                $context->html_redirect = KRequest::referrer();
     	            }
+    	            
+    	            $this->getService('application')->redirect($context->html_redirect);
     	        }
     	    }
     	    
