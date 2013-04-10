@@ -24,14 +24,7 @@
  * @link       http://www.anahitapolis.com
  */
 class ComPeopleDispatcher extends ComBaseDispatcher
-{
-    /**
-     * The URL to redirect the user if they're logged in
-     *
-     * @var string
-     */
-    protected $_login_redirect_url;
-    
+{    
     /**
      * Constructor.
      *
@@ -41,9 +34,8 @@ class ComPeopleDispatcher extends ComBaseDispatcher
      */
     public function __construct(KConfig $config)
     {
-        parent::__construct($config);
-    
-        $this->_login_redirect_url = $config->login_redirect_url;
+        parent::__construct($config); 
+
     }
     
     /**
@@ -56,59 +48,13 @@ class ComPeopleDispatcher extends ComBaseDispatcher
      * @return void
      */
     protected function _initialize(KConfig $config)
-    {
-        //you can set the redirect url for when a user is logged in
-        //as follow
-        //KService::setConfig('com://site/people.dispatcher', array(
-        // 'login_redirect_url' => 'mynewurl'
-        //));
-        $config->append(array(
-                'login_redirect_url' => 'option=com_dashboard&view=dashboard'
-        ));
-    
+    {    
         parent::_initialize($config);
-    }
-        
-	/**
-	 * (non-PHPdoc)
-	 * @see ComBaseDispatcher::_handleDispatchException()
-	 */
-    protected function _handleDispatchException(KCommandContext $context, KException $exception)
-    {
-		//if a session throws exception then check the code
-		//and generate a correct message
-		if ( $this->getController()->getIdentifier()->name == 'session' ) 
-		{
-			$this->getService('application')
-			    ->redirect($this->_login_url);
-							
-			return false;
-		}
-		elseif ( $this->getController()->getIdentifier()->name == 'person' ) 
-		{
-			//if the registration is closed
-			if ( $exception->getCode() == KHttpResponse::METHOD_NOT_ALLOWED )
-			{
-				if ( $context->action == 'read' && $this->getRequest()->layout == 'add' )
-				{
-				    if ( JFactory::getUser()->id ) 
-				    {
-				        $url = $this->getService('application.router')->build('index.php?'.get_viewer()->getURL());
-				        $this->getService('application')->redirect($url);
-				    }
-					else 
-					{
-					    $this->getService('application')->redirect($this->_login_url);
-					}
-					return false;					
-				}
-			}
-		}
-		
-		return parent::_handleDispatchException($context, $exception);		
-	}
+    }	
 	
 	/**
+	 * Handles passowrd token before dispatching 
+	 * 
 	 * (non-PHPdoc)
 	 * @see ComBaseDispatcher::_actionDispatch()
 	 */
@@ -120,60 +66,18 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	        if ( $this->getController()->canRead() ) 
 	        {
 	            $this->getController()->login();
-	            if ( $this->reset_password ) 
-	            {
-	                $url = $this->getController()->getItem()->getURL().'&get=settings&edit=account&reset_password=1';
+
+	            if ( $this->reset_password ) {
+	                $url = JRoute::_($this->getController()->getItem()->getURL().'&get=settings&edit=account&reset_password=1');
 	            }
 	            else {
-	                $url = $this->_login_redirect_url;
+	                $url = $this->getController()->getRedirect()->location;
 	            }
-	            $this->getService('application')->redirect(JRoute::_($url));
+	            $this->getService('application')->redirect($url);
 	            return false;	            
 	        }
 	    }
 	    	    
 	    return parent::_actionDispatch($context);
-	}
-	
-	/**
-	 * If a person has been registered succesfully and no activation is required then
-	 * log them in. If activation is required show a message 
-	 * 
-	 * (non-PHPdoc)
-	 * @see ComBaseDispatcher::_actionForward()
-	 */
-	protected function __actionForward(KCommandContext $context)
-	{
-	    //if creating a new person login the person in
-	    if ( $this->format == 'html' )
-	    {
-	        if ( $this->getController()->getIdentifier()->name == 'person' )
-	        {
-	            //if new person is created an no activation is 
-	            //required
-	            if ( $context->status == KHttpResponse::CREATED && 
-	                    !$this->getController()->activationRequired() ) 
-	            {
-	                $this->getController()->login();
-	                $this->getController()->setRedirect(JRoute::_($this->_login_redirect_url));
-	            }
-	        }
-	    }    
-	       	    	    
-		elseif ( $this->getController()->getIdentifier()->name == 'session' )
-		{
-			//if a new session is created then render the session
-			//info or redirect
-			if ( $context->status == KHttpResponse::CREATED ) 
-			{
-			    if ( $this->format == 'html' ) {
-			        $this->getController()->setRedirect(JRoute::_($this->_login_redirect_url));
-			    } 
-			    else {
-			        $context->result = $this->getController()->display();
-			    }
-			}
-		}
-		return parent::_actionForward($context);				
 	}
 }
