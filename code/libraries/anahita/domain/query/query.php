@@ -60,10 +60,13 @@ class AnDomainQuery extends KObject implements KCommandInterface
                 $query->where(array($identity_property->getName()=>$conditions));
             elseif( is_array($conditions) )
             {
-                if ( !is_numeric(key($conditions))  )
-                    $query->where($conditions);
-                else
+                if ( is_numeric(key($conditions))  || empty($conditions))
+                {
                     $query->where(array($identity_property->getName()=>$conditions));
+                }                    
+                else {
+                    $query->where($conditions);
+                }
             }
         } else
         //clone the query to avoid changing the passed query
@@ -261,13 +264,10 @@ class AnDomainQuery extends KObject implements KCommandInterface
 			$condition  = strtoupper($condition);
 
 			$list = $value instanceof KObjectSet || is_array($value);
-			//if the values are empty then don't bother adding it			
-			if ( $list && !count($value) ) {
-			     return;   
-			}
 						
 			//fix the contstraint 
-			if ( $list || $value instanceof AnDomainQuery ) {
+			if ( $list || $value instanceof AnDomainQuery ) 
+			{
 				if ( $constraint == '=' )
 					$constraint = 'IN';
 				elseif ( $constraint == '<>' )
