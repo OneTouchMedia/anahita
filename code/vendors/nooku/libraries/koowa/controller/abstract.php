@@ -152,23 +152,17 @@ abstract class KControllerAbstract extends KObject
             $this->getCommandChain()->run('after.'.$command, $context);
         }
         //@TODO temporary until we move to the response object
-        } catch(KException $e) {
-            $context->setError($e);
-        }
-        
-        //Handle exceptions
-        if($context->getError() instanceof KException) 
+        } catch(KException $e) 
         {
             //@TODO : Move header handling into a response object
-            if($context->headers) 
-	        {
-	            foreach($context->headers as $name => $value) {
-	                header($name.' : '.$value);
-	            }
-	        }
-	        
-            throw $context->getError();
-        }
+            if($context->headers)
+            {
+                foreach($context->headers as $name => $value) {
+                    header($name.' : '.$value);
+                }
+            }
+            throw $e;            
+        }                
        
         return $context->result;
     }
