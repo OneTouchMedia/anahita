@@ -56,17 +56,19 @@ class AnDomainQuery extends KObject implements KCommandInterface
     
             $identity_property = $repository->getDescription()->getIdentityProperty();
     
-            if ( is_numeric($conditions) )
-                $query->where(array($identity_property->getName()=>$conditions));
-            elseif( is_array($conditions) )
+            if ( !empty($conditions) )
             {
-                if ( is_numeric(key($conditions))  || empty($conditions))
+                if ( is_numeric($conditions) )
+                    $conditions = array($conditions);
+                
+                //if conditions is number of an array of numbers
+                if ( is_numeric($conditions) || 
+                        (is_array($conditions) && is_numeric(key($conditions))) ) 
                 {
-                    $query->where(array($identity_property->getName()=>$conditions));
-                }                    
-                else {
-                    $query->where($conditions);
+                    $conditions = array($identity_property->getName()=>$conditions);                     
                 }
+                
+                $query->where($conditions);
             }
         } else
         //clone the query to avoid changing the passed query
