@@ -8,14 +8,30 @@ if ( !defined('JPATH_BASE') )
     KService::get('com://site/application.dispatcher')->load(); 
 }
 
+KService::setAlias('com://site/application.router','com://site/notifications.router.application');
+
+$base_url = KService::get('koowa:http.url', array('url'=>rtrim(JURI::base(),'/')));
+
+KService::setConfig('com://site/application.router', array(
+    'base_url' => $base_url
+));
+
+class ComNotificationsRouterApplication extends ComApplicationRouter
+{                
+    /**
+     * Always return absolute URL
+     * 
+     * (non-PHPdoc)
+     * @see ComApplicationRouter::build()
+     */
+    public function build($query, $fqr = false)
+    {
+       return parent::build($query, true); 
+    }
+}
+
 $ids = (array)KRequest::get('get.id', 'int', array());
-$notifications = KService::get('repos://site/notifications.notification')->getQuery()
-    ->disableChain()
-    ->status(ComNotificationsDomainEntityNotification::STATUS_NOT_SENT)
-    ->id($ids)
-    ->fetchSet()
-;
-// print json_encode(array('proccessing'=>count($notifications)));
-KService::get('com://site/notifications.mailer')
-    ->sendNotifications($notifications);
+KService::get('com://site/notifications.controller.processor', array('base_url'=>$base_url))
+    ->id($ids)->process();
+exit(0);
 ?>
