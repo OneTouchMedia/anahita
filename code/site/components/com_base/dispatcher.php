@@ -61,7 +61,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 	protected function _initialize(KConfig $config)
 	{
 	    $config->append(array(
-	    	'login_url'			=> $this->getService('application.router')->build('option=people&view=session'),
+	    	'login_url'			=> JRoute::_('option=people&view=session'),
 	        'auto_asset_import' => true
 	    ));
 	    
