@@ -32,6 +32,13 @@ class JSite extends JApplication
      */
     protected $_template;
     
+    /**
+     * Application Router
+     * 
+     * @var JRouter
+     */
+    protected $_router;
+    
     /** 
      * Constructor.
      *
@@ -207,12 +214,30 @@ class JSite extends JApplication
     }
 
     /**
+     * Set the application router
+     * 
+     * @param mixed $router
+     * 
+     * @return void
+     */
+    public function setRouter($router)
+    {
+        $this->_router = $router;
+        return $this;
+    }
+    
+    /**
      * Return a reference to the JRouter object.
      *
      * @return  JRouter
      */
     public function &getRouter()
     {
-        return parent::getRouter('site', array('enable_rewrite'=>JFactory::getConfig()->getValue('sef_rewrite')));
+        if ( !isset($this->_router) )
+        {
+            $this->_router = KService::get('com://site/application.router', array('enable_rewrite'=>JFactory::getConfig()->getValue('sef_rewrite')));
+        }
+        
+        return $this->_router;
     }
 }

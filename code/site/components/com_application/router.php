@@ -23,7 +23,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class JRouterSite extends KObject
+class ComApplicationRouter extends KObject
 {
     /**
      * cloneable url
@@ -39,6 +39,13 @@ class JRouterSite extends KObject
      */
     protected $_enable_rewrite;
     
+    /**
+     * base url
+     * 
+     * @var KHttpUrl
+     */
+    protected $_base_url;
+    
     /** 
      * Constructor.
      *
@@ -50,18 +57,68 @@ class JRouterSite extends KObject
     {
     	$config = new KConfig($config);
     	
-    	$config->append(array(
-    		'enable_rewrite' => false,
-    		'url'	=> clone KService::get('koowa:http.url')	
-    	));
-    	
 		parent::__construct($config);
 		
 		$this->_enable_rewrite = $config->enable_rewrite;
-		
-        $this->_clonable_url = $config->url;
+	    $this->_base_url       = $config->base_url;
+	    
+	    if ( is_string($this->_base_url) ) {
+	        $this->_base_url = $this->getService('koowa:http.url', array('url'=>$this->_base_url));    
+	    }
+	    
+        $this->_clonable_url   = $config->url;
+	}
+	
+	/**
+	 * Initializes the default configuration for the object
+	 *
+	 * Called from {@link __construct()} as a first step of object instantiation.
+	 *
+	 * @param KConfig $config An optional KConfig object with configuration options.
+	 *
+	 * @return void
+	 */
+	protected function _initialize(KConfig $config)
+	{    	
+	    if ( !$config->base_url )
+	    {
+	        $base = clone KRequest::base();
+	        
+	        foreach(array('host','scheme','port','user','pass') as $part) {
+	            $base->$part = KRequest::url()->$part;
+	        }
+	        
+	        $config->base_url = $base;	        	       
+	    }
+	    	    
+    	$config->append(array(
+    		'enable_rewrite' => false,    	    
+    		'url'	=> clone KService::get('koowa:http.url')	
+    	));
+  	
+	    parent::_initialize($config);
+	}	
+	
+	/**
+	 * Return if rewerite is enabled
+	 * 
+	 * @return boolean
+	 */
+	public function rewriteEnabled()
+	{
+	    return $this->_enable_rewrite;
 	}
 
+	/**
+	 * Return the base url
+	 * 
+	 * @return KHttpUrl
+	 */
+	public function getBaseUrl()
+	{
+	    return $this->_base_url;
+	}
+	
     /**
      * Return the router mode
      * 
@@ -87,7 +144,7 @@ class JRouterSite extends KObject
 	        $path .= '.php';
 	        $url->format = null;
 	    }	    	    
-	    $path  = substr_replace($path, '', 0, strlen(KRequest::base()));	    	    
+	    $path  = substr_replace($path, '', 0, strlen($this->_base_url));	    	    
 	    $path  = preg_replace('/index\/?.php/', '', $path);
 	    $path  = trim($path, '/');	    
 	    $url->path   = $path;
@@ -118,7 +175,7 @@ class JRouterSite extends KObject
      * 
      * @return void
      */
-	function build($query = '', $fqr = false)
+	public function build($query = '', $fqr = false)
 	{
 	    if ( is_string($query) ) {
 	        $query = str_replace('index.php?', '', $query);
@@ -154,14 +211,14 @@ class JRouterSite extends KObject
         if ( !$this->_enable_rewrite ) {
             array_unshift($parts,'index.php');
         }
-        array_unshift($parts, KRequest::base()->path);        
+        array_unshift($parts, $this->_base_url->path);        
         $path  = implode('/', $parts);
         $uri->path = $path;
         if ( $fqr )
         {
             foreach(array('host','scheme','port','user','pass') as $part) 
             {
-                $uri->$part = KRequest::url()->$part; 
+                $uri->$part = $this->_base_url->$part; 
             }            
         }        
         return $uri;        

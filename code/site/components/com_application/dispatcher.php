@@ -238,8 +238,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         set_exception_handler(array($this, 'error')); 
                 
         //load the JSite
-        $this->getService('koowa:loader')->loadIdentifier('com://site/application.application');
-        $this->getService('koowa:loader')->loadIdentifier('com://site/application.router');
+        $this->getService('koowa:loader')->loadIdentifier('com://site/application.application');        
                       
         jimport('joomla.application.component.helper');
         
@@ -264,7 +263,6 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         }
                 
         $this->getService()->set('application', $this->_application);
-        $this->getService()->set('application.router', $this->_application->getRouter());        
         
         //set the session handler to none for
         if ( PHP_SAPI == 'cli' ) {
