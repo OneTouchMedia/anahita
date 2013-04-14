@@ -82,7 +82,7 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	    $identifier->name = 'template';
 	    
 		$config->append(array(
-		    'base_url'      => KRequest::base(),
+		    'base_url'      => KRequest::url(),
 		    'test_options'  => array(
 		        'enabled'   => JDEBUG,
 		        'email'     => get_config_value('mailer.redirect_email'),
