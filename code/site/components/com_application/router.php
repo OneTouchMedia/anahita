@@ -144,7 +144,7 @@ class ComApplicationRouter extends KObject
 	        $path .= '.php';
 	        $url->format = null;
 	    }	    	    
-	    $path  = substr_replace($path, '', 0, strlen($this->_base_url));	    	    
+	    $path  = substr_replace($path, '', 0, strlen($this->_base_url->path));	    	    
 	    $path  = preg_replace('/index\/?.php/', '', $path);
 	    $path  = trim($path, '/');	    
 	    $url->path   = $path;
