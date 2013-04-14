@@ -287,11 +287,9 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 				case(AnDomain::OPERATION_DELETE) :
 					$keys = $this->_description->getIdentityProperty()->serialize($entity->getIdentityId());
 					$keys = array($this->_description->getIdentityProperty()->getName() => $entity->getIdentityId());
-					if ( $operation & AnDomain::OPERATION_UPDATE) 
-					{
+					if ( $operation & AnDomain::OPERATION_UPDATE) {
 						$context->result = count($context->data) ? $this->update($context->data, $keys) : true;
-					} else 
-					{
+					} else {
 						$context->result = $this->destroy($keys);
 					}
 			}
@@ -308,18 +306,23 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	 * This method disables the chain in order to ensure the query is not modified by the
 	 * behaviors for unexpected results 
 	 * 
-	 * @param mixed $condition A condition object. Can be an array or domain query object
+	 * If a boolean value true is passed as condition then all the records within the repository is 
+	 * updated 
+	 *  
+	 * @param array|AnDomainQuery|boolean A condition object. Can be an array or domain query object
 	 * 
 	 * @return boolean
 	 */
-	public function destroy($condition)
-	{
-		if ( !empty($condition) )
-		{		    
-		    $this->getCommandChain()->disable();
-		    $this->getStore()->delete($this, $condition);
-		    $this->getCommandChain()->enable();
-		}
+	public function destroy($conditions)
+	{	    
+	    $result = false;
+	    if ( !empty($conditions) ) 
+	    {
+	        $this->getCommandChain()->disable();
+	        $result = $this->getStore()->delete($this, $conditions);
+	        $this->getCommandChain()->enable();	        
+	    }
+	    return $result;
 	}
 	
 	/**
@@ -327,17 +330,25 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	 * 
 	 * This method disables the chain in order to ensure the query is not modified by the
 	 * behaviors for unexpected results 
+	 * 
+	 * If a boolean value true is passed as condition then all the records within the repository is 
+	 * updated 
 	 *
-	 * @param array|string        $values     The update values. Can be an array of key/value pairs or just an update string
-	 * @param array|AnDomainQuery $conditions An array of conditions or a domain query
+	 * @param array|string                $values     The update values. Can be an array of key/value pairs or just an update string
+	 * @param array|AnDomainQuery|boolean $conditions An array of conditions or a domain query or a boolean vaule.
 	 * 
 	 * @return void
 	 */
-	public function update($values, $conditions = array())
+	public function update($values, $conditions)
 	{
-	    $this->getCommandChain()->disable();	    
-	    $this->getStore()->update($this, $conditions, $values);
-	    $this->getCommandChain()->enable();
+	    $result = false;
+	    if ( !empty($conditions) )
+	    {
+	        $this->getCommandChain()->disable();
+	        $result = $this->getStore()->update($this, $conditions, $values);
+	        $this->getCommandChain()->enable();
+	    }
+	    return $result;
 	}
 	
 	/**
