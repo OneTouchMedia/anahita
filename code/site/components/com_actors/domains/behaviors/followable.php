@@ -48,6 +48,28 @@
 class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract 
 {
     /**
+     * A flag to whether subscribe to an actor after following
+     * or not
+     * 
+     * @var boolean
+     */
+    protected $_subscribe_after_follow;
+    
+    /**
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+        
+        $this->_subscribe_after_follow = $config->subscribe_after_follow;
+    }
+        
+    /**
      * A boolean flag to temporarily disable resting the stats
      * 
      * @var boolean
@@ -66,6 +88,7 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(
+		    'subscribe_after_follow'     => $config->mixer->isSubscribable(),
 			'attributes'	=> array(
                 'allowFollowRequest'   => array('default'=>false),                
                 'followRequesterIds'   => array('type'=>'set', 'default'=>'set','write'=>'private'),                 
@@ -191,7 +214,7 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
         self::$__disable_reset_stats = false;
         
         //add a subscriber
-        if ( !is_person($mixer) && $mixer->isSubscribable() ) {
+        if ( $this->_subscribe_after_follow ) {
             $mixer->addSubscriber($actor);
         }
                 
@@ -230,21 +253,24 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
         //mixer
         
         //lets find all the nodes that actor is subscribed to
-        $query        = $this->getService('repos:base.subscription')->getQuery()
+        $query        = $this->getService('repos://site/base.subscription')->getQuery()
                         ->subscriber($actor)
                         ->where('subscribee.id','IN', $this->getService('repos:base.node')->getQuery()->columns('id')->where('owner_id','=',$mixer->id))
         ;
         
-        //the query to update the stats
-        $update_stats = $this->getService('repos:base.node')
-            ->getQuery()
-            ->id($query->fetchValues('subscribee.id'))                        
-            ->update("subscriber_ids = @remove_from_set(subscriber_ids,{$actor->id}), subscriber_count = @set_length(subscriber_ids)")
-            ;
+        $subscribers = $query->disableChain()->fetchValues('subscribee.id');
         
-        $this->getService('repos:base.node')->getStore()->execute($update_stats);
-        $this->getService('repos:base.subscription')->destroy($query);
-                  			        
+        if ( count($subscribers) )
+        {
+            $this->getService('repos://site/base.node')
+            ->update("subscriber_ids = @remove_from_set(subscriber_ids,{$actor->id}), subscriber_count = @set_length(subscriber_ids)",
+            $subscribers
+            );
+            
+            $this->getService('repos://site/base.subscription')
+            ->destroy($query);
+        }
+             			        
         if ( $mixer->isAdministrable() ) {
             $mixer->removeAdministrator($actor);            
         }

@@ -78,6 +78,8 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
 			)
 		));
 				
+		$config->behaviors->append(array('followable' => array('subscribe_after_follow'=>false)));
+		
 		parent::_initialize($config);
         
         AnHelperArray::unsetValues($config->behaviors, array('administrable','enableable'));

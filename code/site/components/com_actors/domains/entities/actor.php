@@ -56,7 +56,6 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 			'behaviors'  => array(
                 'subscribable',
 				'modifiable',
-				'followable',
 			    'storable',				
 				'describable',
 				'authorizer',
@@ -68,6 +67,7 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 		));
 				
         $config->behaviors->append(array(
+              'followable'   => array(),                
               'portraitable' => array(
                       'sizes' => array(
                               'small'  => '80xauto',
