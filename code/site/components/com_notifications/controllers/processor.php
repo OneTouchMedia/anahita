@@ -45,7 +45,8 @@ class ComNotificationsControllerProcessor extends ComBaseControllerResource
     
         $this->_parser  = $this->getService($config->parser);
     
-        JFactory::getLanguage()->load('com_actors');
+        JFactory::getLanguage()->load('lib_anahita');
+        JFactory::getLanguage()->load('com_actors');        
     }
     
     /**
