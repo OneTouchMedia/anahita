@@ -32,7 +32,7 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 * 
 	 * @var ComMailerEmailView
 	 */
-	protected $_template_view;
+	protected $_template_view;	
 	
 	/**
 	 * Mailer test options
@@ -40,6 +40,13 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 * @var KConfig
 	 */
 	protected $_test_options;
+	
+	/**
+	 * Base URL to use within the mails
+	 * 
+	 * @var KHttpUrl
+	 */
+	protected $_base_url;
 	
 	/**
 	 * Constructor.
@@ -52,9 +59,11 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	{
 		parent::__construct($config);
 		
-		$this->_template_view = $config->template_view;
+		$this->_template_view  = $config->template_view;		
 		
-		$this->_test_options  = $config->test_options;
+		$this->_base_url       = $config->base_url;
+		
+		$this->_test_options   = $config->test_options;
 	}
 		
 	/**
@@ -67,14 +76,19 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 * @return void
 	 */
 	protected function _initialize(KConfig $config)
-	{
+	{	    	    
+	    $identifier = clone $config->mixer->getIdentifier();
+	    $identifier->path = array('emails');
+	    $identifier->name = 'template';
+	    
 		$config->append(array(
+		    'base_url'      => KRequest::base(),
 		    'test_options'  => array(
 		        'enabled'   => JDEBUG,
 		        'email'     => get_config_value('mailer.redirect_email'),
 		        'log'       => JFactory::getConfig()->getValue('tmp_path').'/emails.html'       
-            ),
-	        'template_view' => 'com://site/mailer.view.template'
+            ),		    
+	        'template_view'  => $identifier
 		));
 	
 		parent::_initialize($config);
@@ -94,13 +108,14 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 
 	        $paths[] = dirname($identifier->filepath);
 	        $paths[] = implode(DS, array(JPATH_THEMES, JFactory::getApplication()->getTemplate(), 'emails', $identifier->type.'_'.$identifier->package));
-	        $paths[] = implode(DS, array(JPATH_THEMES, JFactory::getApplication()->getTemplate(), 'emails')); 	        
+	        $paths[] = implode(DS, array(JPATH_THEMES, JFactory::getApplication()->getTemplate(), 'emails'));
+	         	        
 	        $config = array(
-                'base_url'          => KRequest::url(),
-	            'template_paths'    => $paths
-	        );	
-     
-	        $this->_template_view = $this->getService($this->_template_view, $config);    
+                'base_url'          => $this->_base_url,
+	            'template_paths'    => $paths	            
+	        );
+	        register_default(array('identifier'=>$this->_template_view, 'default'=>'LibBaseViewTemplate'));
+            $this->_template_view = $this->getService($this->_template_view, $config);
 	    }
 	    
 	    return $this->_template_view;		
@@ -115,6 +130,10 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	{
 	    $config = new KConfig($config);
 	    
+	    $config->append(array(
+            'layout'  => 'default_layout'	            
+        ));
+	    
 	    $data   = $this->getState()->toArray();
 	    
 	    if ( $this->getState()->getItem() ) {
@@ -126,18 +145,19 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	    }
 	    
 	    $config->append(array(
-	            'data' => $data
+            'data' => $data
 	    ));	  
 	      
-	    if ( $config->body ) {
-	        $output = $config->body;
-	    } else {
-	        $output = $this->getEmailTemplateView()
-	        ->layout($config->template)
-	        ->config($config)
-	        ->display($config['data'])
-	        ;
-	    }
+	    $template = $this->getEmailTemplateView()->getTemplate();
+	    $data     = array_merge($config['data'], array('config'=>$config));	    
+	    $output   = $template->loadTemplate($config->template, $data)->render();
+        
+        if ( $config->layout ) {
+            $output = $template->loadTemplate($config->layout, array('output'=>$output))->render();            
+        }
+        
+        //Supposed to fix the random exclamation points
+        $output = wordwrap($output,900,"\n");
 
 	    return $output;
 	}
@@ -165,6 +185,7 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 * @param array $config An array of config
 	 * 				'to' => array of recipients
 	 * 				'template' => name of the email template to use
+	 *              'layout'   => the email layout. It's set to default 
 	 * 				'data'	   => array of data
 	 * 				'subject'  => the mail subject 
 	 * 
@@ -179,9 +200,9 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	        $emails = $this->_test_options->email;
 	    }
 	    
-		$output = $this->renderMail($config);
+		$output = $config->body ? $config->body : $this->renderMail($config);
 
-		$config->append(array(
+		$config->append(array(		    
 		    'is_html' => true        
         ));
 		
