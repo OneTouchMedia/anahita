@@ -116,30 +116,6 @@ class ComBaseControllerComment extends ComBaseControllerService
 		
 		return $this;
 	}	
-	
-	/**
-	 * Generic executation authorization
-	 * 
-     * @param string $action The action to execute
-     *
-     * @return boolean
-	 */
-	public function canExecute($action)
-	{        
-		$parent  = $this->getParent();
-		
-        $comment = $this->getItem();
-        		
-		//either one of them has to exists
-		if ( !pick($parent, $comment) )
-			return false;		
-		
-		if ( $parent && !$parent->authorize('access') ) {
-			return false;	
-		}
-        
-		return parent::canExecute($action);
-	}
     
 	/**
 	 * Returns whether a comment can be added
@@ -148,7 +124,9 @@ class ComBaseControllerComment extends ComBaseControllerService
 	 */
 	public function canAdd()
 	{
-	    return $this->parent->authorize('add.comment');
+	    return $this->parent 
+	    && $this->parent->authorize('access')      
+	    && $this->parent->authorize('add.comment');
 	}
 
 	/**
