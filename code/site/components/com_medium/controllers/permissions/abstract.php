@@ -110,17 +110,12 @@ abstract class ComMediumControllerPermissionAbstract extends LibBaseControllerPe
 	 * @return boolean
 	 */
 	public function canExecute($action)
-	{
-		$viewer = get_viewer();
-	
-		if ( KRequest::method() != 'GET' && $viewer->guest() ) {
-			return false;
-		}
-	
+	{	
 		//check if viewer has access to actor
 		if ( $this->isOwnable() && $this->actor )  {
-			if ( $this->actor->authorize('access') === false )
+			if ( $this->actor->authorize('access') === false ) {
 				return false;
+			}
 		}
 	
 		return parent::canExecute($action);
