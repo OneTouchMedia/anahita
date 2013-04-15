@@ -39,23 +39,7 @@ class JRoute
 	{
 	    return KService::get('application')
 	        ->getRouter()
-	        ->build($url, $fqr);
-		// Get the router
-		$app	= &JFactory::getApplication();
-		$router = &$app->getRouter();
-
-		// Make sure that we have our router
-		if (! $router) {
-			return null;
-		}
-
-		if ( (strpos($url, '&') !== 0 ) && (strpos($url, 'index.php') !== 0) ) {
-            return $url;
- 		}
-
-		// Build route
-		$uri = &$router->build($url);
-        return $uri;
+	        ->build($url, $fqr);		
 	}
 }
 
