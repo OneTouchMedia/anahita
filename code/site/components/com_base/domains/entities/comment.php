@@ -43,16 +43,16 @@ class ComBaseDomainEntityComment extends ComBaseDomainEntityNode
 			'attributes' => array(
 				'body'			=> array('required'=>true)
 			),
-			'behaviors'		=> array(                
-				'parentable' => array('parent'=>'node'),
-                'taggable',
+			'behaviors'		=> array(       
+			    'parentable' => array('parent'=>'com:base.domain.entity.node'),			                 				
+                //'taggable',
 				'modifiable',
 				'authorizer',
 				'locatable' ,
 				'votable'
 			)
-		));
-					
+		));					
+		
 		parent::_initialize($config);
 	}
 	
