@@ -111,7 +111,7 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 */
 	public function getEmailTemplateView()
 	{
-	    if ( !$this->_template_view instanceof ComMailerViewTemplate ) 
+	    if ( !$this->_template_view instanceof LibBaseViewTemplate ) 
 	    {
 	        $identifier = clone $this->_mixer->getIdentifier();
 	        $identifier->path = array('emails');
@@ -144,6 +144,8 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
             'layout'  => 'default_layout'	            
         ));
 	    
+	    $layout = $config->layout;
+	    
 	    $data   = $this->getState()->toArray();
 	    
 	    if ( $this->getState()->getItem() ) {
@@ -162,8 +164,8 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	    $data     = array_merge($config['data'], array('config'=>$config));	    
 	    $output   = $template->loadTemplate($config->template, $data)->render();
         
-        if ( $config->layout && $template->findTemplate($config->layout) ) {
-            $output = $template->loadTemplate($config->layout, array('output'=>$output))->render();            
+        if ( $layout && $template->findTemplate($layout) ) {
+            $output = $template->loadTemplate($layout, array('output'=>$output))->render();            
         }
 
 	    return $output;
