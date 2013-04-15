@@ -304,7 +304,10 @@ class AnDomainQueryBuilder extends KObject
 			
 			if ( $link['bind_type'] )
 			{
-			    $conditions[] = $link['bind_type'].' LIKE \''.$this->_inheritanceTree($description).'\'';
+			    $type = $this->_inheritanceTree($description);
+			    if ( !empty($type) && $type != '%' ) {
+			        $conditions[] = $link['bind_type'].' LIKE \''.$this->_inheritanceTree($description).'\'';
+			    }
 			}
 			
 			$name      = $this->_store->quoteName($link['resource_name']);
@@ -372,10 +375,16 @@ class AnDomainQueryBuilder extends KObject
 			}
             
 			foreach($scopes as $index => $scope) {
-			    $scopes[$index] = $type_column_name.' LIKE \''.$this->_inheritanceTree($scope).'\'';;
+			    $inheritance_type = $this->_inheritanceTree($scope);
+			    if ( !empty($inheritance_type) && $inheritance_type != '%' ) {
+                    $scopes[$index] = $type_column_name.' LIKE \''.$inheritance_type.'\'';;
+			    } else {
+			        unset($scopes[$index]);
+			    }
 			}
-						
-            $clauses[] = '('.implode(' OR ', $scopes).')';            
+			if ( !empty($scopes) ) {
+                $clauses[] = '('.implode(' OR ', $scopes).')';
+			}
 		}
 		
 		if ( !empty($query->where) )
