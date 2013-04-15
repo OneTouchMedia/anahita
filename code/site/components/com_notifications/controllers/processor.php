@@ -81,9 +81,9 @@ class ComNotificationsControllerProcessor extends ComBaseControllerResource
     protected function _actionProcess(KCommandContext $context)
     {   
         $ids = (array)KConfig::unbox($this->id);
+
         $notifications = KService::get('repos://site/notifications.notification')
-            ->getQuery()
-            ->disableChain()
+            ->getQuery(true)          
             ->status(ComNotificationsDomainEntityNotification::STATUS_NOT_SENT)
             ->id($ids)
             ->fetchSet();
@@ -101,6 +101,7 @@ class ComNotificationsControllerProcessor extends ComBaseControllerResource
     public function sendNotifications($notifications)
     {
         $space = $this->getService('anahita:domain.space');
+        
         try
         {
             foreach($notifications as $notification)
@@ -112,12 +113,7 @@ class ComNotificationsControllerProcessor extends ComBaseControllerResource
                 $this->sendNotification($notification);
             }
         }
-        catch(Exception $e)
-        {
-            //re-throw the exception if debug is on
-            if ( JDEBUG )
-                throw $e;
-        }
+        catch(Exception $e) { }
          
         $space->commitEntities();
     }
@@ -177,15 +173,11 @@ class ComNotificationsControllerProcessor extends ComBaseControllerResource
                     )
             ));
                 
-            $subject  = KService::get('koowa:filter.string')->sanitize($data->email_subject);
-             
-            $mailer = JFactory::getMailer();
-            $mailer->setSubject($subject);
-            $mailer->setBody($body);
-            $mailer->isHTML(true);
-            $mailer->addRecipient(array($person->email));
-             
-            $mails[] = $mailer;
+            $mails[] = array(
+                  'subject' => $data->email_subject,
+                  'body'    => $body,
+                  'to'      => $person->email      
+            );
         }
          
         return $mails;
@@ -200,47 +192,39 @@ class ComNotificationsControllerProcessor extends ComBaseControllerResource
      */
     public function sendNotification($notification)
     {
-        $people    = $this->getService('repos://site/actors.actor')->getQuery()->disableChain()->id($notification->subscriberIds->toArray())->fetchSet();
-        $settings  = $this->getService('repos:notifications.setting')
-        ->getQuery()->disableChain()
-        ->where('actor.id','IN', $notification->target->id)->fetchSet();
+        $people    = $this->getService('repos://site/actors.actor')->getQuery(true)->id($notification->subscriberIds->toArray())->fetchSet();
+        $settings  = $this->getService('repos://site/notifications.setting')
+                        ->getQuery(true,array('actor.id'=>$notification->target->id))
+                        ->fetchSet();
+        
         $settings  = AnHelperArray::indexBy($settings, 'person.id');
          
-        $mails     = $this->_renderMails(array('notification'=>$notification,'people'=>$people, 'settings'=>$settings));
-         
-        //forward all the mails to the specified mail
-        if ( JDEBUG )
+        $mails = $this->_renderMails(array('notification'=>$notification,'people'=>$people, 'settings'=>$settings));
+        $debug = $this->getBehavior('mailer')->getTestOptions()->enabled;
+        
+        if ( $debug ) 
         {
-            $email  = explode(',',get_config_value('notifications.redirect_email'));
-            $mailer = JFactory::getMailer();
-            $mailer->isHTML(true);
-            $mailer->addRecipient($email);
-            $mailer->setSubject('Sending out '.count($mails).' notification mail(s)');
-            $recipients = array();
             foreach($mails as $i => $mail)
             {
-                $recipients[] = $mail->to[0][0];
+                $recipients[] = $mail['to'];
                 if ( $i < 3 )
                 {
                     $body   = array();
-                    $body[] = 'Subject   : '.$mail->Subject;
-                    $body[] = $mail->Body;
+                    $body[] = 'Subject   : '.$mail['subject'];
+                    $body[] = $mail['body'];
                     $body   = implode('<br />', $body);
                     $bodies[] = $body;
                 }
             }
             $bodies[] = 'Sending out '.count($mails).' notification mail(s)';
-            $bodies   = implode('<hr />', $bodies);
-            $mailer->setBody($bodies);
-             
-            $tmp = JFactory::getConfig()->getValue('tmp_path').'/notifications.html';
-            $bodies .= '<br /><br />'.implode('<br />',$recipients);
-            file_put_contents($tmp, $bodies);
-            if ( $email ) $mailer->Send();
-        } else {
-            foreach($mails as $person => $mail) {
-                $mail->Send();
-            }
+            $bodies[] = '<br /><br />'.implode('<br />',$recipients);            
+            $mails    = array(array(
+                 'subject'  => 'Sending out '.count($mails).' notification mail(s)',
+                 'body'     => implode('<hr />', $bodies)     
+            ));
+        }
+        foreach($mails as $mail) {
+            $this->mail($mail);
         }
     }    
 }

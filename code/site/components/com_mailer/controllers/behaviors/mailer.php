@@ -95,6 +95,16 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	}
 	
 	/**
+	 * Return the mailer test options
+	 * 
+	 * @return array
+	 */
+	public function getTestOptions()
+	{
+	    return $this->_test_options;
+	}
+	
+	/**
 	 * Return the email view
 	 * 
 	 * @return ComMailerViewTemplate
@@ -152,12 +162,9 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	    $data     = array_merge($config['data'], array('config'=>$config));	    
 	    $output   = $template->loadTemplate($config->template, $data)->render();
         
-        if ( $config->layout ) {
+        if ( $config->layout && $template->findTemplate($config->layout) ) {
             $output = $template->loadTemplate($config->layout, array('output'=>$output))->render();            
         }
-        
-        //Supposed to fix the random exclamation points
-        $output = wordwrap($output,900,"\n");
 
 	    return $output;
 	}
@@ -211,8 +218,10 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 		if ( !empty($emails) )
 		{
 		    $output = nl2br($output);
-		    $mailer = JFactory::getMailer();
-		    $mailer->setSubject($config->subject);
+		    //Supposed to fix the random exclamation points
+		    $output = wordwrap($output,900,"\n");
+		    $mailer = JFactory::getMailer();		    
+		    $mailer->setSubject(KService::get('koowa:filter.string')->sanitize($config->subject));
 		    $mailer->setBody($output);
 		    $mailer->isHTML($config->is_html);
 		    $mailer->addRecipient($emails);
