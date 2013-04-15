@@ -505,11 +505,26 @@ abstract class AnDomainRepositoryAbstract extends KCommand
 	/**
 	 * Return the repostiroy query object 
 	 * 
+	 * @param boolean $disable_chain If set to to true then the chain is disabled for
+	 * the query instance           
+	 * 
+	 * @param array $condition A default condition to set for the query
+	 * 
 	 * @return AnDomainQuery
 	 */
-	public function getQuery()
+	public function getQuery($disable_chain = false, $condition = array())
 	{
-	    return clone $this->_query;		
+	    $query = clone $this->_query;
+	    
+	    if ( $disable_chain ) {
+	        $query->disableChain();
+	    }
+	     
+	    if ( !empty($condition) ) {
+	        $query->where($condition);    
+	    }
+	    
+	    return $query; 		
 	}
 	
 	/**
