@@ -41,7 +41,7 @@ EOF;
 		      <td style="padding:20px 10px 20px 10px;background-color:#ffffff">
                 <table cellspacing="0" cellpadding="0" border="0" style="">
                      <tbody>
-                      <tr><?= $body ?></tr>
+                      <tr><?= $output ?></tr>
                       </tbody>
                 </table>
 		      </td>
