@@ -45,7 +45,7 @@ class ComStoriesControllerBehaviorPublisher extends KControllerBehaviorAbstract
                 $name    = $this->_mixer->getIdentifier()->name.'_'.$config->action;
                 $config->append(array(
                         'story' => array(
-                                'component' => 'com_'.$this->getIdentifier()->package,
+                                'component' => 'com_'.$this->_mixer->getIdentifier()->package,
                                 'name' 		=> $name,
                                 'owner'		=> $this->actor,
                                 'object'	=> $this->getItem(),
@@ -63,7 +63,7 @@ class ComStoriesControllerBehaviorPublisher extends KControllerBehaviorAbstract
     
         $config->append(array(
                 'subject'	=> get_viewer(),
-                'component' => 'com_'.$this->getIdentifier()->package,
+                'component' => 'com_'.$this->_mixer->getIdentifier()->package,
                 'owner'		=> get_viewer()
         ));
     

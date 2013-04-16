@@ -39,7 +39,7 @@ class ComNotificationsControllerBehaviorNotifier extends KControllerBehaviorAbst
         $data = new KConfig($data);
     
         $data->append(array(
-                'component' => 'com_'.$this->getIdentifier()->package,
+                'component' => 'com_'.$this->_mixer->getIdentifier()->package,
                 'subject'	=> get_viewer()
         ));
             
