@@ -119,9 +119,9 @@ class ComStoriesTemplateHelperParser extends KTemplateHelperAbstract
             'type'      => $story->getIdentifier()->name
         );
         
-        $path = JPATH_ROOT.'/components/'.$story->component.'/templates/stories/'.$story->name.'.php';          
-        
-        $data = $this->_parseData( $this->_render($story, $path, $data) );
+        $path   = JPATH_ROOT.'/components/'.$story->component.'/templates/stories/'.$story->name.'.php';          
+        $output = $this->_render($story, $path, $data);
+        $data = $this->_parseData($output);
         
         $data['commands'] = $commands;
         
