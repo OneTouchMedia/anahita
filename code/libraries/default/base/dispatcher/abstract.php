@@ -153,9 +153,10 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 	{
 		parent::setController($controller);
 		
-		if ( !$this->_controller instanceof KControllerAbstract ) {
+		if ( !$this->_controller instanceof KControllerAbstract ) 
+		{
             $default = 'Com'.ucfirst($this->getIdentifier()->package).'ControllerDefault';
-			register_default(array('identifier'=>$this->_controller, 'default'=>array($default,'LibBaseControllerService')));
+			register_default(array('identifier'=>$this->_controller, 'default'=>array($default)));
 		}
 	}
 	
