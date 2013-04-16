@@ -170,57 +170,6 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	    return $this->_comment_controller;
 	}
 	
-    /**
-     * Callback method called from comment controlller after comment add action to create a 
-     * comment story after an object has been commented
-     *
-     * @param KCommandContext $context Context parameter
-     * 
-     * @return void
-     */
-    public function createCommentStory(KCommandContext $context)
-	{
-        //called by the comment controller as as callback
-	    $entity   = $context->caller->getItem();
-	    $parent   = $entity->parent;
-        
-	    //dn't make a comment story for commenting on a story
-	    if ( $parent->getIdentifier()->name == 'story' ) {
-	        return;
-	    }
-        
-        $owner = $entity->author;
-        	    
-	    if ( $parent->isOwnable() ) {
-	        $owner  = $parent->owner;
-	    }
-        
-	    $data = array(
-			'name' 		=> $parent->getIdentifier()->name.'_comment',
-			'component'	=> $parent->component,
-			'comment'	=> $entity,
-			'object'	=> $parent,
-			'owner'		=> $owner,
-			'target'	=> $parent->isOwnable()  ? $parent->owner : null	    			
-	    );
-	   
-	    $story               = $this->createStory($data);
-        
-        //story owner	    
-	    $data['subscribers'] = array($story->owner);
-	    
-        //all the not subscribers
-	    if ( $parent->isSubscribable() ) {
-	        $data['subscribers'][] = $parent->subscriberIds->toArray();
-	    }
-	    
-	    $notification  = $this->createNotification($data);
-	    
-	    $notification->setType('post');
-	    
-	    $story->save();
-	}
-	
 	/**
 	 * Toggles comment status
 	 *
