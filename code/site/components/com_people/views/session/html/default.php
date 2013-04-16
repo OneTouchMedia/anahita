@@ -1,10 +1,10 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
-<?php 
-@service('application.dispatcher')->tmpl = 'component'
-?>
+
+<?php @service('application.dispatcher')->tmpl = 'component' ?>
+
 <div class="row">
 	<div class="offset3 span6">	
-		<form action="<?=@route()?>" method="post">
+		<form action="<?=@route()?>" method="post" class="well">
 		<fieldset>
 			<legend><?= @text('COM-PEOPLE-SESSION-TITLE') ?></legend>
 			
