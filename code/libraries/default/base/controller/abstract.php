@@ -131,14 +131,45 @@ class LibBaseControllerAbstract extends KControllerAbstract
      */
     public function __call($method, $args)
     {
-        if ( count($args) == 1 
-                && !isset($this->_mixed_methods[$method])
-                && !in_array($method, $this->getActions())
-                )
+        //omit anything that starts with underscore 
+        if ( strpos($method, '_') === false )
         {
-            $this->{KInflector::underscore($method)} = $args[0];
-            return $this;
+            if ( count($args) == 1
+                    && !isset($this->_mixed_methods[$method])
+                    && !in_array($method, $this->getActions())
+            )
+            {
+                $this->{KInflector::underscore($method)} = $args[0];
+                return $this;
+            }
         }
+        elseif ( strpos($method, '_action') === 0 ) 
+        {
+            //if the missing method is _action[Name] but
+            //method exists, then that means the action
+            //has been called on the object parent i.e.
+            //parent::_action[Name] but since the parent is 
+            //not implementing the action it falls back to
+            //__call. 
+            //we need to check if a behavior implement this
+            //method            
+            if ( method_exists($this, $method) ) 
+            {
+                $action = strtolower(substr($method, 7));
+                
+                if ( isset($this->_mixed_methods[$action]) ) 
+                {
+                    return $this->_mixed_methods[$action]
+                        ->execute('action.'.$action, isset($args[0]) ? $args[0] : null);
+                }
+                else {
+                    //we need to throw this 
+                    //because if it goes to parent::__call it will causes
+                    //infinite recursion                    
+                    throw new BadMethodCallException('Call to undefined method :'.$method);
+                }
+            }
+        }    
         
         return parent::__call($method, $args);
     }
