@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComBaseControllerService extends LibBaseControllerService
+class ComBaseControllerService extends ComBaseControllerResource
 {
     /**
      * Initializes the default configuration for the object
@@ -58,7 +58,7 @@ class ComBaseControllerService extends LibBaseControllerService
 		$config->append(array(
 		    'toolbars'    => array('menubar', $this->getIdentifier()->name),		        
 			'behaviors' => array(
-				'discoverable', 'executable', 'identifiable', 'persistable'
+				'serviceable'=>array(), 'persistable'
 			),
 			'request' => array(
 				'limit' 	=> 20,

@@ -36,8 +36,7 @@ class ComNotificationsControllerNotification extends ComBaseControllerService
      */ 
     public function __construct(KConfig $config)
     {
-        parent::__construct($config);
-        
+        parent::__construct($config);        
     }
         
    /**
@@ -51,7 +50,7 @@ class ComNotificationsControllerNotification extends ComBaseControllerService
 	protected function _initialize(KConfig $config)
 	{
 		$config->append(array(			
-			'behaviors'	=> array('ownable'),
+			'behaviors'	=> array('ownable', 'serviceable'=>array('except'=>array('add','edit'))),
             'request'   => array('oid'=>'viewer')
 		));
 	

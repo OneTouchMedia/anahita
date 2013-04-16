@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComBaseControllerService extends LibBaseControllerService
+class ComBaseControllerService extends ComBaseControllerResource
 {
 	/**
 	 * Constructor.
@@ -38,9 +38,6 @@ class ComBaseControllerService extends LibBaseControllerService
         
         //insert the search term query
         $this->_state->insert('q');
-        
-        //set viewer in the state
-        $this->_state->viewer = $config->viewer;
 	}
 		
     /**
@@ -56,14 +53,14 @@ class ComBaseControllerService extends LibBaseControllerService
 		parent::_initialize($config);
         
 		$config->append(array(
-            'viewer'        => get_viewer(),
-            'language'      => 'com_'.$this->getIdentifier()->package ,
-		    'behaviors'     => array('com://site/application.controller.behavior.message'),		        
+		    'behaviors'     => array(
+                'serviceable' => array()
+		     ),
             'toolbars'      => array($this->getIdentifier()->name,'menubar','actorbar'),
             'request'       => array(
                 'limit'     => 20,
                 'offset'    => 0                
-            )            
+            )
 		));
 	}
     
@@ -120,28 +117,5 @@ class ComBaseControllerService extends LibBaseControllerService
 	   	$action = $this->getItem() ? 'edit' : 'add';
 		$result = $this->execute($action, $context);
 		return $result;
-	}	
-	
-    /**
-     * Get a toolbar by identifier
-     *
-     * @return KControllerToolbarAbstract
-     */
-    public function getToolbar($toolbar, $config = array())
-    {
-        if ( is_string($toolbar) )
-        {
-            //if actorbar or menu alawys default to the base
-            if ( in_array($toolbar, array('actorbar','menubar','comment')) )
-            {
-                $identifier       = clone $this->getIdentifier();
-                $identifier->path = array('controller','toolbar');
-                $identifier->name = $toolbar;               
-                register_default(array('identifier'=>$identifier, 'default'=>'ComBaseControllerToolbar'.ucfirst($toolbar)));                
-                $toolbar = $identifier;
-            }
-        }
-    
-        return parent::getToolbar($toolbar, $config);
-    }    	
+	}	   	
 }
