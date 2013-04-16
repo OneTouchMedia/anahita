@@ -13,8 +13,6 @@
  * @version    SVN: $Id$
  * @link       http://www.anahitapolis.com
  */
-//set a max limit for the story
-define('POST_MAX_LIMIT', 5000);
 
 /**
  * Post Controller

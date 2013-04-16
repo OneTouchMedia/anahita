@@ -2,7 +2,7 @@
 
 <div id="post-composer">
 	<form id="post-composer-form" action="<?= @route() ?>" method="POST" data-formvalidator-options="'evaluateFieldsOnBlur':true">
-		<textarea class="input-block-level" data-validators="minLength:1 maxLength:<?= POST_MAX_LIMIT ?>" id="composer-textarea"  name="body" overtext="<?= @text('COM-NOTES-SHARE-PROMPT') ?>"></textarea>
+		<textarea class="input-block-level" data-validators="minLength:1 maxLength:5000" id="composer-textarea"  name="body" overtext="<?= @text('COM-NOTES-SHARE-PROMPT') ?>"></textarea>
 	    <input type="hidden" name="composed" value="1" />
 		<div class="post-actions">
 		    <?php $app = @service('repos://site/apps.app')->fetch(array('component'=>'com_connect')); ?>
