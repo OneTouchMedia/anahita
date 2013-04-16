@@ -76,11 +76,7 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	 * @return void
 	 */
 	protected function _initialize(KConfig $config)
-	{	    	    
-	    $identifier = clone $config->mixer->getIdentifier();
-	    $identifier->path = array('emails');
-	    $identifier->name = 'template';
-	    
+	{	    	    	    
 		$config->append(array(
 		    'base_url'      => KRequest::url(),
 		    'test_options'  => array(
@@ -88,7 +84,7 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 		        'email'     => get_config_value('mailer.redirect_email'),
 		        'log'       => JFactory::getConfig()->getValue('tmp_path').'/emails.html'       
             ),		    
-	        'template_view'  => $identifier
+	        'template_view'  => null
 		));
 	
 		parent::_initialize($config);
@@ -113,6 +109,13 @@ class ComMailerControllerBehaviorMailer extends KControllerBehaviorAbstract
 	{
 	    if ( !$this->_template_view instanceof LibBaseViewTemplate ) 
 	    {
+	        if ( !isset($this->_template_view) ) 
+	        {
+	            $this->_template_view = clone $this->_mixer->getIdentifier();
+	            $this->_template_view->path = array('emails');
+	            $this->_template_view->name = 'template';
+	        }
+	        
 	        $identifier = clone $this->_mixer->getIdentifier();
 	        $identifier->path = array('emails');
 
