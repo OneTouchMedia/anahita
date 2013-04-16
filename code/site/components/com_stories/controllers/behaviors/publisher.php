@@ -26,7 +26,7 @@
  * @link       http://www.anahitapolis.com
  */
 class ComStoriesControllerBehaviorPublisher extends KControllerBehaviorAbstract
-{
+{    
     /**
      * Creates a story
      *
@@ -36,39 +36,17 @@ class ComStoriesControllerBehaviorPublisher extends KControllerBehaviorAbstract
      * @return ComStoriesDomainEntityStory
      */
     public function createStory($config = array())
-    {
-        if ( is($config, 'KCommandContext') )
-        {
-            if ( $config->result !== false )
-            {
-                $data	 = $config->data;
-                $name    = $this->_mixer->getIdentifier()->name.'_'.$config->action;
-                $config->append(array(
-                        'story' => array(
-                                'component' => 'com_'.$this->_mixer->getIdentifier()->package,
-                                'name' 		=> $name,
-                                'owner'		=> $this->actor,
-                                'object'	=> $this->getItem(),
-                                'target'	=> $this->actor	,
-                                'comment'	=> $this->isCommentable() ? $data->comment : null
-                        )
-                ));
-                $story = $this->createStory( KConfig::unbox($config->story) );
-                $data->story = $story;
-                return $story;
-            }
-            else return false;
-        } else
-            $config =  new KConfig($config);
-    
+    {            
+        $config =  new KConfig($config);
+        
         $config->append(array(
-                'subject'	=> get_viewer(),
-                'component' => 'com_'.$this->_mixer->getIdentifier()->package,
-                'owner'		=> get_viewer()
+            'subject'	=> get_viewer(),
+            'owner'		=> get_viewer(),               
+            'component' => 'com_'.$this->_mixer->getIdentifier()->package,                
         ));
-    
-        $story = $this->getService('repos://site/stories.story')->create($config);
-        $story->save();
+        
+        $story = $this->getService('com://site/stories.controller.story')->add($config->toArray());
+        
         return $story;
     }
 }
