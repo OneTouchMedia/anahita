@@ -131,17 +131,13 @@ class LibBaseControllerAbstract extends KControllerAbstract
      */
     public function __call($method, $args)
     {
-        //Handle action alias method
-        if(!in_array($method, $this->getActions()) && count($args) )
+        if ( count($args) == 1 
+                && !isset($this->_mixed_methods[$method])
+                && !in_array($method, $this->getActions())
+                )
         {
-            //Check first if we are calling a mixed in method.
-            //This prevents the model being loaded durig object instantiation.
-            if(!isset($this->_mixed_methods[$method]))
-            {                
-                $this->{KInflector::underscore($method)} = $args[0];            
-            
-                return $this;
-            }
+            $this->{KInflector::underscore($method)} = $args[0];
+            return $this;
         }
         
         return parent::__call($method, $args);
