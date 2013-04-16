@@ -82,25 +82,9 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
     public function setController($controller)
     {
         parent::setController($controller);
-            
-        if ( !$this->_controller instanceof KControllerAbstract ) 
-        {
-            $resource = clone $this->_controller;
-            $resource->path = array('domain','entity');
-            try 
-            {
-                $repository = AnDomain::getRepository($resource);
-                $entity     = $repository->getClone();
-                $default    = array('prefix'=>$entity, 'fallback'=>'ComBaseControllerService');                         
-            } 
-            catch(Exception $e)
-            {
-                $default = 'Com'.ucfirst($this->getIdentifier()->package).'ControllerDefault';
-                $default = array('default'=>array($default, 'ComBaseControllerResource'));               
-            }
-            
-            $default['identifier'] = $this->_controller;
-            register_default($default);
+        
+        if ( !$this->_controller instanceof KControllerAbstract) {
+            register_default(array('identifier'=>$this->_controller,'default'=>array('ComBaseControllerDefault')));
         }
     }
 
