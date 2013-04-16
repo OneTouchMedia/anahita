@@ -14,9 +14,6 @@
  * @link       http://www.anahitapolis.com
  */
 
-//set a max limit for the story
-define('STORY_MAX_LIMIT', 5000);
-
 /**
  * Story Controller
  * 
@@ -41,7 +38,7 @@ class ComStoriesControllerStory extends ComBaseControllerService
     {
         parent::__construct($config);
         
-        $this->_state->insert('name');                  
+        $this->_state->insert('name');
     }
         	
     
@@ -57,13 +54,30 @@ class ComStoriesControllerStory extends ComBaseControllerService
 	{
         $config->append(array(
             'behaviors' => array(
-                'ownable' => array('default'=>get_viewer())
+                'serviceable'  => array('except'=>array('edit')),
+                'ownable'      => array('default'=>get_viewer())
             )
         ));
         
 		parent::_initialize($config);
 	}
     
+	/**
+	 * Creates a new story. This is an internal method and can not be
+	 * called from outside. 
+	 * 
+	 * Check 
+	 * ComStoriesControllerPermissionStory::canAdd
+	 * 
+	 * (non-PHPdoc)
+	 * @see ComBaseControllerService::_actionAdd()
+	 */
+	protected function _actionAdd(KCommandContext $context)
+	{
+	    $data = $context->data;
+        return $this->getRepository()->create($data->toArray());
+	}
+	
     /**
      * Browse action
      * 

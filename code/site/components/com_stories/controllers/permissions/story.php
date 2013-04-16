@@ -26,7 +26,17 @@
  * @link       http://www.anahitapolis.com
  */
 class ComStoriesControllerPermissionStory extends LibBaseControllerPermissionDefault
-{
+{    
+    /**
+     * Can't add a story if the story controller is dispatched
+     *
+     * @return boolean
+     */
+    public function canAdd()
+    {
+        return !$this->_mixer->isDispatched();
+    }    
+    
     /**
      * Checks if _actionBrowse
      *
