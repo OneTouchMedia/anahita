@@ -36,21 +36,28 @@ final class ComBaseControllerDefault extends KObject implements KServiceInstanti
      * @return KServiceInstantiatable
      */
     public static function getInstance(KConfigInterface $config, KServiceInterface $container)
-    {
-        try {
-            $identifier          = clone $config->service_identifier;
-            $identifier->type    = 'repos';
-            $identifier->path = array('domain','entity');
-            $default  = array('prefix'=>$container->get($identifier)->getClone(), 'fallback'=>'ComBaseControllerService');
+    {        
+        $strIdentifier = (string)$config->service_identifier;
+        $registery     = $container->get('application.registry', array('key'=>$strIdentifier.'_default_class'));        
+        if ( !$registery->offsetExists($strIdentifier) )
+        {
+            try {
+                $identifier          = clone $config->service_identifier;
+                $identifier->type    = 'repos';
+                $identifier->path = array('domain','entity');
+                $default  = array('prefix'=>$container->get($identifier)->getClone(), 'fallback'=>'ComBaseControllerService');
+            }
+            catch(Exception $e) {
+                $default = 'Com'.ucfirst($config->service_identifier->package).'ControllerDefault';
+                $default = array('default'=>array($default, 'ComBaseControllerResource'));
+            }
+            $default['identifier'] = $config->service_identifier;
+            register_default($default);
+            $classname = AnServiceClass::findDefaultClass($config->service_identifier);
+            $config->service_identifier->classname = $classname;
+            $registery->offsetSet($strIdentifier, $classname);
         }
-        catch(Exception $e) {
-            $default = 'Com'.ucfirst($config->service_identifier->package).'ControllerDefault';
-            $default = array('default'=>array($default, 'ComBaseControllerResource'));
-        }        
-        $default['identifier'] = $config->service_identifier;
-        register_default($default);
-        $classname = AnServiceClass::findDefaultClass($config->service_identifier);
-        $config->service_identifier->classname = $classname;
+        $classname = $registery->offsetGet($strIdentifier);        
         $instance  = new $classname($config);
         return $instance;       
     }
