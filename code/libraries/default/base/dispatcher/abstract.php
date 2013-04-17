@@ -66,8 +66,8 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
     protected function _actionDispatch(KCommandContext $context)
     {        
         //Load the component aliases
-        $component   = $this->getController()->getIdentifier()->package;
-        $application = $this->getController()->getIdentifier()->application;
+        $component   = $this->getIdentifier()->package;
+        $application = $this->getIdentifier()->application;
         $this->getService('koowa:loader')->loadIdentifier('com://'.$application.'/'.$component.'.aliases');
                 
         //if a command line the either do get or 
