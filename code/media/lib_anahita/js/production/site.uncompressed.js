@@ -20605,9 +20605,9 @@ Delegator.register('click', {
 			if ( el.hasClass('disabled') ) {
 			    return false;
 			}
-			if ( api.get('form') ) 
+			if ( api.get('form') || el.form ) 
 			{
-				var form = document.getElement(api.get('form'));
+				var form = api.get('form') ? document.getElement(api.get('form')) : el.form;
 				var submit = function() {
 					form.spin();
 					form.submit();			
