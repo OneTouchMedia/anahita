@@ -125,6 +125,10 @@ class AnServiceClass
          }
          
          self::$_identifiers[$strIdentifier] = $config;
+         
+         if ( isset(self::$_defaults[$strIdentifier]) ) {
+             unset(self::$_defaults[$strIdentifier]);
+         }
     }
     
     /**
