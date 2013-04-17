@@ -5,7 +5,7 @@
 		<textarea class="input-block-level" data-validators="minLength:1 maxLength:5000" id="composer-textarea"  name="body" overtext="<?= @text('COM-NOTES-SHARE-PROMPT') ?>"></textarea>
 	    <input type="hidden" name="composed" value="1" />
 		<div class="post-actions">
-		    <?php $app = @service('repos://site/apps.app')->fetch(array('component'=>'com_connect')); ?>
+		    <?php $app = @service('repos://site/components.component')->find(array('component'=>'com_connect')); ?>
 			<?php if ( $app && $app->authorize('echo', array('actor'=>$actor)) ) : ?>
                 <?php               
                 $services  = ComConnectHelperApi::getServices();
@@ -45,7 +45,7 @@
 			<?php if ( is_person($actor) && !is_viewer($actor) ) : ?>			
 			<div class="post-action pull-right">
 				<label class="checkbox" for="private-message">
-					<input id="private-flag" type="checkbox" name="private_message"> 
+					<input id="private-flag" type="checkbox" name="private"> 
 					<?=@text('COM-NOTES-COMPOSER-PRIVATE-FLAG')?>
 				</label>
 			</div>
