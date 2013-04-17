@@ -123,6 +123,45 @@ class LibBaseControllerBehaviorServiceable extends KControllerBehaviorAbstract
         return $methods;
     }
     
+
+    /**
+     * Service Browse
+     *
+     * @param KCommandContext $context Context parameter
+     *
+     * @return AnDomainQuery
+     */
+    protected function _actionBrowse(KCommandContext $context)
+    {
+        if ( !$context->query ) {
+            $context->query = $this->getRepository()->getQuery(); 
+        }
+        
+        $query = $context->query;
+    
+        if ( $this->q ) {
+            $query->keyword = explode(' OR ', $this->q);
+        }
+    
+        if ( $this->hasBehavior('parentable') && $this->getParent() ) {
+            $query->parent($this->getParent());
+        }
+    
+        //do some sorting
+        if ( $this->sort )
+        {
+            $this->_state->append(array(
+                'direction' => 'ac'
+            ));
+            
+            $query->order($this->sort,  $this->direction);
+        }
+    
+        $query->limit( $this->limit , $this->start );
+    
+        return $this->getState()->setList($query->toEntityset())->getList();
+    }
+    
     /**
      * Add Action
      *

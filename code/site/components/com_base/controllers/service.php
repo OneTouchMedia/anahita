@@ -64,46 +64,6 @@ class ComBaseControllerService extends ComBaseControllerResource
 		));
 	}
     
-    /** 
-     * Service Browse
-     * 
-     * @param KCommandContext $context Context parameter
-     * 
-     * @return AnDomainQuery
-     */ 
-    protected function _actionBrowse(KCommandContext $context)
-    {                
-        $context->append(array(
-            'query' => $this->getRepository()->getQuery() 
-        ));
-        
-        $query = $context->query;
-        
-        if ( $this->q ) {
-            $query->keyword = explode(' OR ', $this->q);            
-        }
-        
-        if ( $this->hasBehavior('parentable') && $this->getParent() ) {
-            $query->parent($this->getParent());
-        }
-        
-        //do some sorting
-        if ( $this->sort ) 
-        {
-            $this->_state->append(array(
-                'direction' => 'ac'
-            ));            
-            
-            $dir = $this->direction;
-            
-            $query->order($this->sort, $dir);
-        }
-        
-        $query->limit( $this->limit , $this->start );
-        
-        return $this->getState()->setList($query->toEntityset())->getList();
-    }
-    
 	/**
 	 * Generic POST action for a medium. If an entity exists then execute edit
 	 * else execute add
