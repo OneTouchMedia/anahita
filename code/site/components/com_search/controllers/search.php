@@ -102,12 +102,11 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     	$query = $this->getService('com://site/search.domain.query.search')
     				->ownerContext($this->actor)
     				->searchTerm(urldecode($this->q))
-    				
+    				->orderBySearchRank()
     				->searchComments($this->search_comments)
     				->scope($this->current_scope)
     				->limit($this->limit, $this->start)
     				;
-
     	$this->_state->setList($query->toEntitySet());
         
         return $this->getView()->display();        

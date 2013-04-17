@@ -43,7 +43,7 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 				'node.alias','node.body','node.created_on','node.modified_on','node.modified_by','node.person_usertype',
 				'node.blocker_ids','node.blocked_ids','node.access','node.follower_count','node.leader_count',
 				'node.parent_id','node.parent_type',
-				'node.filename'
+				'node.filename'				
 		));		
 	}
 		
@@ -127,12 +127,23 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 				$comment_query = preg_replace('/\)$/', ' AND comment_parent.owner_id = '.$this->owner_context->id.')', $comment_query);				
 			}			
 		}
-		$this->order('node.created_on','DESC');
+		//$this->order('node.created_on','DESC');
+		
 		$this
 			->where('( '.$owner_query.' @col(node.type) IN (:types) '.$comment_query.')')
 			->bind('types', $types)
 			->bind('comment_type','ComBaseDomainEntityComment%')
 			->bind('parent_types',$comments);
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 */
+	public function orderBySearchRank()
+	{
+		$this->order('(COALESCE(node.comment_count,0) + COALESCE(node.vote_up_count,0) + COALESCE(node.subscriber_count,0) + COALESCE(node.follower_count,0))', 'DESC');	
+		return $this;	
 	}
 	
 	/**
