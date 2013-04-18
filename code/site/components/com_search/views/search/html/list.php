@@ -45,9 +45,24 @@
 				<span class="stat-name"><?= @text('COM-ACTORS-SOCIALGRAPH-LEADERS') ?></span>
 				<?php endif; ?>
 			</div>
-			<div class="an-meta"><?= sprintf(@text('LIB-AN-MEDIUM-EDITOR'), @date($item->updateTime), @name($item->editor)) ?></div>
-			<?php else: ?>
-			<div class="an-meta"><?= sprintf(@text('LIB-AN-MEDIUM-AUTHOR'), @date($item->creationTime), @name($item->author)) ?></div>
+			<?php endif; ?>
+			
+			<?php if($item->inherits('ComMediumDomainEntityMedium')): ?>
+			<div class="an-meta">
+				<?= sprintf(@text('LIB-AN-MEDIUM-AUTHOR'), @date($item->creationTime), @name($item->author)) ?>  
+			</div>
+			
+			<div class="an-meta">
+				<div class="vote-count-wrapper" id="vote-count-wrapper-<?= $item->id ?>">
+					<?= @helper('ui.voters', $item); ?>
+				</div>
+			</div>
+			
+			<div class="an-meta">
+				<a href="<?= @route($item->getURL()) ?>">
+					<?= sprintf( @text('LIB-AN-MEDIUM-NUMBER-OF-COMMENTS'), $item->numOfComments) ?>
+				</a>
+			</div>
 			<?php endif; ?>
 		</div>
 		<?php endif; ?>
