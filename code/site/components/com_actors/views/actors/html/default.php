@@ -2,7 +2,7 @@
 
 <module position="sidebar-b" style="simple"></module>
 
-<?= @helper('ui.searchbox', @route('layout=list'))?>
+<?= @helper('ui.filterbox', @route('layout=list'))?>
 
 <div class="an-entities-wrapper">	
 	<?= @template('list') ?>

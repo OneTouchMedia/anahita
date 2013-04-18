@@ -458,13 +458,13 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
 
 	
 	/**
-	 * Renders a searchbox
+	 * Renders a filterbox
 	 *
 	 * @param  array $config Configuration
 	 * 
 	 * @returns	void
 	 */
-	public function searchbox($path, $config = array())
+	public function filterbox($path, $config = array())
 	{
 	    if ( is_array($path) ) {
 	        $path = $this->_template->getView()->getRoute($path);
@@ -484,7 +484,7 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
 	            'update_element' 		=> false
 	    ));
 	
-	    return $this->_render('searchbox',  $config);
+	    return $this->_render('filterbox',  $config);
 	}
 		
 	/**
