@@ -127,7 +127,6 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 				$comment_query = preg_replace('/\)$/', ' AND comment_parent.owner_id = '.$this->owner_context->id.')', $comment_query);				
 			}			
 		}
-		//$this->order('node.created_on','DESC');
 		
 		$this
 			->where('( '.$owner_query.' @col(node.type) IN (:types) '.$comment_query.')')
@@ -137,10 +136,11 @@ class ComSearchDomainQuerySearch extends AnDomainQueryDefault
 	}
 	
 	/**
+	 * Order by relevance
 	 * 
-	 * Enter description here ...
+	 * @return ComSearchDomainQuerySearch
 	 */
-	public function orderBySearchRank()
+	public function orderByRelevance()
 	{
 		$this->order('(COALESCE(node.comment_count,0) + COALESCE(node.vote_up_count,0) + COALESCE(node.subscriber_count,0) + COALESCE(node.follower_count,0))', 'DESC');	
 		return $this;	

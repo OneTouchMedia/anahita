@@ -33,10 +33,15 @@
 		submit_form();		
 	});	
 
+	Delegator.register('change',{'SortOption': function(event, el, api) {
+		search_options[el.name] = el.options[el.selectedIndex].value;		
+		submit_form();
+	}});
+	
 	Delegator.register('change',{'SearchOption': function(event, el, api) {
 		search_options[el.name] = el.checked ? el.value : 0;
 		submit_form();
-	}});	
+	}});
 	
 	Delegator.register('click','ChangeScope', function(event, el, api) {
 			

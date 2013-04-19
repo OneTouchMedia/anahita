@@ -1,16 +1,31 @@
 <?php defined('KOOWA') or die; ?>
 
+<div class="an-meta"><?= sprintf(@text('COM-SEARCH-RESULTS-FOUND'), $items->getTotal()) ?></div>
+
 <?php if ( $current_scope && ($current_scope->commentable || $current_scope->ownable) && $items->getTotal() ) : ?>
-<fieldset>
-	<legend><?= sprintf(@text('COM-SEARCH-RESULTS-FOUND-'.$current_scope->type), $items->getTotal())?></legend>
-	<?php if ( $current_scope && $current_scope->commentable ) : ?>
-	<label class="checkbox">
-		<input data-trigger="SearchOption" <?= $search_comments ? 'checked' : ''?> type="checkbox" name="search_comments" value="1" >
-		<?= @text('COM-SEARCH-OPTION-COMMENTS') ?>
-    </label>
-	
-    <?php endif;?>
-</fieldset>
+<form>
+	<fieldset>
+		<legend><?= @text('COM-SEARCH-OPTIONS') ?></legend>
+		<?php if ( $current_scope->ownable ) : ?>
+		<label><?= @text('COM-SEARCH-OPTION-SORT') ?></label>
+		<select data-trigger="SortOption" name="sort">
+			<option <?= ($sort == 'relevant') ? 'selected' : '' ?> value="relevant">
+				<?= @text('COM-SEARCH-OPTION-SORT-MOST-RELEVANT') ?>
+			</option>
+			<option <?= ($sort == 'recent') ? 'selected' : '' ?> value="recent">
+				<?= @text('COM-SEARCH-OPTION-SORT-MOST-RECENT') ?>
+			</option>
+		</select>
+		<?php endif;?>
+		
+		<?php if ($current_scope->commentable) : ?>
+		<label class="checkbox">
+			<input data-trigger="SearchOption" <?= $search_comments ? 'checked' : ''?> type="checkbox" name="search_comments" value="1" >
+			<?= @text('COM-SEARCH-OPTION-COMMENTS') ?>
+	    </label>
+	    <?php endif;?>
+	</fieldset>
+</form>
 <?php endif;?>
 
 <div class="an-entities" id="an-entities-main">

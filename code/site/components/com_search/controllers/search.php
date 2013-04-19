@@ -48,7 +48,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
 			'toolbars'      => array($this->getIdentifier()->name,'menubar','actorbar'),				
             'request'       => array(
                 'limit'     => 20,
-				'sort'		=> 'id',
+				'sort'		=> 'relevant',
 				'direction' => 'ASC'                
             )            
 		));
@@ -102,11 +102,15 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     	$query = $this->getService('com://site/search.domain.query.search')
     				->ownerContext($this->actor)
     				->searchTerm(urldecode($this->q))
-    				->orderBySearchRank()
     				->searchComments($this->search_comments)
     				->scope($this->current_scope)
-    				->limit($this->limit, $this->start)
-    				;
+    				->limit($this->limit, $this->start);
+    				
+    	if($this->sort == 'recent')
+    		$query->order('node.created_on','DESC');
+    	else 
+    		$query->orderByRelevance();
+    				
     	$this->_state->setList($query->toEntitySet());
         
         return $this->getView()->display();        

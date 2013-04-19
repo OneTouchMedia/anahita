@@ -30,7 +30,7 @@
 		
 		<div class="entity-description">
 			<?php $text = @helper('text.highlight', strip_tags($item->body), $keywords) ?>
-			<?= @helper('text.truncate', $text, array('length'=>400, 'read_more'=>true))?>
+			<?= @helper('text.truncate', $text, array('length'=>400))?>
 		</div>
 		
 		<?php if($item->isModifiable()): ?>
