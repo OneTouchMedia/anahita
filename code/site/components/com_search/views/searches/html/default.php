@@ -12,7 +12,7 @@
 
 
 <?php if(empty($keywords)) : ?>
-<form action="<?=@route('view=searches')?>">
+<form action="<?=@route('view=searches')?>" class="well">
 	<fieldset>
 		<legend><?= @text('COM-SEARCH-PROMPT') ?></legend>
 		<input type="text" name="q" class="input-block-level">
