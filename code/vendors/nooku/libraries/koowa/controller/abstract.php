@@ -131,38 +131,23 @@ abstract class KControllerAbstract extends KObject
            $command = $action;
         }
        
-        $context->append(array('headers'=>array()));
-        
-        try {
         //Execute the action
-        if($this->getCommandChain()->run('before.'.$command, $context) !== false) 
+        if($this->getCommandChain()->run('before.'.$command, $context) !== false)
         {
             $method = '_action'.ucfirst($command);
-            
-            if(!method_exists($this, $method)) 
-            {             
-                if(isset($this->_mixed_methods[$command])) {      
+        
+            if(!method_exists($this, $method))
+            {
+                if(isset($this->_mixed_methods[$command])) {
                     $context->result = $this->_mixed_methods[$command]->execute('action.'.$command, $context);
                 } else {
                     throw new KControllerException("Can't execute '$command', method: '$method' does not exist");
                 }
             }
             else  $context->result = $this->$method($context);
-                
+        
             $this->getCommandChain()->run('after.'.$command, $context);
-        }
-        //@TODO temporary until we move to the response object
-        } catch(KException $e) 
-        {
-            //@TODO : Move header handling into a response object
-            if($context->headers)
-            {
-                foreach($context->headers as $name => $value) {
-                    header($name.' : '.$value);
-                }
-            }
-            throw $e;            
-        }                
+        }              
        
         return $context->result;
     }
