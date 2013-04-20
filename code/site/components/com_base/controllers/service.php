@@ -53,9 +53,7 @@ class ComBaseControllerService extends ComBaseControllerResource
 		parent::_initialize($config);
         
 		$config->append(array(
-		    'behaviors'     => array(
-                'serviceable' => array()
-		     ),
+		    'behaviors'     => to_hash('serviceable'),
             'toolbars'      => array($this->getIdentifier()->name,'menubar','actorbar'),
             'request'       => array(
                 'limit'     => 20,
