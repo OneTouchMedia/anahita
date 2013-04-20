@@ -47,20 +47,22 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
         
         $this->_enabled = $config->enabled;
         $session        = JFactory::getSession();
-        
+
         if ( $this->_enabled ) 
-        {          
-            $strIdentifier =  (string)$this->_mixer->getIdentifier();
-            
-            $data          = $session->get($strIdentifier,new stdClass(), 'controller_persistance');            
-            
-            unset($_SESSION['controller_persistance']);            
+        {   
+            $namespace     = $this->_getQueueNamespace(false);
+            $data          = $session->get($namespace->queue,new stdClass(), $namespace->namespace);
             $config->mixer->getState()->session = $data;            
         }
         
         else {
-            unset($_SESSION['controller_persistance']);
             $config->mixer->getState()->session = new stdClass();
+        }
+        
+        static $once;
+        if ( !$once ) {
+            $_SESSION['__controller_persistance'] = array('controller.queue'=>new stdClass());
+            $once = true;
         }
     }
 
@@ -122,9 +124,8 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
 	    {
             $namespace   = $this->_getQueueNamespace($global);
             $queue       = JFactory::getSession()
-                            ->get($namespace->queue, array(), $namespace->namespace);
-            $queue[$key] = $value;
-            
+                            ->get($namespace->queue, new stdClass(), $namespace->namespace);
+            $queue->$key = $value;              
             JFactory::getSession()
                 ->set($namespace->queue, $queue, $namespace->namespace);
 	    }
@@ -146,7 +147,7 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
 	    {
             $namespace = $this->_getQueueNamespace($global);
             $queue     = JFactory::getSession()
-                            ->get($namespace->queue, array(), $namespace->namespace);
+                            ->get($namespace->queue, new stdClass(), $namespace->namespace);
             $ret       = isset($queue[$key]) ? $queue[$key] : null;
 	    }
 	    return $ret;    	     
@@ -170,11 +171,8 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
 	         
 	    } else {
 	        $store     = (string)$this->_mixer->getIdentifier();
+	        $store     = 'controller.queue';
 	        $namespace = 'controller_persistance';
-	    }
-	    
-	    if ( !$session->has($store, null, $namespace) ) {
-	        $session->set($store, array(), $namespace);
 	    }
 	    
 	    return new KConfig(array('queue'=>$store, 'namespace'=>$namespace));
