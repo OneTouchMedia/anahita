@@ -19652,6 +19652,7 @@ Element.implement(
 		{
 			var event = {
 				_stop   : false,
+				mock	: true,
 				request : request,
 				stop    : function() {
 					event._stop = true;
@@ -19757,11 +19758,8 @@ Behavior.addGlobalFilter('Hide',{
 /**
  * Request Delegagor. Creates a AJAX request 
  */
-Delegator.register(['click'],'Request', 
-{
-	handler  : function(event, el, api) 
-	{
-		event.stop();
+(function(){
+	var request = function(el, api) {
 		var options = (function() {
 			return JSON.decode.bind(el).attempt(el.get('data-request-options') || '{}');
 		}.bind(el)).apply();
@@ -19791,13 +19789,30 @@ Delegator.register(['click'],'Request',
 		
 		options.onTrigger.apply(el, [request, event]);
 		
-		if ( uri.getData('submit') || options.submit )
-			request.submit();
-		else {
-			request.send();
+		request.send();
+	};
+	Behavior.addGlobalFilter('Request', {
+    	setup : function(el, api)
+    	{
+    		el.addEvent('submit', function(e) {
+    			if ( !e.mock ) {
+    				e.stop();    			
+        			request(el,api);    				
+    			}
+    		});
+    	}
+	});
+	Delegator.register(['click'],'Request', 
+	{
+		handler  : function(event, el, api) 
+		{
+			event.stop();
+			request(el,api);
 		}
-	}
-});
+	});	
+})();
+
+
 
 /**
  * Countable Behavior for a textarea
