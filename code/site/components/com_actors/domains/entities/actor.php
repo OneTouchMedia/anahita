@@ -48,7 +48,7 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 		$config->append(array(
 		    'abstract_identifier' => 'com:actors.domain.entity.actor', //actor is an abstract entity, can not be stored in database
 			'attributes' => array(
-				'name'		=> array('required'=>true, 'format'=>'string','read'=>'public'),
+				'name'		=> array('required'=>AnDomain::VALUE_NOT_EMPTY, 'format'=>'string','read'=>'public'),
 			    'body'      => array('format'=>'string'),
 				'status',
 				'statusUpdateTime',
