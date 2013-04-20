@@ -142,9 +142,9 @@ class LibBaseControllerBehaviorServiceable extends KControllerBehaviorAbstract
         }
         
         $query = $context->query;
-    
+        
         if ( $this->q ) {
-            $query->keyword = explode(' OR ', $this->q);
+            $query->keyword = $this->q;
         }
     
         if ( $this->hasBehavior('parentable') && $this->getParent() ) {
