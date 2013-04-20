@@ -9,6 +9,7 @@
   		<?= @template('tmpl/js') ?>        
         <div id="container-system-message" class="container">       
     		<?= @render('messages') ?>
+    		<?= @helper('modules.render','messages', array('style'=>'none')) ?>
     	</div>
         
         <?= @render('component') ?>

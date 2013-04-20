@@ -9,8 +9,8 @@
   <body>	  	
 	<?= @template('tmpl/js') ?>
     
-    <div id="container-system-message" class="container">       
-    	<?= @render('messages') ?>
+    <div id="container-system-message" class="container">
+    	<?= @helper('modules.render','messages', array('style'=>'none')) ?>
     </div>
     		
     <?= @template('tmpl/navbar') ?>
