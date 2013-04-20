@@ -805,6 +805,7 @@ function is_hash_array($array)
  */
 function to_hash($array, $default = array())
 {
+    $array     = (array)$array;
     $new_array = array();
     foreach($array as $key => $value) 
     {
