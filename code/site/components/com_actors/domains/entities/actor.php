@@ -44,39 +44,35 @@ class ComActorsDomainEntityActor extends ComBaseDomainEntityNode
 	 * @return void
 	 */
 	protected function _initialize(KConfig $config)
-	{
+	{		
 		$config->append(array(
-		    'abstract_identifier' => 'com:actors.domain.entity.actor', //actor is an abstract entity, can not be stored in database
-			'attributes' => array(
-				'name'		=> array('required'=>AnDomain::VALUE_NOT_EMPTY, 'format'=>'string','read'=>'public'),
-			    'body'      => array('format'=>'string'),
-				'status',
-				'statusUpdateTime',
-			),
-			'behaviors'  => array(
+	        'abstract_identifier' => 'com:actors.domain.entity.actor', //actor is an abstract entity, can not be stored in database
+	        'attributes' => to_hash(array(
+                'name'		=> array('required'=>AnDomain::VALUE_NOT_EMPTY, 'format'=>'string','read'=>'public'),
+                'body'      => array('format'=>'string'),
+                'status',
+                'statusUpdateTime',
+	        )),
+	        'behaviors'  => to_hash(array(	                
                 'subscribable',
-				'modifiable',
-			    'storable',				
-				'describable',
-				'authorizer',
-				'dictionariable',
-				'privatable',
+                'modifiable',
+                'storable',
+                'describable',
+                'authorizer',
+                'privatable',
                 'administrable',
-			    'enableable'                
-			)
-		));
-				
-        $config->behaviors->append(array(
-              'followable'   => array(),                
-              'portraitable' => array(
-                      'sizes' => array(
-                              'small'  => '80xauto',
-                              'medium' => '160xauto',
-                              'large'  => '480xauto',
-                              'square' => 56 ))                
-//            'taggable'     => array('parse_hashtag'=>true)
-        ));
-		
+                'enableable',
+                'dictionariable',
+                'followable',
+                'portraitable'   => array(
+                        'sizes'  => array(
+                                'small'  => '80xauto',
+                                'medium' => '160xauto',
+                                'large'  => '480xauto',
+                                'square' => 56 ))	                
+	        )		        
+        )));
+
 		parent::_initialize($config);
 	}
 				

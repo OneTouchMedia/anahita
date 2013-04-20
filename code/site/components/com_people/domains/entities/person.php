@@ -71,18 +71,19 @@ class ComPeopleDomainEntityPerson extends ComActorsDomainEntityActor
 				'registrationDate' => 'creationTime',
 				'aboutMe'		   => 'description'
 			),		    
-			'behaviors'	=>  array(
+			'behaviors'	=>  to_hash(array(
+			    'describable' => array('searchable_properties'=>array('username')),
                 'administrator',
                 'notifiable',					
 				'leadable'
-			)
+			))
 		));
 				
 		$config->behaviors->append(array('followable' => array('subscribe_after_follow'=>false)));
 		
 		parent::_initialize($config);
         
-        AnHelperArray::unsetValues($config->behaviors, array('administrable','enableable'));
+        AnHelperArray::unsetValues($config->behaviors, array('administrable'));
 	}
 
 	/**
