@@ -147,7 +147,7 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
         {
         	      
         	$component = $this->getService('repos://site/components.component')
-        						->fetch(array('component'=>$component));
+        						->find(array('component'=>$component));
 
         	if ( $component )
         	{
