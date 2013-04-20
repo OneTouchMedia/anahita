@@ -304,7 +304,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
                 
         $this->tmpl = 'error';
         
-        header(KHttpResponse::getHeader($error->getCode(), KRequest::protocol()));
+        if ( !headers_sent() ) {
+            header(KHttpResponse::getHeader($error->getCode(), KRequest::protocol()));
+        }
                                
         return $error;
     }
