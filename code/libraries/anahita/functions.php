@@ -777,4 +777,44 @@ if (!function_exists('fastcgi_finish_request'))
     }
 }
 
+/**
+ * Return if an arary is a hash array
+ *
+ * @param array $array
+ *
+ * @return boolean
+ */
+function is_hash_array($array)
+{
+    $count = count($array);   
+    foreach($array as $key => $value) 
+    {
+        if ( !is_int($key) || $key >= $count ) {
+            return true;
+        }
+    }
+    return false;    
+}
+
+/**
+ * Fix config bug when hash array and list array are mixed together
+ * 
+ * @param array $array
+ * 
+ * @return array
+ */
+function to_hash($array, $default = array())
+{
+    $new_array = array();
+    foreach($array as $key => $value) 
+    {
+        if ( is_int($key) ) {
+            $key   = $value;
+            $value = $default;
+        }
+        $new_array[$key] = $value;
+    }
+    return $new_array;
+}
+
 ?>
