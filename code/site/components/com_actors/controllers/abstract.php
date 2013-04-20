@@ -63,7 +63,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         parent::_initialize($config);
         
         $config->append(array(
-            'behaviors' => array(
+            'behaviors' => to_hash(array(
             	'com://site/search.controller.behavior.searchable',
                 'com://site/stories.controller.behavior.publisher',
                 'com://site/notifications.controller.behavior.notifier',                                    
@@ -72,8 +72,8 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
                 'ownable',
                 'privatable',
                 'enablable',
-                'subscribable'                
-            )
+                'subscribable'
+            ))
         ));
                 
         JFactory::getLanguage()->load('com_actors');
