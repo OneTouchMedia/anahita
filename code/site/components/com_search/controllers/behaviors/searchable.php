@@ -49,20 +49,23 @@ class ComSearchControllerBehaviorSearchable extends KControllerBehaviorAbstract
 	protected function _afterControllerGet()
 	{
 		if ( $this->_mixer->isIdentifiable() ) 
-		{
+		{			
+			$scope = $this->_mixer->getIdentifier()->package.'.'.$this->_mixer->getIdentifier()->name;
+			$scope = $this->getService('com://site/search.domain.entityset.scope')->find($scope);
+			if ( $scope ) {
+			    $this->getService()->set('mod://site/search.scope', $scope);
+			}
+			
 			$item = $this->_mixer->getItem();
-			if ( $item && $item->persisted() && 
-					$item->inherits('ComActorsDomainEntityActor') ) 
+			if ( $item && $item->persisted() &&
+			        $item->inherits('ComActorsDomainEntityActor') )
 			{
-				$this->getService()->set('mod://site/search.owner', $item);
+			    $this->getService()->set('mod://site/search.owner', $item);
+			    $this->getService()->set('mod://site/search.scope', null);
 			}
-			else if ( $this->getRepository()->isOwnable() && $this->actor ) 
-			{
-				$this->getService()->set('mod://site/search.owner', $this->actor);
-				$scope = $this->_mixer->getIdentifier()->package.'.'.$this->_mixer->getIdentifier()->name;
-				$scope = $this->getService('com://site/search.domain.entityset.scope')->find($scope);				
-				$this->getService()->set('mod://site/search.scope', $scope);
-			}
+			else if ( $this->getRepository()->isOwnable() && $this->actor ) {
+			    $this->getService()->set('mod://site/search.owner', $this->actor);
+			}			
 		}
 	}
 }
