@@ -92,11 +92,11 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
             'query' => $this->getRepository()->getQuery()
         ));
 
-        $query  = $context->query;
+        $query  = $context->query;        
         
         if ( $this->q ) {
             $query->keyword($this->q);
-        }        
+        }  
         
         $key      = KInflector::pluralize($this->getIdentifier()->name);        
         $entities =  $query->limit( $this->limit, $this->start )
@@ -284,7 +284,7 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
         }
         
         if ( $url ) {
-            $this->setRedirect(JRoute::_($url));
+            $context->response->setRedirect(JRoute::_($url));
         }
     }
 }

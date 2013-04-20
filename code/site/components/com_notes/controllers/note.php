@@ -81,7 +81,7 @@ class ComNotesControllerNote extends ComMediumControllerDefault
                 'subscribers'      => array($entity->owner->subscriberIds->toArray(),$entity->owner)
             ))->setType('post', array('new_post'=>true));
         }
-        
+
         if ( !empty($data['channels']) ) {
             $this->shareObject(array('object'=>$entity,'sharers'=>$data['channels']));
         }

@@ -82,13 +82,19 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
 		$config = new KConfig($config);
 		
 		$config->append(array(
-			'type'	=> 'info',
-			'block' => true
+			'type'	    => 'info',
+			'block'     => true  ,
+		    'closable'  => false
 		));
 		
 		$alertblock = ($config->block) ? 'alert-block' : '';
 		
-		return "<div class=\"alert alert-{$config->type} $alertblock\"><p>$message</p></div>";
+		$close_handler = '';
+		if ( $config->closable ) {
+		    $close_handler =  "<a class=\"close\" data-trigger=\"nix\" data-nix-options=\"'target':'!div.alert'\">&times;</a>";
+		}
+		
+		return "<div class=\"alert alert-{$config->type} $alertblock\">$close_handler<p>$message</p></div>";
 	}
 	
 	/**

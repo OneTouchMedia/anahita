@@ -33,14 +33,7 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
      * @var string|object
      */
     protected $_view;
-                
-    /**
-     * Redirect options
-     *
-     * @var KConfig
-     */
-    protected $_redirect;
-    
+        
     /**
      * Constructor.
      *
@@ -48,13 +41,11 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
      */
     public function __construct( KConfig $config)
     {            
-        parent::__construct($config);
-        
-        $this->_redirect = new KConfig();
+        parent::__construct($config);        
         
         //set the view
         $this->_view     = $config->view;
-                
+      
         //register display as get so $this->display() return
         //$this->get()
         $this->registerActionAlias('display', 'get');
@@ -102,7 +93,8 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
     {
         $action = null;
         
-        if ( $this->_request->get ) {
+        if ( $this->_request->get ) 
+        {
             $action = strtolower('get'.$this->_request->get);
         }        
         else {
@@ -111,18 +103,37 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
        
         $result = null;
            
-        if ( in_array($action, $this->getActions()) ) {
+        if ( in_array($action, $this->getActions()) ) 
+        {
             $result = $this->execute($action, $context);
+            
+            if ( is_string($result) ) {
+                $context->response->setContent($result);
+            }
         }
         
-        //if the result of the previous actions is not
-        //string and not false then display the view
-        if ( !is_string($result) && $result !== false ) {
-            $result = $this->getView()->display();
+        JFactory::getLanguage()->load($this->getIdentifier()->package);
+        
+        $view = $this->getView();
+        
+        if ( !$context->response->getContent() )
+        {            
+            if ( $context->params ) {
+                foreach($context->params as $key => $value) {
+                    $view->set($key, $value);
+                }
+            }
+                        
+            $content = $view->display();
+
+            //Set the data in the response
+            $context->response->setContent($content);                       
         }
- 
-        return (string) $result;
-    }   
+        
+        $context->response->setContentType($view->mimetype);
+                                
+        return $context->response->getContent();
+    }
     
     /**
      * Get the view object attached to the controller
@@ -186,56 +197,6 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
         $this->_view = $view;
                 
         return $this;
-    }
-            
-    /**
-     * Set a URL for browser redirection.
-     *
-     * @param string $location The location of the redirect
-     * @param string $message  The redirect header message
-     * @param int    $code     The redirect header code
-     * 
-     * @return void
-     */
-    public function setRedirect($location, $message = null, $code = KHttpResponse::SEE_OTHER)
-    {
-        if (empty($location)) {
-            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
-        }
-        
-        if (!is_string($location) && !is_numeric($location) && !is_callable(array($location, '__toString')))
-        {
-            throw new \UnexpectedValueException(
-                    'The Response location must be a string or object implementing __toString(), "'.gettype($location).'" given.'
-            );
-        }
-
-        $this->_redirect->code         = $code;
-        $this->_redirect->message      = $message;        
-        $this->_redirect->location     = (string)$location;
-        return $this;
-    }  
-            
-    /**
-     * Returns an array with the redirect url, the message and the message type
-     *
-     * @return KConfig Named array containing url, and redirect code
-     */
-    public function getRedirect()
-    {
-        return $this->_redirect;
-    }
-
-    /**
-     * Renders the controller's view by passing the $data to the view
-     *
-     * @param KCommandContext $context Context 
-     *
-     * @return string
-     */
-    public function render(KCommandContext $context)
-    {        
-        return (string) $this->getView()->display();
     }
     
     /**

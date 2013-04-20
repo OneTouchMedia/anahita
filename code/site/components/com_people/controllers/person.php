@@ -169,7 +169,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         }
                             
         //set the status
-        $context->status  = KHttpResponse::CREATED; 
+        $this->getResponse()->status  = KHttpResponse::CREATED; 
         
         $this->setItem($person);
                         
@@ -232,7 +232,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
             throw new KControllerException('Unexpected error when saving user');
         }
         
-        $context->status = KHttpResponse::RESET_CONTENT;
+        $this->getResponse()->status = KHttpResponse::RESET_CONTENT;
          
         return $person;      
     }
@@ -253,8 +253,8 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
     				'subject'	=> JText::_('COM-PEOPLE-ACTIVATION-SUBJECT'),
     				'template'	=> 'account_activate'
 		));
-		$context->headers['X-User-Activation-Required'] = true;
-		$this->setRedirect(JRoute::_('option=com_people&view=session'));
+		$context->response->setHeader('X-User-Activation-Required', true);
+		$context->response->setRedirect(JRoute::_('option=com_people&view=session'));
     }
     
     /**
@@ -298,6 +298,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
     	$this->getService()->set('com:people.viewer', $this->getItem());
     	$controller = $this->getService('com://site/people.controller.session');
     	$ret = $controller->login($user);
+    	_die('need work here');
     	$this->setRedirect($controller->getRedirect()->location);
     	return $ret;
     }

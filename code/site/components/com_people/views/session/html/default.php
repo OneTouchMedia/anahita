@@ -16,22 +16,11 @@
 			<div class="connect-service-actions">
 			<?= $this->renderHelper('com://site/connect.template.helper.service.renderLogins')?>			
 			</div>
-			<?php endif; ?>
-			<?php 
-			//if there's a login error code then translate the codes
-			//into error messages
-			?>
-            <?php if ( !empty($flash['error_code']) ) : ?>
-            <?php 
-                switch($flash['error_code']) 
-                {
-                    case 401 : $message = 'COM-PEOPLE-AUTHENTICATION-FAILED';break;
-                    case 403 : $message = 'COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED';break;
-                    default  : $message = 'COM-PEOPLE-AUTHENTICATION-FAILED-UNKOWN';break;
-                }
-            ?>
-            <?= @message(@text($message), array('type'=>'error')) ?>
+						           
             <?php endif ?>
+         
+            <?= @session_message ?>
+         
 			<div class="control-group">			
 				<div class="controls">
 					<input class="input-block-level" name="username" placeholder="<?= @text('COM-PEOPLE-SESSION-PLACEHOLDER-USERNAME-EMAIL')?>" id="username" type="text" alt="username" size="18" />

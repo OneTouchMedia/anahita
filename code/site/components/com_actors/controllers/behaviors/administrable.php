@@ -90,7 +90,8 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
 		    foreach($canditates as $key => $person) {
 				$people[$key] = array('id'=>$person->id, 'value'=>$person->name);
 			}
-            return $this->getView()->set($people)->display();            
+			$this->getView()->set($people);
+			return $people;
 		}
 	}
 		

@@ -44,7 +44,7 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	{	
 	    if ( $this->cid )
         {                        
-	        $context->result = $this->getCommentController()->id($this->cid)
+	        $context->response->content = $this->getCommentController()->id($this->cid)
 	                ->display();	  
 	        return false;      
 	    }
@@ -63,7 +63,7 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 		   $this->getService('application')
 				->redirect($url.'#scroll='.$this->permalink);			
 			return;
-		} 
+		}
 	}
 	
 	/**
@@ -76,7 +76,7 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	protected function _actionDeletecomment(KCommandContext $context)
 	{
         $ret = $this->getCommentController()->id($this->cid)->delete();
-	    $context->status  = KHttpResponse::NO_CONTENT;	    
+	    $context->response->status  = KHttpResponse::NO_CONTENT;	    
 	}
 		
 	/**
@@ -90,12 +90,11 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	{    
 	    $data    = $context->data;
         $comment = $this->getCommentController()->id($this->cid)->edit(array('body'=>$data->body));        
-	    $context->comment = $comment;
-	    $result = $comment;
+	    $context->comment = $comment;	    
 	    if ( $this->isDispatched() ) {
-	        $result = $this->getCommentController()->display();
+	        $context->response->content = $this->getCommentController()->display();
 	    }
-	    return $result;     
+	    return $comment;     
 	}
 		
 	/**
@@ -109,13 +108,22 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	{	    
         $data    = $context->data;
 	    $comment = $this->getCommentController()->add(array('body'=>$data->body));
-	    $context->status  = KHttpResponse::CREATED;
-	    $context->comment = $comment;
-	    $result = $comment;
-	    if ( $this->isDispatched() ) {
-	        $result = $this->getCommentController()->display();
+	    $context->response->status = KHttpResponse::CREATED;
+	    $context->comment = $comment;	   
+	    if ( $this->isDispatched() ) 
+	    {
+	        $context->response->content = $this->getCommentController()->display();	  
+	        if ( $context->response->isHtml() ) 
+	        {
+	            $offset = $this->getItem()->getCommentOffset( $comment->id );
+	            $start  = (int)($offset / $this->limit) * $this->limit;
+	            $context->response->setRedirect(JRoute::_($comment->parent->getURL().'&start='.$start).'#scroll='.$comment->id);
+	        }
+	        else {
+	            $context->response->setRedirect(JRoute::_($comment->getURL()));
+	        }
 	    }
-	    return $result;
+	    return $comment;
 	}
 
 	/**
@@ -127,7 +135,7 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	 */
 	protected function _actionUnvoteComment(KCommandContext $context)
 	{
-	    return $this->getCommentController()
+	    $this->getCommentController()
 	    ->id($this->cid)->execute('unvote', $context);
 	}
 		
@@ -140,7 +148,7 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	 */
 	protected function _actionVoteComment(KCommandContext $context)
 	{
-	    return $this->getCommentController()
+	    $this->getCommentController()
 	        ->id($this->cid)->execute('vote', $context);
 	}
 	
@@ -160,7 +168,8 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	        $request = new KConfig(array('format'=>$this->format));
 	        $request->append(pick($this->_mixer->getRequest()->comment,array()));
 	        $this->_comment_controller = $this->getService($identifier, array(
-	                'request' => $request
+	                'request'  => $request,
+	                'response' => $this->getResponse()
 	        ));
 	        //set the parent
 	        if ( $this->getItem() ) {

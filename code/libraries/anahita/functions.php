@@ -760,4 +760,21 @@ function get_marked_traces()
     return pick($_checkpoints, array());
 }
 
+
+
+if (!function_exists('fastcgi_finish_request'))
+{
+    function fastcgi_finish_request()
+    {
+        if (PHP_SAPI !== 'cli')
+        {
+            for ($i = 0; $i < ob_get_level(); $i++) {
+                ob_end_flush();
+            }
+        
+            flush();
+        }        
+    }
+}
+
 ?>

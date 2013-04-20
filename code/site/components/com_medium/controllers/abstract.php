@@ -48,7 +48,7 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
         $this->getState()
                 ->insert('filter')->insert('grid')->insert('order');
         
-        $this->registerCallback('after.delete', array($this, 'redirect'));
+        $this->registerCallback(array('after.delete','after.add'), array($this, 'redirect'));
 	}
 	
 	/**
@@ -131,8 +131,15 @@ abstract class ComMediumControllerAbstract extends ComBaseControllerService
 	    {
 	        $url['oid']    = $this->getItem()->owner->id;
 	        $url['view']   = KInflector::pluralize($this->getIdentifier()->name);
-	        $url['option'] = $this->getIdentifier()->package;	        
-	        $this->setRedirect(JRoute::_($url));
+	        $url['option'] = $this->getIdentifier()->package;
+	        $this->getResponse()->setRedirect(JRoute::_($url));
+	    }	    
+	    elseif ( $context->action == 'add' ) 
+	    {
+	        $url['id']     = $this->getItem()->id;
+	        $url['view']   = KInflector::pluralize($this->getIdentifier()->name);
+	        $url['option'] = $this->getIdentifier()->package;
+	        $this->getResponse()->setRedirect(JRoute::_($url));	        
 	    }
 	}
 	

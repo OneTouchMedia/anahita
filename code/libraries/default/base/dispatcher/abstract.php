@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
+abstract class LibBaseDispatcherAbstract extends LibBaseControllerAbstract
 {
     /**
      * Constructor.
@@ -38,11 +38,11 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
     {
         parent::__construct($config);
         
-        $this->unregisterCallback('after.dispatch' , array($this, 'forward'));
-        
-        $this->registerCallback('after.post' ,       array($this, 'forward'));
+		$this->_controller = $config->controller;
+
+	    $this->registerCallback('after.dispatch', array($this, 'render'));
     }
-        
+    
     /**
      * Initializes the options for the object
      *
@@ -53,10 +53,18 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
      */
     protected function _initialize(KConfig $config)
     {
-        parent::_initialize($config);
-        
+        $config->append(array(
+                'controller' => $this->getIdentifier()->package,
+                'request'	 => KRequest::get('get', 'string'),
+        ))->append(array (
+                'request' 	 => array('format' => KRequest::format() ? KRequest::format() : 'html')
+        ));
+    
+        parent::_initialize($config);        
+    
+        //prevent rendering layouts starting with _
         if ( strpos($config->request->layout, '_') === 0 ) {
-			unset($config->request->layout);
+            unset($config->request->layout);
         }
     }
         
@@ -79,8 +87,25 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
         else {
             $method = strtolower(KRequest::method());
         }
-        
-        $result = $this->execute($method, $context);
+        try {
+            $result = $this->execute($method, $context);
+        } catch(KException $exception) 
+        {
+            $this->getController()->getResponse()
+                ->setContentType($this->getController()->getView()->mimetype);
+            
+            $this->getController()->getResponse()
+                ->setStatus($exception->getCode(), $exception->getMessage());
+            
+            $this->getController()->getResponse()->sendHeaders();
+            
+            //if redirect then end the request 
+            if ( $this->getController()->getResponse()->isRedirect() ) {
+                exit(0);
+            }
+            
+            throw $exception;
+        }
         
     	return $result;
     }
@@ -124,6 +149,15 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
                 throw new KControllerException('Action: '.$action.' not allowed');
             }
         }
+                
+        if ( KRequest::format() != 'html' || KRequest::type () == 'AJAX' ) {
+            $this->registerCallback('after.post', array($this, 'forward'));
+        } else {
+            $this->getController()
+                ->getResponse()
+                ->setRedirect(KRequest::get('server.HTTP_REFERER', 'url'));            
+        }
+        
         return $this->getController()->execute($action, $context);
     }    
     
@@ -136,29 +170,82 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
      */
     protected function _actionDelete(KCommandContext $context)
     {
-        $result = $this->getController()->execute('delete', $context);
+        $redirect = KRequest::get('server.HTTP_REFERER', 'url');
+        
+        $this->getController()
+            ->getResponse()
+            ->setRedirect($redirect);
                 
-        if ( $this->format == 'json' && $context->status == KHttpResponse::NO_CONTENT ) {
-            $this->getController()->getRedirect()->code = null;
-        }
+        $result = $this->getController()->execute('delete', $context);
+        
         return $result;        
     }
-        
-	/**
-	 * Set the default controller to LibBaseControllerResource
-	 * 
-	 * @see KDispatcherAbstract::setController()
-	 */
-	public function setController($controller)
-	{
-		parent::setController($controller);
-		
-		if ( !$this->_controller instanceof KControllerAbstract ) 
-		{
+
+    /**
+     * Method to get a controller object
+     *
+     * @return	KControllerAbstract
+     */
+    public function getController()
+    {
+        if(!($this->_controller instanceof KControllerAbstract))
+        {
+            //Make sure we have a controller identifier
+            if(!($this->_controller instanceof KServiceIdentifier)) {
+                $this->setController($this->_controller);
+            }
+    
+            $config = array(
+                    'response'     => $this->getResponse(),
+                    'request' 	   => $this->_request,
+                    'dispatched'   => true
+            );
+    
+            $this->_controller = $this->getService($this->_controller, $config);
+        }
+    
+        return $this->_controller;
+    }
+    
+    /**
+     * Method to set a controller object attached to the dispatcher
+     *
+     * @param	mixed	An object that implements KObjectServiceable, KServiceIdentifier object
+     * 					or valid identifier string
+     * @throws	KDispatcherException	If the identifier is not a controller identifier
+     * @return	KDispatcherAbstract
+     */
+    public function setController($controller)
+    {
+        if(!($controller instanceof KControllerAbstract))
+        {
+            if(is_string($controller) && strpos($controller, '.') === false )
+            {
+                // Controller names are always singular
+                if(KInflector::isPlural($controller)) {
+                    $controller = KInflector::singularize($controller);
+                }
+    
+                $identifier			= clone $this->getIdentifier();
+                $identifier->path	= array('controller');
+                $identifier->name	= $controller;
+            }
+            else $identifier = $this->getIdentifier($controller);
+    
+            if($identifier->path[0] != 'controller') {
+                throw new KDispatcherException('Identifier: '.$identifier.' is not a controller identifier');
+            }
+    
             $default = 'Com'.ucfirst($this->getIdentifier()->package).'ControllerDefault';
-			register_default(array('identifier'=>$this->_controller, 'default'=>array($default)));
-		}
-	}
+            register_default(array('identifier'=>$identifier, 'default'=>array($default)));
+                        
+            $controller = $identifier;
+        }
+    
+        $this->_controller = $controller;
+    
+        return $this;
+    }
 	
 	/**
 	 * Renders a controller view
@@ -168,49 +255,24 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 	 * @return string
 	 */	
 	protected function _actionForward(KCommandContext $context)
-	{	    
-	    $data  = $context->data;
-        
-	    $context->append(array(
-            'html_redirect' => KRequest::get('server.HTTP_REFERER', 'url')
-	    ));	    	    
+	{	    	    
+	    $response = $this->getController()->getResponse();
 	    
-	    $context->append(array(
-	        'render_after_post'  => is_string($context->result) || ($this->format == 'json' && $context->status == KHttpResponse::NO_CONTENT),
-	        'forward_after_post' => ($this->format == 'json' || KRequest::type() == 'AJAX') && 
-	                        ($context->status == KHttpResponse::RESET_CONTENT || $context->status == KHttpResponse::CREATED),
-	        'auto_redirect_after_post'     => KRequest::type() == 'HTTP' 
-	                                && $this->format == 'html' 
-	                                && !$this->getController()->getRedirect()->location          
-	    ));
-
-	    if ( $context->render_after_post ) 
+	    if ( !$response->getContent() )
 	    {
-	        $this->getController()->getRedirect()->code = null;
-	        return $context->result;
+	        if ( in_array($response->getStatusCode(), array(201, 205)) )
+	        {
+	            //set the view to single
+	            //render the item
+	            $view   = $this->getController()->getIdentifier()->name;
+	            $response->setContent($this->getController()->view($view)->execute('display', $context));
+	            if ( $response->getStatusCode() == 205 ) {
+	                $response->setStatus(200);
+	            }
+	        }	        
 	    }
-	    elseif ( $context->forward_after_post === true )
-	    {
-	        //don't do any redirect
-	        $this->getController()->getRedirect()->code = null;
-	        
-	        $context->result = $this->getController()
-	                //set the view to single
-	                ->view($this->getController()->getIdentifier()->name)
-    	            //render the item
-	                ->execute('display', $context);
-	            ;
-	        //we can not send back content with reset content
-	        if ( $context->status == KHttpResponse::RESET_CONTENT) {
-	            $context->status = KHttpResponse::OK;
-	        }
-	        
-            return $context->result;
-	    }
-	    elseif ( $context->auto_redirect_after_post &&
-	            $context->html_redirect ) {
-	        $this->getController()->setRedirect($context->html_redirect); 
-	    }
+	    
+	    return $context->result;
 	}
 	
 	/**
@@ -222,38 +284,19 @@ abstract class LibBaseDispatcherAbstract extends KDispatcherAbstract
 	 */
 	protected function _actionRender(KCommandContext $context)
 	{
-	    $redirect = $this->getController()->getRedirect();
+	    $response = $this->getController()->getResponse();
 	    
-	    //if the redirect code i
-	    if ( $redirect->location && 
-	            $redirect->code >= 300 && $redirect->code < 400 ) 
-	    {
-    	    $context->status              = $redirect->code;
-    	    $context->status_message      = $redirect->message;
-    	    $context->headers['Location'] = (string)$redirect->location;    	    
+        $response->setContentType($this->getController()->getView()->mimetype);
+	    
+	    $content = $response->getContent();
+	    
+	    $response->sendHeaders();
+	    
+	    if ( $response->isRedirect() ) {
+	        exit(0);    
 	    }
 	    
-	    //if there's a content set the content type
-	    if(is_string($context->result)) {
-	        header('Content-Type: '.$this->getController()->getView()->mimetype);
-	    }
-	    
-        //Headers
-	    if($context->headers)
-	    {
-	        foreach($context->headers as $name => $value) {
-	            header($name.' : '.$value);
-	        }
-	    }
-
-	    //Status
-        if($context->status) {
-            header(KHttpResponse::getHeader($context->status, $context->status_message, KRequest::protocol()));
-        }
-                
-	    if(is_string($context->result)) {
-		     return $context->result;
-		}
+	    return $content; 	    
 	}
 	
 }

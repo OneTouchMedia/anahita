@@ -38,7 +38,7 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
 	{
 		$this->commit();
         
-		if ( $this->format == 'html' ) 
+		if ( $context->response->isHtml() ) 
         {
             return $this->getView()
                 ->getTemplate()
@@ -64,13 +64,16 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
 	 */
 	protected function _actionVote($context)
 	{				
+	    $context->response->status = KHttpResponse::CREATED;
+	    
 		$this->getItem()->voteup( get_viewer() );
 		$notification = $this->_mixer->createNotification(array(
 			'name' 		=> 'voteup',
 			'object'	=> $this->getItem(),
 		    'component' => $this->getItem()->component
 		));
-		return $this->_mixer->execute('getvoters', $context);
+		$context->response->content = 
+		    $this->_mixer->execute('getvoters', $context);
 	}
 	
 	/**
@@ -83,7 +86,8 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
 	protected function _actionUnvote($context)
 	{
 		$this->getItem()->unvote( get_viewer() );
-		return $this->_mixer->execute('getvoters', $context);
+		$context->response->content = 
+		    $this->_mixer->execute('getvoters', $context);
 	}
 }
 

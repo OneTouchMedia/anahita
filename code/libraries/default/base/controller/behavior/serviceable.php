@@ -73,12 +73,16 @@ class LibBaseControllerBehaviorServiceable extends KControllerBehaviorAbstract
                 'except' => array('add','edit','delete')
             ));
         }
-                
-        $config = $config->toArray();
-        
-        $this->_mixer->addBehavior('identifiable', $config);
-        $this->_mixer->addBehavior('validatable',  $config);
-        $this->_mixer->addBehavior('committable',  $config);
+                        
+        $config->append(array(
+            'identifiable' => array(),
+            'validatable'  => array(),
+            'committable'  => array()              
+        ));
+
+        $this->_mixer->addBehavior('identifiable', $config['identifiable']);
+        $this->_mixer->addBehavior('validatable',  $config['validatable']);
+        $this->_mixer->addBehavior('committable',  $config['committable']);
         
         
         $this->_exclude_actions = (array)$config['except'];
@@ -171,7 +175,7 @@ class LibBaseControllerBehaviorServiceable extends KControllerBehaviorAbstract
      */
     protected function _actionAdd(KCommandContext $context)
     {
-        $context['status'] = KHttpResponse::CREATED;
+        $context->response->status = KHttpResponse::CREATED;
         $entity = $this->getRepository()->getEntity()->setData($context['data']);
         $this->setItem($entity);
         return $this->getItem();
@@ -186,7 +190,7 @@ class LibBaseControllerBehaviorServiceable extends KControllerBehaviorAbstract
      */
     protected function _actionEdit(KCommandContext $context)
     {
-        $context['status'] = KHttpResponse::RESET_CONTENT;
+        $context->response->status = KHttpResponse::RESET_CONTENT;
         return $this->getItem()->setData($context['data']);
     }
     
@@ -209,7 +213,7 @@ class LibBaseControllerBehaviorServiceable extends KControllerBehaviorAbstract
      */
     protected function _actionDelete(KCommandContext $context)
     {
-        $context['status'] = KHttpResponse::NO_CONTENT;
+        $context->response->status = KHttpResponse::NO_CONTENT;
         $entity = $this->getItem()->delete();
         return $entity;
     }    

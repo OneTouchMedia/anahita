@@ -1146,6 +1146,41 @@ Delegator.register(['click'],'Comment', {
 	}
 });
 
+Delegator.register(['click'],'Checkbox', {
+	defaults : {
+		'toggle-element' : null,
+		'toggle-class'	 : 'selected'
+	},
+	handler  : function(event, el, api) 
+	{		
+		var target = el;
+		if ( api.get('toggle-element') ) {
+			target = el.getElement(api.get('toggle-element'));
+		}				
+		if ( !el.retrieve('checkbox') ) 
+		{			
+			var checkbox = new Element('input',{
+				type   : 'checkbox',
+				value  : api.getAs(String,'value'),
+				name   : api.getAs(String,'name')
+			});			
+			el.adopt(checkbox);
+			checkbox.hide();
+			if ( checkbox.form ) {
+				checkbox.form.addEvent('reset', function(){
+					target.removeClass(api.get('toggle-class'));
+				});
+			}
+			el.store('checkbox', checkbox);
+		}
+
+		var checkbox 	   = el.retrieve('checkbox');
+		checkbox.checked   = !checkbox.checked;
+		target.toggleClass(api.get('toggle-class'));
+		el.fireEvent('check');
+	}
+});
+
 var ScrollLoader = new Class({
 
     Implements: [Options, Events],

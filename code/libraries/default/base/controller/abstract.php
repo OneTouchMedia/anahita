@@ -33,8 +33,15 @@ class LibBaseControllerAbstract extends KControllerAbstract
      * 
      * @var KConfigState
      */
-    protected $_state;
-    
+    protected $_state;    
+
+    /**
+     * response object
+     *
+     * @var LibBaseControllerResponseAbstract
+     */
+    protected $_response;
+        
     /**
      * Constructor.
      *
@@ -42,7 +49,13 @@ class LibBaseControllerAbstract extends KControllerAbstract
      */
     public function __construct( KConfig $config)
     {
-        parent::__construct($config);                        
+        parent::__construct($config);  
+
+        if ( !$config->response ) {
+            $config->response = 'com:base.controller.response.'.pick($this->format,'default');
+        }
+        
+        $this->_response = $config->response;
     }
               
     /**
@@ -55,7 +68,11 @@ class LibBaseControllerAbstract extends KControllerAbstract
      * @return void
      */
     protected function _initialize(KConfig $config)
-    {            	
+    {         
+        $config->append(array(
+            'response' => null   
+        ));
+        
         parent::_initialize($config);    
     }
             
@@ -173,6 +190,51 @@ class LibBaseControllerAbstract extends KControllerAbstract
         
         return parent::__call($method, $args);
     }
+
+    /**
+     * Return the response object
+     *
+     * @return LibBaseControllerResponseAbstract
+     */
+    public function getResponse()
+    {
+        if(!$this->_response instanceof LibBaseControllerResponseAbstract)
+        {
+            $this->_response = $this->getService($this->_response);
+            
+            if ( !$this->_response instanceof LibBaseControllerResponseAbstract ) {
+                throw new 
+                    UnexpectedValueException('Response must be an instanceof LibBaseControllerResponseAbstract');    
+            }
+        }
+    
+        return $this->_response;
+    }
+    
+    /**
+     * Set the response object
+     *
+     * @param mixed $response
+     *
+     * @return LibBaseControllerResource
+     */
+    public function setResponse($response)
+    {
+        $this->_response = $response;    
+        return $this;
+    }
+        
+    /**
+     * Sets the context response
+     *
+     * @return KCommandContext
+     */
+    public function getCommandContext()
+    {
+        $context = parent::getCommandContext();
+        $context->response = $this->getResponse();
+        return $context;
+    }
         
     /**
      * Get a behavior by identifier
@@ -200,4 +262,6 @@ class LibBaseControllerAbstract extends KControllerAbstract
         
         return parent::getBehavior($behavior, $config);        
     }
+    
+   
 }

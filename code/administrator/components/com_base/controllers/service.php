@@ -121,7 +121,7 @@ class ComBaseControllerService extends ComBaseControllerResource
 	protected function _actionPost($context)
 	{
 		if ( $context->action == 'save' )
-			$this->setRedirect('option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
+			$context->response->setRedirect('option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name));
 		
 		$data = $context->data;
 
@@ -157,7 +157,7 @@ class ComBaseControllerService extends ComBaseControllerResource
 	protected function _actionCancel(KCommandContext $context)
 	{
 		//Create the redirect		
-		$this->setRedirect(JRoute::_('option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name)));	
+		$context->response->setRedirect(JRoute::_('option=com_'.$this->getIdentifier()->package.'&view='.KInflector::pluralize($this->getIdentifier()->name)));	
 	}
 	
 	/**

@@ -38,7 +38,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     {
         parent::__construct($config);
         
-        $this->registerCallback('after.login', array($this, 'redirect'), 
+        $this->registerCallback('after.add', array($this, 'redirect'), 
                 array('url'=>$config->redirect_to_after_login));
         
         $this->registerCallback('after.delete', array($this, 'redirect'),
@@ -84,7 +84,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      * @return void
      */
     protected function _actionRead(KCommandContext $context)
-    {
+    {       
     	$person = $this->getService('repos://site/people.person')->find(array('userId'=>JFactory::getUser()->id));
     	$this->_state->setItem($person);
     	if ( isset($_SESSION['return']) ) {
@@ -112,7 +112,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             if ( $this->format != 'html' ) {
                 throw $e;
             }
-            $this->setRedirect(JRoute::_('option=com_people&view=session'));
+            $context->response->setRedirect(JRoute::_('option=com_people&view=session'));
         }
     }
     
@@ -177,16 +177,16 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     		
 			if ( $user && $user->block ) 
 			{
-			    $this->setFlash('error_code', KHttpResponse::FORBIDDEN);
+			    $this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED', 'error', false);			    
                 throw new KControllerException('User is blocked', KHttpResponse::FORBIDDEN);
 			}
 						
-			$this->setFlash('error_code', KHttpResponse::INTERNAL_SERVER_ERROR);
+			$this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-UNKOWN', 'error', false);			
 			throw new KControllerException('Unkown Error');
 		}
 
 		// Trigger onLoginFailure Event		
-		$this->setFlash('error_code', KHttpResponse::UNAUTHORIZED);
+		$this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error', false);
     	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$user));
     	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
     }
@@ -220,11 +220,11 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         {
             $_SESSION['return'] = null;
             $this->login((array)$authentication);
-            $context->status = KHttpResponse::CREATED;
+            $this->getResponse()->status = KHttpResponse::CREATED;
         }
         else 
         {
-            $this->setFlash('error_code', KHttpResponse::UNAUTHORIZED);
+            $this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error', false);
         	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$authentication));
         	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
         }
@@ -240,9 +240,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     protected function _actionDelete(KCommandContext $context)
     {
         //we don't care if a useris logged in or not just delete
-        $context->status = KHttpResponse::NO_CONTENT;
+        $context->response->status = KHttpResponse::NO_CONTENT;
         JFactory::getApplication()->logout();
-    }  
+    }
 
     /**
      * Redirect a user after login
@@ -258,6 +258,6 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         if ( $data && $data->return ) {
             $url=  base64_decode($data->return);
         }
-        $this->setRedirect($url);
+        $context->response->setRedirect($url);
     }
 }

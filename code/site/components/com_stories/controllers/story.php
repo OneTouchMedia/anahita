@@ -128,8 +128,8 @@ class ComStoriesControllerStory extends ComBaseControllerService
 	 */
 	protected function _actionDelete($context)
 	{
-	    $context->status = KHttpResponse::NO_CONTENT;
+	    $context->response->status = KHttpResponse::NO_CONTENT;
         $this->getItem()->delete();
-        $this->setRedirect(JRoute::_($this->getItem()->owner->getURL()));
+        $context->response->setRedirect(JRoute::_($this->getItem()->owner->getURL()));
 	}
 }

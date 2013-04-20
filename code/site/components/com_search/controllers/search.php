@@ -67,12 +67,7 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     {           
     	$this->setView('searches');
     	
-    	$this->getToolbar('menubar')->setTitle('');
-    	
-    	if ( $this->q ) {
-    		//$this->getToolbar('menubar')->setTitle(sprintf(JText::_('COM-SEARCH-HEADER'), $this->q));
-    	} 
-    		
+    	$this->getToolbar('menubar')->setTitle('');    		
     	
     	if ( $this->actor) {
         	$this->getToolbar('actorbar')->setTitle($this->actor->name);
@@ -113,6 +108,6 @@ class ComSearchControllerSearch extends ComBaseControllerResource
     				
     	$this->_state->setList($query->toEntitySet());
         
-        return $this->getView()->display();        
+        parent::_actionGet($context);
     }
 }

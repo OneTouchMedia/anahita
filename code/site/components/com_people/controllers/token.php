@@ -91,15 +91,14 @@ class ComPeopleControllerToken extends ComBaseControllerResource
                     ->fetch();
         
         if ( $user ) 
-        {
-            $this->setFlash('confirm', true);
+        {            
+            $this->setMessage('COM-PEOPLE-TOKEN-SENT','success', false);            
             $user->requiresActivation()->save();
-            $context->status = KHttpResponse::CREATED;
+            $this->getResponse()->status = KHttpResponse::CREATED;
             $this->user = $user;
         }
         else {
-            $context->html_redirect = true;
-            $this->setFlash('error', true);
+            $this->setMessage('COM-PEOPLE-TOKEN-INVALID-EMAIL','error', false);
             throw new KControllerException('Invalid Email Address', KHttpResponse::NOT_FOUND);
         }
     }

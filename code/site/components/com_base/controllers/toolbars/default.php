@@ -47,12 +47,11 @@ class ComBaseControllerToolbarDefault extends ComBaseControllerToolbarAbstract
      * @return void
      */
     public function onAfterControllerGet(KEvent $event)
-    {
-        $can_render = is_string($event->result)  && 
-                      $this->getController()->isDispatched()   &&
-                      $this->getController()->format == 'html' &&
-                      KRequest::type()   == 'HTTP'; 
-                      
+    {        
+        $can_render = $this->getController()->isDispatched() 
+                        && $this->getController()->getResponse()->isHtml()
+                        && $this->getController()->getView() instanceof LibBaseViewTemplate
+                        && KRequest::type()   == 'HTTP';
 
         if ( $can_render ) 
         {
@@ -64,12 +63,12 @@ class ComBaseControllerToolbarDefault extends ComBaseControllerToolbarAbstract
                'toolbar'  => $this->getController()->toolbar    
             );
             
-            $filter = $this->getController()->getView()->getTemplate()->getFilter('module');
+            $module = '<module position="toolbar" style="none">'.$ui->header($data).'</module>';
             
-            if ( $filter ) {          
-                $module = '<module position="toolbar" style="none">'.$ui->header($data).'</module>';
-                $filter->write($module);
-            }
+            $this->getController()
+                    ->getView()
+                    ->getTemplate()
+                    ->loadString($module)->render();
         }
     }    
            

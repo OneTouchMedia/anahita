@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ * Message Behavior
  *
  * @category   Anahita
  * @package    Com_Application
@@ -26,13 +26,13 @@
  * @link       http://www.anahitapolis.com
  */
 class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstract
-{
+{    
     /**
-     * Flash
+     * Check if the behavior is enabled or not
      * 
-     * @var array
+     * @var boolean
      */
-    protected $_flash;
+    protected $_enabled;
     
     /**
      * Constructor.
@@ -45,15 +45,23 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
     {
         parent::__construct($config);
         
-        if ( KRequest::has('session.flash') )
-        {
-            $this->_flash = $_SESSION['flash'];
-        } else {
-            $this->_flash = new KConfig();
+        $this->_enabled = $config->enabled;
+        $session        = JFactory::getSession();
+        
+        if ( $this->_enabled ) 
+        {          
+            $strIdentifier =  (string)$this->_mixer->getIdentifier();
+            
+            $data          = $session->get($strIdentifier,new stdClass(), 'controller_persistance');            
+            
+            unset($_SESSION['controller_persistance']);            
+            $config->mixer->getState()->session = $data;            
         }
-                
-        unset($_SESSION['flash']);
-        $config->mixer->getState()->flash = $this->_flash;
+        
+        else {
+            unset($_SESSION['controller_persistance']);
+            $config->mixer->getState()->session = new stdClass();
+        }
     }
 
     /**
@@ -68,7 +76,8 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-    
+            'enabled' => KRequest::format() == 'html' && 
+                         $config->mixer->isDispatched()
         ));
     
         parent::_initialize($config);
@@ -80,26 +89,97 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
      */
     public function execute( $name, KCommandContext $context) 
 	{
-	    //$context->headers['X-FLASH'] = (string)$this->_flash;
 	    return parent::execute($name, $context);
 	}
-    
+	
     /**
-     * Insert into flash
-     * 
-     * @param string  $key    The key
-     * @param mixed   $value  The value
-     * @param boolean $gobal  Glboal flag
-     * 
-     * @return void
-     */
-    public function setFlash($key, $value, $global = false)
-    {
-        $this->_flash[$key] = $value;
-        KRequest::set('session.flash', $this->_flash);
-        return $this->_mixer;
-    }
+	 * Sets a message
+	 * 
+	 * @param string  $type    The message type
+	 * @param string  $message The message text
+	 * @param boolean $global  A flag to whether store the message in the global queue or not
+	 * 
+	 * @return void
+	 */
+	public function setMessage($message,$type = 'info', $global = true)
+	{
+	    $this->storeValue('message', array('type'=>$type, 'message'=>$message), $global);
+	}
+	
+	/**
+	 * Stores a value in the session. This value is removed in the next
+	 * request
+	 * 
+	 * @param string  $key    Key to use to store the value
+	 * @param string  $value  The value
+	 * @param boolean $global Global queue flag 
+	 * 
+	 * @return void
+	 */
+	public function storeValue($key, $value, $global = false)
+	{
+	    if ( $this->_enabled )
+	    {
+            $namespace   = $this->_getQueueNamespace($global);
+            $queue       = JFactory::getSession()
+                            ->get($namespace->queue, array(), $namespace->namespace);
+            $queue[$key] = $value;
+            
+            JFactory::getSession()
+                ->set($namespace->queue, $queue, $namespace->namespace);
+	    }
+	}
+	
+	/**
+	 * Retreive a stored value from the session	 
+	 *
+	 * @param string $key The value key
+	 * @param boolean $global Global queue flag 
+	 *  
+	 * @return void
+	 */
+	public function retrieveValue($key, $global = false)
+	{
+	    $ret = null;
+	    
+        if ( $this->_enabled )
+	    {
+            $namespace = $this->_getQueueNamespace($global);
+            $queue     = JFactory::getSession()
+                            ->get($namespace->queue, array(), $namespace->namespace);
+            $ret       = isset($queue[$key]) ? $queue[$key] : null;
+	    }
+	    return $ret;    	     
+	}
 
+	/**
+	 * Return a value queue. If global is set then it returns the global 
+	 * queue 
+	 * 
+	 * @param boolean $global
+	 * 
+	 * @return array
+	 */
+	protected function _getQueueNamespace($global = false)
+	{
+	    $session        = JFactory::getSession();
+	     
+	    if ( $global ) {
+	        $store     = 'application.queue';
+	        $namespace = 'default';
+	         
+	    } else {
+	        $store     = (string)$this->_mixer->getIdentifier();
+	        $namespace = 'controller_persistance';
+	    }
+	    
+	    if ( !$session->has($store, null, $namespace) ) {
+	        $session->set($store, array(), $namespace);
+	    }
+	    
+	    return new KConfig(array('queue'=>$store, 'namespace'=>$namespace));
+	}
+	
     /**
      * Return the object handle
      *
@@ -108,5 +188,6 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
     public function getHandle()
     {
         return KMixinAbstract::getHandle();
-    }
+    }        
 }
+

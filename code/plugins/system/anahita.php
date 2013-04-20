@@ -199,7 +199,7 @@ class PlgSystemAnahita extends JPlugin
 		
 		if(!$person)
 			return;
-
+        _die();
 		$apps = KService::get('repos://site/apps.app')->getQuery()->disableChain()->fetchSet();
 		
 		foreach($apps as $app) 

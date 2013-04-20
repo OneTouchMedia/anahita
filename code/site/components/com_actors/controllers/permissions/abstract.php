@@ -76,13 +76,14 @@ abstract class ComActorsControllerPermissionAbstract extends LibBaseControllerPe
 	 */
 	public function canAdd()
 	{
-	    $app    = $this->getService('repos://site/apps.app')
-                    ->fetch(array('component'=>'com_'.$this->getIdentifier()->package));
-        $result = false;
-        
-	    if ( $app ) {
-	        $result = $app->authorize('publish');
-        }
+	    $component = $this->getService('repos://site/components.component')
+	                ->find(array('component'=>'com_'.$this->getIdentifier()->package));
+	    
+	    $result = false;
+	    
+	    if ( $component ) {
+	        $result = $component->authorize('add');
+	    }
 	        
 		return $result;
 	}

@@ -25,7 +25,7 @@
  */
 class ComApplicationViewHtml extends LibApplicationViewHtml
 {
-    /**
+    /** 
     * Initializes the default configuration for the object
     *
     * Called from {@link __construct()} as a first step of object instantiation.
@@ -48,6 +48,19 @@ class ComApplicationViewHtml extends LibApplicationViewHtml
     }
 
     /**
+     * Before displaying modularize the system messages
+     * 
+     * (non-PHPdoc)
+     * @see LibApplicationViewHtml::display()
+     */
+    public function display()
+    {
+        $this->_modularizeMessages();
+        
+        return parent::display();
+    }
+    
+    /**
      * (non-PHPdoc)
      * @see LibBaseViewAbstract::getRoute()
      */
@@ -58,5 +71,37 @@ class ComApplicationViewHtml extends LibApplicationViewHtml
     	}
     	return $this->getService('application')
     	->getRouter()->build($route);
+    }
+    
+    /**
+     * Converts all the system messages queued into modules so it 
+     * can be displayed in the template
+     * 
+     * @return void
+     */
+    protected function _modularizeMessages()
+    {
+        $session  =& JFactory::getSession();
+        $queue    = $session->get('application.queue', array());
+        $session->set('application.queue', null);
+        if ( isset($queue['message']) ) 
+        {
+            $message = $queue['message'];
+            $config  = array('closable'=>true);
+            
+            if ( isset($message['type']) ) {
+                $config['type'] = $message['type'];
+            }
+            
+            $html = $this->getTemplate()
+            ->renderHelper('ui.message', $message['message'], $config);
+            
+            $module  = JModuleHelper::addDynamicModule(array(
+                    'content'   => $html,
+                    'position'  => 'messages',
+                    'params'    => '',
+                    'attribs'   => array()
+            ));            
+        }          
     }
 }

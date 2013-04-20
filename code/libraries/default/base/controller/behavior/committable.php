@@ -47,8 +47,8 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-            'priority'   => KCommand::PRIORITY_HIGHEST,
-          ));
+            'priority'   => KCommand::PRIORITY_HIGHEST
+        ));
         
         parent::_initialize($config);
     }
@@ -66,6 +66,8 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
     {
         $parts = explode('.', $name);
         
+        $result = $context->result;
+        
         //after an action save
         if ( $parts[0] == 'after' && $parts[1] != 'cancel') 
         {
@@ -76,19 +78,23 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
             }
             
             //do a commit
-            $result = $this->commit();
-            
+            $result  = $this->commit();
+            $type    = $result === false ? 'error' : 'success';             
+            $message = $this->_makeStatusMessage($context->action, $type);
+            if ( $message ) {
+                $this->setMessage($message, $type);    
+            }
             if ( $result === false ) 
             {
-                if ( $this->isIdentifiable() && $this->getItem() )
+                if ( $this->isIdentifiable() && $this->getItem() ) 
                 {
                      if ( $this->getItem()->getErrors()->count() ) {
                          throw new AnErrorException($this->getItem()->getErrors(), KHttpResponse::BAD_REQUEST);
-                     }   
+                     }
                 }
+                
+                throw new KControllerException('Commit failed');
             }
-            
-            return $result;
         }
     }
     
@@ -117,7 +123,7 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
         $messages[]  = strtoupper('LIB-AN-MESSAGE-'.$this->_mixer->getIdentifier()->name.'-'.$action.'-'.$type);
         $messages[]  = strtoupper('LIB-AN-MESSAGE-'.$action.'-'.$type);
         $messages[]  = 'LIB-AN-PROMPT-COMMIT-'.strtoupper($type);
-        $message = translate($messages);
+        $message = translate($messages, false);
         return $message;
     }
     
