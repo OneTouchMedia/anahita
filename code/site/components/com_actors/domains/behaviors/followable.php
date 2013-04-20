@@ -411,9 +411,9 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
 	    {
 	        if ( $actor->isFollowable() )
 	        {
-	            $follower_ids 	= $actor->followers->getQuery(true)->disableChain()->fetchValues('id');	
-	            $blocked_ids	= $actor->blockeds->getQuery(true)->disableChain()->fetchValues('id');
-                $requester_ids  = $actor->requesters->getQuery(true)->disableChain()->fetchValues('id');
+	            $follower_ids 	= $actor->followers->getQuery(true,true)->fetchValues('id');
+	            $blocked_ids	= $actor->blockeds->getQuery(true,true)->fetchValues('id');
+                $requester_ids  = $actor->requesters->getQuery(true,true)->fetchValues('id');
 	            $actor->set('followerCount', count($follower_ids));
 	            $actor->set('followerIds'  , AnDomainAttribute::getInstance('set')->setData($follower_ids));
 	            $actor->set('blockedIds', 	 AnDomainAttribute::getInstance('set')->setData($blocked_ids));
@@ -422,8 +422,8 @@ class ComActorsDomainBehaviorFollowable extends AnDomainBehaviorAbstract
 	
 	        if ( $actor->isLeadable() )
 	        {
-	            $leader_ids	 	= $actor->leaders->getQuery(true)->disableChain()->fetchValues('id');
-	            $blocker_ids	= $actor->blockers->getQuery(true)->disableChain()->fetchValues('id');
+	            $leader_ids	 	= $actor->leaders->getQuery(true,true)->fetchValues('id');
+	            $blocker_ids	= $actor->blockers->getQuery(true,true)->fetchValues('id');
 	            $mutual_ids	 	= array_intersect($leader_ids, $follower_ids);
 	            $actor->set('leaderCount' , count($leader_ids));
 	            $actor->set('leaderIds'	  , AnDomainAttribute::getInstance('set')->setData($leader_ids));

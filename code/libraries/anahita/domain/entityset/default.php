@@ -68,10 +68,11 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 	 * query is returned
 	 * 
 	 * @param boolean $clone If set to true then it will return a new clone instance of entityset
+	 * @param boolean $disable_chain Disable the chain
 	 * 
 	 * @return AnDomainQuery
 	 */
-	public function getQuery($clone = false)
+	public function getQuery($clone = false, $disable_chain = false)
 	{
 		if ( !isset($this->_set_query) || $clone ) 
 		{
@@ -87,6 +88,9 @@ class AnDomainEntitysetDefault extends AnDomainEntityset
 			
 			//if clone is set, then return the qury object 
 			if  ( $clone ) {
+			    if ( $disable_chain ) {
+			        $query->disableChain();
+			    }
 			    return $query;
 			}
 			//if not then set the entity query object    
