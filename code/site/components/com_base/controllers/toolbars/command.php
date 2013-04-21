@@ -58,7 +58,7 @@ class ComBaseControllerToolbarCommand extends LibBaseTemplateObject
      */
     public function setHref($href)
     {
-        $this->setAttribute('href', $href);   
+        $this->setAttribute('href', (string)JRoute::_($href));   
         return $this;
     }
     
