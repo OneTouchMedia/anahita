@@ -9,8 +9,9 @@
     	<form id="modal-login-form" action="<?=@route()?>" method="post">
 			<?php KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service')?>
 			<?php if ( class_exists('ComConnectTemplateHelperService', true) ): ?>
+			<p><?= @text('COM-PEOPLE-SESSION-CONNECT-PROMPT-DESCRIPTION') ?></p>
 			<div class="connect-service-actions">
-			<?php echo KService::get('com://site/connect.template.helper.service')->renderLogins() ?>
+				<?= KService::get('com://site/connect.template.helper.service')->renderLogins() ?>
 			</div>
 			<?php endif; ?>
 			
