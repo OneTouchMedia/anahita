@@ -19,7 +19,7 @@
 						           
             <?php endif ?>
          
-            <?= @session_message ?>
+            <?= @flash_message ?>
          
 			<div class="control-group">			
 				<div class="controls">
