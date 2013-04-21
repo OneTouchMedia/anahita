@@ -175,14 +175,30 @@ class ComApplicationRouter extends KObject
      * 
      * @return void
      */
-	public function build($query = '', $fqr = false)
-	{
-	    if ( is_string($query) ) {
-	        $query = str_replace('index.php?', '', $query);
+	public function build($url = '', $fqr = false)
+	{	    
+	    if ( is_array($url) ) {
+	        $url = '?'.http_build_query($url, '', '&');    
+	    }
+	    
+	    $url   = (string) $url;
+	    //remove the index.php for urls that starts
+	    //with index.php? 	    
+	    if ( strpos($url, 'index.php?') === 0 ) {
+	        $url = substr($url, 9);
+	    }
+	    //add ? to the urls that starts with option=
+	    elseif ( strpos($url, 'option=') === 0 ) {
+	        $url = '?'.$url;
 	    }	    
-        $uri = clone $this->_clonable_url;
-        $uri->setQuery($query);
-        $query = $uri->query;
+	    
+	    $uri = clone $this->_clonable_url;	    	    
+	    $uri->setUrl($url);
+	    if ( $uri->scheme || $uri->path ) {
+	        return $uri;
+	    }
+	    
+	    $query = $uri->query;
         
         if ( isset($query['format']) ) {            
             $uri->format = $query['format'];                        
