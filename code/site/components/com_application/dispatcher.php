@@ -301,8 +301,15 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
             print debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             exit(0);
         }
-                
-        $this->tmpl = 'error';
+
+        if ( KRequest::type() == 'AJAX' ) 
+        {
+            $this->_request->format = 'json';
+            $this->tmpl     = 'raw';
+        } 
+        else 
+            $this->tmpl = 'error';
+        
         
         if ( !headers_sent() ) {
             header(KHttpResponse::getHeader($error->getCode(), KRequest::protocol()));
