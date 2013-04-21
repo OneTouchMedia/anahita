@@ -35,6 +35,13 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     protected $_cache;
     
     /**
+     * Turn off/on cache
+     * 
+     * @var boolean
+     */
+    protected $_enable;
+    
+    /**
      * Constructor.
      *
      * @param KConfig $config An optional KConfig object with configuration options.
@@ -44,8 +51,8 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     public function __construct(KConfig $config)
     {
         parent::__construct($config);
-        
-        $this->_cache  = $config->cache;     
+        $this->_cache  = $config->cache;
+        $this->_enable = $config->enable;     
     }
         
     /**
@@ -60,6 +67,7 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
+            'enable'     => true,
             'priority'   => KCommand::PRIORITY_LOWEST,
             'cache'      => new ArrayObject()
         ));
@@ -78,12 +86,15 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
      */
     protected function _beforeRepositoryFetch(KCommandContext $context)
     {
-        $key = $this->_getCacheKey($context->query);
-        
-        if ( $this->_cache->offsetExists($key) ) 
+        if ( $this->_enable )
         {
-            $context->data = $this->_cache->offsetGet($key);
-            return false;
+            $key = $this->_getCacheKey($context->query);
+            
+            if ( $this->_cache->offsetExists($key) )
+            {
+                $context->data = $this->_cache->offsetGet($key);
+                return false;
+            }            
         }
     }
     
@@ -97,8 +108,11 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
      */
     protected function _afterRepositoryFetch(KCommandContext $context)
     {
-        $key = $this->_getCacheKey($context->query);    
-        $this->_cache->offsetSet($key, $context->data);
+        if ( $this->_enable )
+        {
+            $key = $this->_getCacheKey($context->query);
+            $this->_cache->offsetSet($key, $context->data);            
+        }
     }    
     
     /**
@@ -108,10 +122,10 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
      *
      * @return void
      */
-    protected function _beforeRepositoryInsert(KCommandContext $context)
+    protected function _beforeEntityInsert(KCommandContext $context)
     {
         $this->_cache->exchangeArray(array());
-    }
+    }    
     
     /**
      * Clean and disable the cahce before delete
@@ -120,7 +134,7 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
      *
      * @return void
      */
-    protected function _beforeRepositoryDelete(KCommandContext $context)
+    protected function _beforeEntityDelete(KCommandContext $context)
     {
         $this->_cache->exchangeArray(array());
     }    
@@ -132,10 +146,30 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
      *
      * @return void
      */
-    protected function _beforeRepositoryUpdate(KCommandContext $context)
+    protected function _beforeEntityUpdate(KCommandContext $context)
     {
         $this->_cache->exchangeArray(array());
     }      
+    
+    /**
+     * Enables the cache
+     * 
+     * @return void
+     */
+    public function enableCache()
+    {
+        $this->_enable = true;
+    }
+    
+    /**
+     * Disable the cache
+     *
+     * @return void
+     */
+    public function disableCache()
+    {
+        $this->_enable = false;
+    }    
     
     /**
      * Empty the cache
