@@ -8,7 +8,7 @@
 		<form data-behavior="FormValidator" action="<?= @route('view=token') ?>" method="post" class="well">
 		<fieldset>
 			<legend><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD') ?></legend>            
-            <?= @session_message ?>
+            <?= @flash_message ?>
 			<div class="control-group">				
 				<div class="controls">
 					<p><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD-INSTRUCTIONS') ?></p>
