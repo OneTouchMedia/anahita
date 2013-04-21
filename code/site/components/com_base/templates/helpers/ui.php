@@ -203,10 +203,6 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
             $command->label = '<i class="'.$icon.'"></i>&nbsp;'.$command->label;
             unset($attributes['icon']);
         }
-        
-		if ( isset($attributes['href']) ){
-		    $attributes['href'] = JRoute::_($attributes['href']);
-		}
 				
 		$html = $this->getService('com:base.template.helper.html');
 		
