@@ -82,7 +82,7 @@ class AnDomainBehaviorCachable extends AnDomainBehaviorAbstract
         
         if ( $this->_cache->offsetExists($key) ) 
         {
-            $context->data = $cache->offsetGet($key);
+            $context->data = $this->_cache->offsetGet($key);
             return false;
         }
     }
