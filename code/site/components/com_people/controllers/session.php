@@ -177,16 +177,16 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     		
 			if ( $user && $user->block ) 
 			{
-			    $this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED', 'error', false);			    
+			    $this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED', 'error');			    
                 throw new KControllerException('User is blocked', KHttpResponse::FORBIDDEN);
 			}
 						
-			$this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-UNKOWN', 'error', false);			
+			$this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-UNKOWN', 'error');			
 			throw new KControllerException('Unkown Error');
 		}
 
 		// Trigger onLoginFailure Event		
-		$this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error', false);
+		$this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error');
     	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$user));
     	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
     }
@@ -204,10 +204,16 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      */
     protected function _actionAdd(KCommandContext $context)
     {
-        $data = $context->data;
+        $data     = $context->data;
+        $url      = base64_decode($data->return);
         
-        if ( $data->return ) {
+        //if there's a sign up then 
+        //change the redirect url
+        if ( $data->return ) 
+        {
             $_SESSION['return'] = $data->return;
+            $url = base64UrlDecode($data->return);            
+            $this->registerCallback('after.login', array($this, 'redirect'), array('url'=>$url));            
         }
         
         jimport('joomla.user.authentication');
@@ -224,7 +230,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         }
         else 
         {
-            $this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error', false);
+            $this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error');
         	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$authentication));
         	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
         }
@@ -254,10 +260,6 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     public function redirect(KCommandContext $context)
     {
         $url  = JRoute::_($context->url);
-        $data = $context->data;
-        if ( $data && $data->return ) {
-            $url=  base64_decode($data->return);
-        }
         $context->response->setRedirect($url);
     }
 }
