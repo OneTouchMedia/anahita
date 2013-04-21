@@ -293,14 +293,12 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
      * @return void
      */
     public function login()
-    {    
+    {
     	$user = (array)JFactory::getUser($this->getItem()->userId);
     	$this->getService()->set('com:people.viewer', $this->getItem());
-    	$controller = $this->getService('com://site/people.controller.session');
-    	$ret = $controller->login($user);
-    	_die('need work here');
-    	$this->setRedirect($controller->getRedirect()->location);
-    	return $ret;
+    	$controller = $this->getService('com://site/people.controller.session', 
+    	        array('response'=>$this->getResponse()));
+    	return $controller->login($user);
     }
     
     /**
