@@ -94,7 +94,9 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
     {
         $flash   = $this->_mixer->getState()->flash;
         $message = $flash->getMessage();
-        if ( $message ) {
+        if ( $message ) 
+        {
+            $message['message'] = JText::_($message['message']);
             $this->storeValue('message', $message, true);
         }
     }
