@@ -57,9 +57,9 @@ class ComBaseControllerService extends ComBaseControllerResource
 	{		
 		$config->append(array(
 		    'toolbars'    => array('menubar', $this->getIdentifier()->name),		        
-			'behaviors' => array(
-				'serviceable'=>array(), 'persistable'
-			),
+			'behaviors' => to_hash(array(
+				'serviceable', 'persistable'
+			)),
 			'request' => array(
 				'limit' 	=> 20,
                 'sort'      => 'id',
@@ -69,48 +69,23 @@ class ComBaseControllerService extends ComBaseControllerResource
 				
 		parent::_initialize($config);
 	}
-    	
-	/**
-	 * Deletes an entity
-	 * 
-	 * @param KCommandContext $context Context parameter
-	 * 
-	 * @return void
-	 */	
-	protected function _actionDelete($context)
-	{
-		$this->getItem()->delete();
-	}	
-	
-	/**
-	 * Display a set of entities
-	 * 
-	 * @param KCommandContext $context Context parameter
-	 * 
-	 * @return AnDomainEntitysetAbstract
-	 */		
-	protected function _actionGet($context)
-	{
-		if ( KInflector::isPlural($this->view) ) 
-		{
-			$result = $this->execute('browse', $context);
-		} 
-		else 
-		{
-			//create an empty entity for the form layout;
-            if ( !$this->getItem() ) {
-                $this->setItem($this->getRepository()->getEntity()->reset());    
-            }
-            
-			$result = $this->execute('read',   $context);
-		}
-				
-		if ( $result !== false && !is_string($result) )
-			$result = $this->render($context);
-			
-		return (string) $result;
-	}
 
+	/**
+	 * Return the item
+	 * 
+	 * @param KCommandContext $context Context parameter
+	 * 
+	 * @return mixed
+	 */
+	protected function _actionRead(KCommandContext $context)
+	{
+	    //create an empty entity for the form layout;
+	    if ( !$this->getItem() ) {
+	        $this->setItem($this->getRepository()->getEntity()->reset());
+	    }
+	    return $this->getItem();
+	}
+	
 	/**
 	 * Saves/Add an entity and then redirects
 	 * 
@@ -195,31 +170,17 @@ class ComBaseControllerService extends ComBaseControllerResource
 	 */
 	protected function _actionEdit($context)
 	{
-		$data 	= $context->data;
-		$entity = $this->getItem();
-		$entity->setData($data);
+	    $entity = parent::_actionEdit($context);
+	    
 		if ( $entity->isDictionariable() && $data->meta ) 
 		{
-		    foreach($data->meta as $key => $value) 
-		    {
+		    foreach($data->meta as $key => $value) {
 		        $entity->setValue($key, $value);
 		    }
-		}	
+		}
 		
 		return $entity;
-	}	
-	
-	/**
-	 * Fetch and return an entity
-	 * 
-	 * @param KCommandContext $context Context parameter
-	 * 
-	 * @return AnDomainEntityAbstract
-	 */	
-	protected function _actionRead($context)
-	{
-		return $this->getItem();
-	}	
+	}		
 	
 	/**
 	 * Return a set of entities
