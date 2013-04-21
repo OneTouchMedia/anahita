@@ -1,6 +1,6 @@
 <?php defined('KOOWA') or die; ?>
 
-<?= @helper('ui.searchbox', @route('view='.@listItemView()->getName().'&layout=list&get=graph&type='.$type.'&id='.$actor->id))?>
+<?= @helper('ui.filterbox', @route('view='.@listItemView()->getName().'&layout=list&get=graph&type='.$type.'&id='.$actor->id))?>
 
 <module position="sidebar-b" title="<?= @text('COM-ACTORS-SOCIALGRAPH-STATS') ?>">  
     <div class="an-socialgraph-stat">
