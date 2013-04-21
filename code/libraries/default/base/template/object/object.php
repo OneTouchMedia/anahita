@@ -40,7 +40,7 @@ class LibBaseTemplateObject extends KConfig implements LibBaseTemplateObjectInte
         static $instance;
     
         if ( !$instance ) {
-            $instance = new self();
+            $instance = new static();
         }
     
         $object = clone $instance;
