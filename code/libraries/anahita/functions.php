@@ -197,6 +197,25 @@ function is()
 }
 
 /**
+ * When __toString throws error it's a headahce for debuggin
+ * this method safely converts an object to string that if it
+ * throws an error it can be caught 
+ * 
+ * @param mixed $object
+ */
+function to_str($object)
+{
+    if ( is_object($object) && 
+            is_callable(array($object, '__toString') ))
+    {
+        $string = $object->__toString();
+    } else 
+        $string = (string)$object;
+            
+    return $string;
+}
+
+/**
  * Check if a value is within range of $min, $max
  *
  * @param int $value         An integer value
