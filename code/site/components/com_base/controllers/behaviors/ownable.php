@@ -103,7 +103,8 @@ class ComBaseControllerBehaviorOwnable extends KControllerBehaviorAbstract
     }
    	
     /**
-     * Set the owner to the data before controller
+     * If the context->data actor is not already set them set the owner to the data 
+     * before controller add. 
      * 
      * @param KCommandContext $context
      * 
@@ -111,9 +112,12 @@ class ComBaseControllerBehaviorOwnable extends KControllerBehaviorAbstract
      */
     protected function _beforeControllerAdd(KCommandContext $context)
     {
-        if  ( $this->getRepository()->hasBehavior('ownable') ) {
-            $context->data['owner'] = $this->actor;
-		}
+        if ( !$context->data['owner'] instanceof ComActorsDomainEntityActor )
+        {
+            if  ( $this->getRepository()->hasBehavior('ownable') ) {
+                $context->data['owner'] = $this->actor;
+            }
+        }
     }
    	
     /**
