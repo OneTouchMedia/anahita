@@ -7,12 +7,8 @@
 		<form action="<?=@route()?>" method="post" class="well">
 		<fieldset>
 			<legend><?= @text('COM-PEOPLE-SESSION-TITLE') ?></legend>
-			
-			<?php 
-			$connect = KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service');			
-			?>
-			<?php ?>
-			<?php if ( $connect ): ?>
+			<?php if ( KService::get('koowa:loader')->loadIdentifier('com://site/connect.template.helper.service') ): ?>
+			<p><?= @text('COM-PEOPLE-SESSION-CONNECT-PROMPT-DESCRIPTION') ?></p>
 			<div class="connect-service-actions">
 			<?= $this->renderHelper('com://site/connect.template.helper.service.renderLogins')?>			
 			</div>
