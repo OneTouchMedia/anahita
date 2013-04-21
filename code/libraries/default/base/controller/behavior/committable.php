@@ -92,8 +92,10 @@ class LibBaseControllerBehaviorCommittable extends KControllerBehaviorAbstract
                          throw new AnErrorException($this->getItem()->getErrors(), KHttpResponse::BAD_REQUEST);
                      }
                 }
-                
-                throw new KControllerException('Commit failed');
+                else {
+                    $errors = AnHelperArray::getValues($this->getCommitErrors());
+                    throw new AnErrorException($errors, KHttpResponse::BAD_REQUEST);
+                }
             }
         }
     }

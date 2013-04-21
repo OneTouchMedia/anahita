@@ -51,6 +51,22 @@ class AnErrorException extends KException
     }
     
     /**
+     * Format the exception for display
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $errors = array();
+        foreach($this->_errors as $error) {
+            $errors[] = $error->toArray();
+        }
+        $msg  = "Exception '".get_class($this) ."' with message '".$this->getMessage()."' in ".$this->getFile().":".$this->getLine();
+        $msg .= ' '.json_encode($errors);
+        return $msg;     
+    }  
+     
+    /**
      * Return an array of errors
      * 
      * @return array
