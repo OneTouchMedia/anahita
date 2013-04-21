@@ -72,6 +72,23 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
 	}
 	
 	/**
+	 * Render the message in the flash
+	 * 
+	 * @param array $config
+	 * 
+	 * @return string
+	 */
+	public function flash($config = array())
+	{
+	    $data = $this->_template->getData();
+	    if ( isset($data['flash']) && $data['flash']->message )
+	    {
+	        $message = array_merge((array)$data['flash']->getMessage(true), $config);
+	        return $this->message(JText::_($message['message']), $message);
+	    }
+	}
+	
+	/**
 	 * Renders a message
 	 * 
 	 * @param string 	$message 

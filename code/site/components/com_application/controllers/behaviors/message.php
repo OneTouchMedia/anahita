@@ -47,18 +47,15 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
         
         $this->_enabled = $config->enabled;
         $session        = JFactory::getSession();
-
+        $data           = array();
         if ( $this->_enabled ) 
         {   
             $namespace     = $this->_getQueueNamespace(false);
-            $data          = $session->get($namespace->queue,new stdClass(), $namespace->namespace);
-            $config->mixer->getState()->session = $data;            
+            $data          = (array)$session->get($namespace->queue, new stdClass(), $namespace->namespace);
         }
-        
-        else {
-            $config->mixer->getState()->session = new stdClass();
-        }
-        
+          
+        $config->mixer->getState()->flash = new ComApplicationControllerBehaviorMessageFlash($data);
+                
         static $once;
         if ( !$once ) {
             $_SESSION['__controller_persistance'] = array('controller.queue'=>new stdClass());
@@ -86,6 +83,23 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
     }
     
     /**
+     * If the message is still in the flash, push that to the global 
+     * message stack. This gives a chance for the message to be seen
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return void
+     */
+    protected function _afterControllerGet(KCommandContext $context)
+    {
+        $flash   = $this->_mixer->getState()->flash;
+        $message = $flash->getMessage();
+        if ( $message ) {
+            $this->storeValue('message', $message, true);
+        }
+    }
+    
+    /**
      * (non-PHPdoc)
      * @see KControllerBehaviorAbstract::execute()
      */
@@ -103,7 +117,7 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
 	 * 
 	 * @return void
 	 */
-	public function setMessage($message,$type = 'info', $global = true)
+	public function setMessage($message,$type = 'info', $global = false)
 	{
 	    $this->storeValue('message', array('type'=>$type, 'message'=>$message), $global);
 	}
@@ -125,7 +139,12 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
             $namespace   = $this->_getQueueNamespace($global);
             $queue       = JFactory::getSession()
                             ->get($namespace->queue, new stdClass(), $namespace->namespace);
-            $queue->$key = $value;              
+            $queue->$key = $value;
+            
+            if ( !$global && $this->_mixer->flash ) {
+                $this->_mixer->flash->$key = $value;
+            }
+            
             JFactory::getSession()
                 ->set($namespace->queue, $queue, $namespace->namespace);
 	    }

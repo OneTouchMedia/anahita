@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-final class ComBaseControllerDefault extends KObject implements KServiceInstantiatable
+final class ComBaseControllerDefault extends ComBaseControllerService implements KServiceInstantiatable
 {
     /**
      * Force creation of a singleton
@@ -45,7 +45,7 @@ final class ComBaseControllerDefault extends KObject implements KServiceInstanti
                 $identifier          = clone $config->service_identifier;
                 $identifier->type    = 'repos';
                 $identifier->path = array('domain','entity');
-                $default  = array('prefix'=>$container->get($identifier)->getClone(), 'fallback'=>'ComBaseControllerService');
+                $default  = array('prefix'=>$container->get($identifier)->getClone());
             }
             catch(Exception $e) {
                 $default = 'Com'.ucfirst($config->service_identifier->package).'ControllerDefault';

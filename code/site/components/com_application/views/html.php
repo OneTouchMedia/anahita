@@ -82,7 +82,7 @@ class ComApplicationViewHtml extends LibApplicationViewHtml
     protected function _modularizeMessages()
     {
         $session  =& JFactory::getSession();
-        $queue    = $session->get('application.queue', array());
+        $queue    = (array)$session->get('application.queue', array());
         $session->set('application.queue', null);
         if ( isset($queue['message']) ) 
         {
