@@ -48,29 +48,37 @@ class PlgSystemAnahita extends JPlugin
         
         jimport('joomla.utilities.utility');
         jimport('joomla.utilities.simplecrypt');
-        $cookie = KRequest::get('cookie.'.JUtility::getHash('JLOGIN_REMEMBER'),'raw');
-        if ( $cookie ) 
+                
+        if ( KRequest::has('server.PHP_AUTH_USER')
+             && KRequest::has('server.PHP_AUTH_PW')   
+                )
+        {
+            $data['username'] = KRequest::get('server.PHP_AUTH_USER', 'raw');
+            $data['password'] = KRequest::get('server.PHP_AUTH_PW',   'raw');
+        }
+        elseif ( $cookie = KRequest::get('cookie.'.JUtility::getHash('JLOGIN_REMEMBER'),'raw') )
         {
             //first lets clear the cookie
             setcookie( JUtility::getHash('JLOGIN_REMEMBER'), false, time() - AnHelperDate::dayToSeconds(), '/' );
-            
-            //lets decrypt
             $key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
             $crypt    = new JSimpleCrypt($key);
             $cookie   = $crypt->decrypt($cookie);
             $data     = (array)@unserialize($cookie);
-            
-            //@TODO what happens when a user is blocked
+        }
+        
+        if ( !empty($data) ) 
+        {
             try {
+                //@TODO what happens when a user is blocked
                 KService::get('com://site/people.controller.session')
-                    ->login($data, true);
+                ->login($data, true);
             }
             
             catch(KControllerException $e) {
                 //only throws exception if we are using JSON format
-                //otherwise let the current app handle it 
-                if ( KRequest::format() == 'json' && 
-                    $e->getCode() == KHttpResponse::UNAUTHORIZED ) {
+                //otherwise let the current app handle it
+                if ( KRequest::format() == 'json' &&
+                        $e->getCode() == KHttpResponse::UNAUTHORIZED ) {
                     throw $e;
                 }
             }
