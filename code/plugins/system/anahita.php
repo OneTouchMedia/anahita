@@ -49,7 +49,6 @@ class PlgSystemAnahita extends JPlugin
         jimport('joomla.utilities.utility');
         jimport('joomla.utilities.simplecrypt');
         $cookie = KRequest::get('cookie.'.JUtility::getHash('JLOGIN_REMEMBER'),'raw');
-        
         if ( $cookie ) 
         {
             //first lets clear the cookie
@@ -64,7 +63,7 @@ class PlgSystemAnahita extends JPlugin
             //@TODO what happens when a user is blocked
             try {
                 KService::get('com://site/people.controller.session')
-                    ->authenticate($data);
+                    ->login($data, true);
             }
             
             catch(KControllerException $e) {
