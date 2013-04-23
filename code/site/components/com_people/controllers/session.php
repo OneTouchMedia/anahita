@@ -160,11 +160,11 @@ class ComPeopleControllerSession extends ComBaseControllerResource
 			if ( $remember === true )
 			{
     				//legacy for now
-    				$key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
-    				$crypt    = new JSimpleCrypt($key);
-    				$cookie  = $crypt->encrypt(serialize($credentials));
-    				$lifetime = time() + AnHelperDate::yearToSeconds();
-    				setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
+				$key      = JUtility::getHash(KRequest::get('server.HTTP_USER_AGENT','raw'));
+				$crypt    = new JSimpleCrypt($key);
+				$cookie   = $crypt->encrypt(serialize($user));
+				$lifetime = time() + AnHelperDate::yearToSeconds();
+				setcookie(JUtility::getHash('JLOGIN_REMEMBER'), $cookie, $lifetime, '/');
 			}
 			$context = $this->getCommandContext();
 			$context->result = true;
@@ -225,7 +225,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         if ( $authentication->status === JAUTHENTICATE_STATUS_SUCCESS )
         {
             $_SESSION['return'] = null;
-            $this->login((array)$authentication);
+            $this->login((array)$authentication, (bool)$data->remember);
             $this->getResponse()->status = KHttpResponse::CREATED;
         }
         else 
