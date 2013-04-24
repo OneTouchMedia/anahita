@@ -5,10 +5,10 @@
 
 <div class="row">
 	<div class="offset3 span6">
-		<form data-behavior="FormValidator" action="<?= @route('view=token') ?>" method="post" class="well">
+		<form data-behavior="FormValidator " action="<?= @route('view=token') ?>" method="post" class="well">
 		<fieldset>
-			<legend><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD') ?></legend>            
-            <?= @flash_message ?>
+			<legend><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD') ?></legend>                        
+            <div id="flash-message"></div>
 			<div class="control-group">				
 				<div class="controls">
 					<p><?= @text('COM-PEOPLE-TOKEN-FORGOT-PASSWORD-INSTRUCTIONS') ?></p>
@@ -17,7 +17,7 @@
 			</div>
 		
 			<div class="form-actions">
-				<button type="submit" class="btn btn-large">
+				<button data-trigger="Request" type="submit" class="btn btn-large">
 					<?= @text('COM-PEOPLE-ACTION-RESET-PASSWORD'); ?>
 				</button>
 			</div>
