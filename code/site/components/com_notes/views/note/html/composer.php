@@ -22,7 +22,7 @@
     			<div class="post-action">
     			    <div class="connect-service-share">
     			    <?php foreach($sessions as $session) : ?>
-    			        <a data-trigger="Checkbox" data-checkbox-toggle-element="i" data-checkbox-name="channels[]" data-checkbox-value="<?=$session->getName() ?>" data-behavior="BS.Twipsy" title="<?= sprintf(@text('COM-CONNECT-SHARE-POST'), ucfirst($session->api->getName()))?>">
+    			        <a class="btn" data-trigger="Checkbox" data-checkbox-toggle-element="i" data-checkbox-name="channels[]" data-checkbox-value="<?=$session->getName() ?>" data-behavior="BS.Twipsy" title="<?= sprintf(@text('COM-CONNECT-SHARE-POST'), ucfirst($session->api->getName()))?>">
     			            <?= @helper('com://site/connect.template.helper.service.icon', $session->api->getName())?>    			            			         
     			        </a>
     			    <?php endforeach;?>
