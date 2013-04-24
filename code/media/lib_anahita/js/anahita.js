@@ -1,3 +1,6 @@
+//@depends libs/Request.js
+//@depends libs/Validation.js
+
 /**
  * Initialize Global Behavior and Delegator
  */
@@ -43,6 +46,7 @@
 	});	
 })();
 
+
 //parse language
 (function(){
 	//set the language
@@ -69,7 +73,14 @@ Object.extend({
             original[key] = value;
         });
         return Object;
-    }
+    },
+    add : function(original, extension) {
+        extension = Object.merge(extension, original);
+        Object.each(extension, function(value, key) {
+            original[key] = value;
+        });
+        return Object;
+    },
 });
 
 /**
@@ -233,7 +244,7 @@ Class.refactor(Spinner, {
 					}
 				}
 				
-				Object.set(options, {
+				Object.add(options, {
                     where    : 'top',
                     fx       : {
                         duration : 'long'                        
@@ -301,7 +312,7 @@ Class.refactor(Spinner, {
  */
 Element.Form = function(options)
 {
-	Object.set(options, {
+	Object.add(options, {
 		method : 'post',
 		data   : {}
 	});
@@ -343,123 +354,6 @@ Element.Form = function(options)
 }
 
 
-/**
- * Creates an ajax request with the element as the spiner 
- */
-Element.implement(
-{
-	/**
-	 * Returns a request object associated with a element, canceling an exsiting one,
-	 * it will set the element itself as a spinner target
-	 * 
-	 * @param  options
-	 * @return Request
-	 */
-	ajaxRequest : function(options) 
-	{
-		options = options || {};
-		var spinnerTarget;
-		if ( this.get('tag') == 'a' ) {
-			spinnerTarget = this.getParent('ul') || this;
-			Object.set(options, {
-				method : 'get',
-				url	   : this.get('href')
-			});
-			if ( options.method != 'get' ) {
-				//legacy
-				var data = this.get('href').toURI().getData();
-				if ( this.get('data') ) {
-					data = JSON.decode(this.get('data'));
-				}
-				Object.set(options, {data : data});
-			}
-		} else 
-		{
-			if ( this.get('tag') == 'form' ) 
-				Object.set(options,{
-					method : 'get',
-					form : this
-				});
-			else if ( this.form ) {
-				Object.set(options,{
-					form : this.form
-				});				
-			}
-			
-			if ( options.form ) {
-				Object.set(options,{
-					url  	: options.form.get('action'),
-					data 	: options.form,
-					method	: options.form.get('method')
-				});
-			}
-		}
-		
-		if ( instanceOf(options.url, Function) ) {
-			options.url = options.url.apply(this)
-		}
-		
-		Object.set(options,{
-		    fireSubmitEvent : true,
-			useSpinner	    : true,
-			spinnerTarget   : spinnerTarget || options.form || this
-		});
-
-		if ( this.retrieve('request') ) 
-			this.retrieve('request').cancel();
-		
-		var request = null;
-		
-		//if json request create a json object
-		if ( (options.url && options.url.toURI().getData('format') == 'json') || options.format == 'json' )
-		    request = new Request.JSON(options);
-		else 
-			request = new Request.HTML(options);
-		
-		this.store('request', request);
-		
-		if ( options.form && options.fireSubmitEvent ) 
-		{
-			var event = {
-				_stop   : false,
-				mock	: true,
-				request : request,
-				stop    : function() {
-					event._stop = true;
-				},
-				preventDefault : function() {
-				
-				}
-			}
-			options.form.fireEvent('submit', [event]);
-			if ( event._stop ) 
-			{
-				Object.append(request, {
-					send : function() {
-						return false;
-					}
-				});
-				return request;
-			}
-		}
-		
-		if (  options.form && options.form.retrieve('validator') ) 
-		{
-			var validator = options.form.retrieve('validator');
-			var send 	  = request.send.bind(request);
-			Object.append(request, {
-				send : function() {
-					if  ( !validator.validate() ) {
-						return false;
-					}
-					else return send();
-				}
-			});
-		}
-		
-		return request;
-	}
-});
 
 /**
  * Content Property
@@ -525,64 +419,6 @@ Behavior.addGlobalFilter('Hide',{
 	}
 });
 
-/**
- * Request Delegagor. Creates a AJAX request 
- */
-(function(){
-	var request = function(el, api) {
-		var options = (function() {
-			return JSON.decode.bind(el).attempt(el.get('data-request-options') || '{}');
-		}.bind(el)).apply();
-		
-		if ( instanceOf(options, Function) ) {
-			options = options.apply(el);
-		}
-		
-		if ( instanceOf(options.replace, String) ) {
-			options.replace = el.getElement(options.replace);
-		}
-		
-		if ( update = document.getElement(options.update) ) {
-			options.update = update;	
-		}
-		
-		if ( instanceOf(options.remove, String) ) {
-			options.remove = el.getElement(options.remove);
-		}
-		
-		Object.set(options,{
-			onTrigger : Function.from()
-		});
-		
-		var request = el.ajaxRequest(options),
-			uri		= new URI();
-		
-		options.onTrigger.apply(el, [request, event]);
-		
-		request.send();
-	};
-	Behavior.addGlobalFilter('Request', {
-    	setup : function(el, api)
-    	{
-    		el.addEvent('submit', function(e) {
-    			if ( !e.mock ) {
-    				e.stop();    			
-        			request(el,api);    				
-    			}
-    		});
-    	}
-	});
-	Delegator.register(['click'],'Request', 
-	{
-		handler  : function(event, el, api) 
-		{
-			event.stop();
-			request(el,api);
-		}
-	});	
-})();
-
-
 
 /**
  * Countable Behavior for a textarea
@@ -619,145 +455,6 @@ Behavior.addGlobalFilter('Countable',{
 		})
 	}
 })
-
-/**
- * Custom Form Validators
- */
-
-Class.refactor(InputValidator, {
-	getSuccess: function(field, props) {
-		var msg = this.options.successMsg;
-		if ($type(msg) == 'function') msg = msg(document.id(field), props||this.getProps(field));
-		return msg;
-	}
-});
-
-Class.refactor(Form.Validator, {
-	options : {
-		warningPrefix : '',
-		errorPrefix	  : ''
-	}
-});
-
-Class.refactor(Form.Validator.Inline, {
-	
-	initialize: function(form, options) 
-	{
-		this.parent(form, options);
-		this.addEvent('onElementValidate', function(isValid, field, className, warn){
-			var validator = this.getValidator(className);
-			if (!isValid && validator.getError(field)) 
-			{
-				if (warn) field.addClass('warning');
-				var error  = validator.getError(field);
-				var advice = this.makeAdvice(className, field, error, warn);
-				advice.set('html', error);				
-				var cssClass = (warn) ? 'warning-advice' : 'validation-advice';
-				advice.set('class', cssClass);
-				this.insertAdvice(advice, field);
-				if ( advice.getParent('.control-group') )
-				    advice.getParent('.control-group').removeClass('success').addClass('error');
-				this.showAdvice(className, field);
-			} else if ( isValid && validator.getSuccess(field)) {
-			    var succes = validator.getSuccess(field);
-				var advice = this.makeAdvice(className, field, succes);
-				advice.set('html', succes);
-				advice.set('class', 'success-advice');				
-				this.insertAdvice(advice, field);
-				if ( advice.getParent('.control-group') )
-				    advice.getParent('.control-group').removeClass('error').addClass('success');
-				this.showAdvice(className, field);
-			} else {
-				this.hideAdvice(className, field);
-			}
-		});
-	}
-});
-
-/**
- * Form Remote Validator 
- */
-(function() {
-	
-	Class.refactor(Form.Validator, {
-		pendingRequest  : 0,
-		aRequestFailed  : false,
-		dvalidate: function(event) 
-		{
-			var result = this.previous(event);			
-			if ( event && event.target )
-			{
-				event.preventDefault();
-				var intervalID = (function() {				
-					if ( this.pendingRequest == 0 ) {
-						clearInterval(intervalID);
-						if ( !this.aRequestFailed )
-							event.target.submit();
-					}
-				}).periodical(5, this);				
-			}
-		}
-	});
-	Form.Validator.add('validate-remote', {
-		successMsg : function(element, props) {
-			var validation = element.retrieve('remote:validation:result:'+element.get('value')) || {};		
-			return  validation.successMsg || props.successMsg;
-		},	
-		errorMsg: function(element, props) {
-		    var validation = element.retrieve('remote:validation:result:'+element.get('value')) || {};	    
-		    return  validation.errorMsg || props.errorMsg;
-		},
-		test 	: function(element, props) {		
-			if ( Form.Validator.getValidator('IsEmpty').test(element) )
-				return true;
-			var form = element.form;
-			var validator = form.get('validator');
-			var key = 'remote:validation:result:'+ element.get('value');			
-			var result;
-			if ( result = element.retrieve(key) ) 
-			{				
-				var ret =  result.status < 300;
-				if ( !ret ) {
-					validator.aRequestFailed = true;
-				}
-				return ret;
-			}
-			
-			if ( request = element.retrieve('remote:validation:request') ) {				
-				if ( request.key == key ) {
-					return;
-				}
-			}
-			
-			var request = new Request({
-				url    : props.url || element.form.get('action'),
-				method : 'post',
-				data   : {action:'validate','key':props.key || element.get('name'),'value':element.get('value')},
-				onRequest : function(){
-				    //element.spin();
-				},
-				onComplete : function() 
-				{
-				    //element.unspin();
-					var value = this.options.data.value;
-					element.store('remote:validation:request', null);
-					var result = JSON.decode(this.getHeader('Validation') || '{}');
-					result.status = this.status;
-					console.log(this.key);
-				    element.store(this.key, result);
-				    element.form.get('validator').pendingRequest--;
-				    element.form.get('validator').validateField(element);				    
-				},
-				async : true
-			})	
-			request.key = key;
-			validator.pendingRequest++;			
-			element.store('remote:validation:request', request);
-			request.post();
-			return true;
-		}
-	});	
-})();
 
 
 
@@ -799,4 +496,4 @@ var parseLess = function()
 			document.body.adopt(new Element('style',{html:css}));
     	});
 	});	
-}
+};

@@ -5,30 +5,12 @@
 //@depends vendors/Scrollable.js
 //@depends vendors/purr.js
 //@depends anahita.js
+//@depends libs/popup.js
+//@depends libs/alert.js
+//@depends libs/Submit.js
+//@depends libs/Request.Message.js
  
-/**
- * Handling displaying ajax message notifications
- */
-Class.refactor(Request.HTML, 
-{	
-	//check the header
-	onSuccess: function() {
-		var message 	= this.xhr.getResponseHeader('Redirect-Message');
-		var messageType = this.xhr.getResponseHeader('Redirect-Message-Type') || 'success';
-		if  ( message ) {
-			message.alert(messageType);
-		}
-		return this.previous.apply(this, arguments);
-	},
-	onFailure: function() {
-		var message 	= this.xhr.getResponseHeader('Redirect-Message');
-		var messageType = this.xhr.getResponseHeader('Redirect-Message-Type') || 'error';
-		if  ( message ) {
-			message.alert(messageType);
-		}
-		return this.previous.apply(this, arguments);
-	}
-});
+
 
 /**
  * String Alert using Purr
@@ -43,100 +25,6 @@ String.implement({
 				]
 		};
 		return new Bootstrap.Popup.from(options).show();	
-	},
-	alert  : function(type) {
-		var div = new Element('div',{html:this});
-		div.set('data-alert-type', type);
-		window.behavior.applyFilter(div, Behavior.getFilter('Alert'));
-	}
-});
-
-(function(){
-	Class.refactor(Bootstrap.Popup, {	
-		_animationEnd: function(){
-			if (Browser.Features.getCSSTransition()) this.element.removeEventListener(Browser.Features.getCSSTransition(), this.bound.animationEnd);
-			this.animating = false;
-			if (this.visible){
-				this.fireEvent('show', this.element);
-			} else {
-				this.fireEvent('hide', this.element);
-				if (!this.options.persist){
-					this.destroy();
-				} else {
-					this.element.addClass('hide');
-					this._mask.dispose();
-				}
-			}
-		},
-	});	
-	Bootstrap.Popup.from = function(data) 
-	{
-		Object.set(data, {buttons:[], header:''});
-		var html = '';
-		if ( data.header )
-			html += '<div class="modal-header">' + 
-//						'<a href="#" class="close dismiss stopEvent">x</a>' + 
-						'<h3>'+data.header+'</h3>' +
-					'</div>';
-					
-		html +=	'<div class="modal-body"><p>' + data.body  + '</p>' + 
-					'</div>' +
-					'<div class="modal-footer">' +
-					'</div>';			
-		element = new Element('div', {'html':html,'class':'modal fade'});
-		
-		data.buttons = data.buttons.map(function(button) {
-			Object.set(button, {
-				click 	: Function.from(),
-				type	: ''
-			});
-			var btn  = new Element('button', {
-				html	: button.name, 
-				'class' : 'btn'
-			});
-			
-			btn.addClass(button.type);
-			
-			btn.addEvent('click', button.click.bind(this));
-			
-			if ( button.dismiss ) {
-				btn.addClass('dismiss stopEvent');
-			} 
-			
-			return btn;
-		});
-		 
-		element.getElement('.modal-footer').adopt(data.buttons);
-		element.inject(document.body, 'bottom');
-		
-		return new Bootstrap.Popup(element, data.options || {});	
-	}
-})();
-
-Behavior.addGlobalFilter('Alert', {
-	defaults : {
-		mode 		: 'bottom',
-		position	: 'right',
-		highlight   : false,
-		hide 		: true,
-		alert		: {
-			
-		}
-	},
-	returns	: Purr,
-	setup 	: function(el, api) 
-	{
-		el.dispose();
-		var options = api._getOptions();
-		if ( api.getAs(Boolean, 'hide') === false) {			
-			options.alert['hideAfter'] = false;
-		}
-		if ( !this._purr ) {
-			this._purr = new Purr(options);
-		}
-		var wrapper = new Element('div',{'class':'alert alert-'+api.get('type')}).set('html', el.get('html'));		
-		this._purr.alert(wrapper, api._getOptions() || {});
-		return this._purr;
 	}
 });
 
@@ -566,119 +454,7 @@ Delegator.register('click', {
 	}
 });
 
-(function() {
-	Behavior.addGlobalFilter('Submit', {
-    	setup : function(el, api)
-    	{
-    		var form = document.getElement(api.get('form') || el);
-    		
-    		if ( !form ) 
-    			return;
-			
-    		var submit = function() {
-				form.spin();
-				form.submit();			
-			}
-    		if ( el != form ) {
-    			el.addEvent('click', submit);
-    		}
-    		form.addEvent('keyup', function(e) {
-    			if ( e.key == 'enter' ) {
-    				submit();
-    			}
-    		});
-    	}
-	});	
-	Delegator.register('click', {
-		'Submit' : function(event, el, api) {
-			event.stop();
-			if ( el.hasClass('disabled') ) {
-			    return false;
-			}
-			if ( api.get('form') || el.form ) 
-			{
-				var form = api.get('form') ? document.getElement(api.get('form')) : el.form;
-				var submit = function() {
-					form.spin();
-					form.submit();			
-				}
-			} else {
-				var url    = api.get('url') || el.get('href');
-				var data   = JSON.encode(api.get('data')) || el.get('href').toURI().getData();
-				var target = api.get('target') || el.get('target');
-				var form   = Element.Form({action:url, data:data});
-				var spinner   = el.getElement(api.get('spinner')) || el;
-				if ( target ) {
-					form.set('target', target);
-				}	
-				var submit = function(){
-					if ( spinner ) spinner.spin();
-					form.inject(document.body, 'bottom');
-					form.submit();			
-				}
-			}
-			
-			if ( api.get('promptMsg') ) {
-				api.get('promptMsg').prompt({onConfirm:submit});
-			}		
-			else {			
-				submit();
-			}
-		}		
-	});
-})();
-(function() {
-	var remote_popups = {};
-	Delegator.register('click', 'BS.showPopup', {
-		handler: function(event, link, api) {
-			var target, url;	
-			event.preventDefault();
-			if ( api.get('target') ) {
-				target = link.getElement(api.get('target'));
-			} 
-			if ( api.get('url') ) {			
-				url	   = api.get('url');
-			}
-			if ( !url && !target ) {
-				api.fail('Need either a url to the content or can\'t find the target element');
-			}
-						
-			if ( target )								
-				target.getBehaviorResult('BS.Popup').show();
-			else 
-			{
-				if ( remote_popups[url] ) {
-					remote_popups[url].show();
-					return;
-				}
-				var popup = Bootstrap.Popup.from({
-					header : 'Prompt.loading'.translate(),
-					body   : '<div class="uiActivityIndicator">&nbsp;</div>',					
-				});
-				remote_popups[url] = popup;
-				popup.show();
-				var req = new Request.HTML({
-					url : url,
-					onSuccess : function(nodes, tree, html) {
-						var sections = {};
-						['header','body','footer'].each(function(section) {
-							var element = popup.element.getElement('.modal-' + section);
-							var section = new RegExp('<popup:'+section+'>([\\s\\S]*?)<\/popup:'+section+'>');
-							var matches = section.exec(html);
-							if ( matches ) {
-								element.set('html', matches[1]);
-							} else {
-								element.hide();
-							}
-						});						
-					}
-				}).get();
-			}
-		}
 
-	}, true);
-
-})();
 
 Request.Options = {};
 
