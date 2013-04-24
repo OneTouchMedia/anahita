@@ -51,6 +51,21 @@
     }
     
     /**
+     * Calls this method if ajax
+     * 
+     * @param call if ajax $callback
+     * 
+     * @return LibBaseControllerResponseAbstract
+     */
+    public function ifAjax($callback)
+    {
+        if ( $this->isAjax() ) {
+            $callback($this);
+        }
+        return $this;
+    }
+    
+    /**
      * Easy way to see if a respons is AJAX.
      * 
      * This will later be moved to the request object

@@ -372,37 +372,23 @@
     {
         $parts = KInflector::explode($method);
         
-        if ( count($parts) > 1 && $parts[0] == 'is' ) {
-             $format = strtolower($parts[1]);   
-             return $format == $this->getIdentifier()->name;
+        if ( count($parts) > 1 ) 
+        {
+            $format = strtolower($parts[1]);             
+            if ( $parts[0] == 'is') {   
+                return $format == $this->getIdentifier()->name;
+            } 
+            elseif ( $parts[0] == 'if' )  
+            {
+                if ( $format == $this->getIdentifier()->name ) 
+                {
+                    $callback = $arguments[0];
+                    $callback($this);                    
+                }
+                return $this;
+            }
         }
         
         return parent::__call($method, $arguments);
-    }
-    
-    /**
-     * An array of differnet format can be passed to configure 
-     * the format using the current format
-     * 
-     * @param array $array Array of formats
-     * 
-     * @return void
-     */
-    public function __invoke($array)
-    {
-        $format  = $this->getIdentifier()->name;
-        $closure = null;
-        if ( isset($array[$format]) ) 
-        {
-            $closure = $array[$format];
-        } 
-        elseif ( isset($format['default']) ) {
-            
-            $closure = $array['default'];
-        }
-        
-        if ( $closure instanceof Closure ) {
-            $closure($this);
-        }
     }
  }
