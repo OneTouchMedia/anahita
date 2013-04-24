@@ -150,7 +150,7 @@ abstract class LibBaseDispatcherAbstract extends LibBaseControllerAbstract
             }
         }
                 
-        if ( KRequest::format() != 'html' || KRequest::type () == 'AJAX' ) {
+        if ( KRequest::format() == 'json' || (KRequest::type () == 'AJAX' ) ) {
             $this->registerCallback('after.post', array($this, 'forward'));
         } else {
             $this->getController()
