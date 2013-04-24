@@ -121,6 +121,10 @@ class ComApplicationControllerBehaviorMessage extends KControllerBehaviorAbstrac
 	 */
 	public function setMessage($message,$type = 'info', $global = false)
 	{
+	    if ( !$global ) {
+	        $this->getResponse()->setHeader('X-Message', 
+	                json_encode(array('text'=>JText::_($message),'type'=>$type)));
+	    }
 	    $this->storeValue('message', array('type'=>$type, 'message'=>$message), $global);
 	}
 	
