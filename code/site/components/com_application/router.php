@@ -187,10 +187,10 @@ class ComApplicationRouter extends KObject
 	    if ( strpos($url, 'index.php?') === 0 ) {
 	        $url = substr($url, 9);
 	    }
-	    //add ? to the urls that starts with option=
-	    elseif ( strpos($url, 'option=') === 0 ) {
+	    //add ? to the urls that starts with a query key=
+	    elseif ( preg_match('/^\w+=/', $url) ) {
 	        $url = '?'.$url;
-	    }	    
+	    }
 	    
 	    $uri = clone $this->_clonable_url;	    	    
 	    $uri->setUrl($url);
