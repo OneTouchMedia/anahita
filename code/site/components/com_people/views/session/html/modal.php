@@ -44,9 +44,11 @@
 </form>
 
 <popup:footer>
+    <?php if ( @service('com://site/people.controller.person')->permission->canRegister() ) : ?>
      <a href="" data-trigger="BS.showPopup" data-bs-showpopup-url="<?=@route('option=com_people&view=person&layout=add&modal=1&return='.@$return)?>" class="pull-left">
          <?= @text('COM-PEOPLE-ACTION-SIGNUP-NEW-ACCOUNT')?>
      </a>
+     <?php endif;?>
     <button data-behavior="Request" data-request-form="#modal-login-form" name="Submit" class="btn btn-large btn-primary">
     	<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>
     </button>    

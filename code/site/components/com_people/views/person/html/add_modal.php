@@ -45,22 +45,12 @@
 	    <div class="controls">
 	    	<div class="input-prepend">
 	    		<span class="add-on"><i class="icon-lock"></i></span>
-	    		<input type="password" id="password" name="password" />
+	    		<?= @helper('password.input')?>
 	    	</div>
 	    </div>
 	</div>
 	        
-	<div class="control-group">
-	   <label class="control-label"  for="password2">
-			<?php print JText::_('COM-PEOPLE-PASSWORD-VERIFY'); ?>:
-	   </label>
-	   <div class="controls">
-	   		<div class="input-prepend">
-	   			<span class="add-on"><i class="icon-ok"></i></span>
-				<input data-validators="validate-match matchInput:'password' matchName:'<?php print JText::_( 'Password' )?>'" type="password" id="password2" name="password2" value="" />
-			</div>
-		</div>
-	</div>
+
 	<?php if ( !empty($return) ) : ?>
 		<input type="hidden" name="return" value="<?= $return; ?>" />
 	<?php endif;?>
@@ -68,5 +58,5 @@
 </form>
 
 <popup:footer>
-    <button data-behavior="Request" data-request-form="#registration-form" class="btn"><?= @text('COM-PEOPLE-ACTION-REGISTER') ?></button>
+    <button data-behavior="Request" data-request-form="#registration-form" class="btn btn-large btn-primary"><?= @text('COM-PEOPLE-ACTION-REGISTER') ?></button>
 </popup:footer>

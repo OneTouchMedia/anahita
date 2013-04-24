@@ -69,12 +69,10 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 
 	            if ( $this->reset_password ) {
 	                $url = JRoute::_($this->getController()->getItem()->getURL().'&get=settings&edit=account&reset_password=1');
+	                $this->getController()->getResponse()->location = $url;
 	            }
-	            else {
-	                $url = $this->getController()->getRedirect()->location;
-	            }
-	            $this->getService('application')->redirect($url);
-	            return false;	            
+	            $this->getController()->getResponse()->sendHeaders();
+	            exit(0);
 	        }
 	    }
 	    	    

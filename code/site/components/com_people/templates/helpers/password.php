@@ -5,7 +5,6 @@
  * 
  * @category   Anahita
  * @package    Com_People
- * @subpackage Controller
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @copyright  2008 - 2010 rmdStudio Inc./Peerglobe Technology Inc
@@ -15,40 +14,25 @@
  */
 
 /**
- * Password filter.
+ * Password Helper
  *
  * @category   Anahita
  * @package    Com_People
- * @subpackage Controller
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPeopleFilterPassword extends KFilterRaw
+class ComPeopleTemplateHelperPassword extends KTemplateHelperAbstract
 {
     /**
-     * Password min length 
+     * Renders a password input with the validation
+     * 
+     * @return void
      */
-    public static $MIN_LENGTH = 6;
-    
-    /**
-     * Sanitize a value
-     *
-     * @param   mixed   Value to be sanitized
-     * @return  string
-     */
-    protected function _validate($value)
+    public function input()
     {
-        $ret = parent::_validate($value);
-        
-        if ( $ret ) 
-        {
-            if ( strlen($value) < self::$MIN_LENGTH ) {
-                $ret = false;
-            }
-        }
-        
-        return $ret;        
+        $min = ComPeopleFilterPassword::$MIN_LENGTH;
+        return '<input data-validators="required minLength:'.$min.' validate-passwod" type="password" id="password" name="password" />';
     }
 }

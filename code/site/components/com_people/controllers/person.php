@@ -161,7 +161,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         }
         
         $user->save();
-        $person = $this->getRepository()->fetch(array('userId'=>$user->id));
+        $person = $this->getRepository()->find(array('userId'=>$user->id));
         
         //if person is null then user has not been saved
         if ( !$person ) {
@@ -177,7 +177,13 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $this->getResponse()->status  = KHttpResponse::CREATED; 
         
         $this->setItem($person);
-                        
+
+        //we don't want to return
+        //the person
+        $this->getResponse()->ifHtml(function($response){
+            $response->status = 200;
+        });
+                
         return $person;
         
     }
@@ -259,6 +265,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
     				'template'	=> 'account_activate'
 		));
 		$context->response->setHeader('X-User-Activation-Required', true);
+		$this->setMessage(JText::_('COM-PEOPLE-ACTIVATION-LINK-SENT'),'success');
 		$context->response->setRedirect(JRoute::_('option=com_people&view=session'));
     }
     

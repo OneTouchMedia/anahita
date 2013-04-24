@@ -33,7 +33,7 @@
 	    <div class="controls">
 	    	<div class="input-prepend">
 	    		<span class="add-on"><i class="icon-envelope"></i></span>
-	    		<input data-validators="required validate-email validate-remote url:'<?=@route('view=person', false)?>'" type="text" id="email" name="email" value="d<?=uniqid()?>@example.com" maxlength="100" />
+	    		<input data-validators="required validate-email validate-remote url:'<?=@route('view=person', false)?>'" type="text" id="email" name="email" value="ash@peerglobe.com" maxlength="100" />
 	    	</div>
 	    </div>
 	</div>
@@ -45,7 +45,7 @@
 	    <div class="controls">
 	    	<div class="input-prepend">
 	    		<span class="add-on"><i class="icon-lock"></i></span>
-	    		<input type="password" id="password" name="password" />
+	    		<?= @helper('password.input')?>	    		
 	    	</div>
 	    </div>
 	</div>
@@ -61,7 +61,9 @@
 			</div>
 		</div>
 	</div>
-	
+	<?php if ( !empty($return) ) : ?>
+		<input type="hidden" name="return" value="<?= $return; ?>" />
+	<?php endif;?>	
 	        
 	<div class="form-actions">
 		<button type="submit" class="btn"><?= @text('LIB-AN-ACTION-SAVE') ?></button>

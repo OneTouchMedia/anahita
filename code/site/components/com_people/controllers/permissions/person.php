@@ -54,6 +54,7 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
         
         $this->_can_register        = $config->can_register;        
         $this->_activation_required = $config->activation_required;
+        $this->_mixer->permission   = $this;
     }
         
     /**
@@ -70,6 +71,7 @@ class ComPeopleControllerPermissionPerson extends ComActorsControllerPermissionD
         $config->append(array(
             'activation_required' => get_config_value('users.useractivation'),                
             'can_register' => (bool)get_config_value('users.allowUserRegistration', true)
+
         ));
     
         parent::_initialize($config);

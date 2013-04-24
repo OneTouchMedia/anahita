@@ -226,11 +226,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             $this->login((array)$authentication, (bool)$data->remember);
             $this->getResponse()->status = KHttpResponse::CREATED;
             //set the content to null for HTML
-            $this->getResponse()->__invoke(array(
-               'html' => function($response) {
-                   $response->status = 200;
-               }
-            ));
+            $this->getResponse()->ifHtml(function($response){
+                $response->status = 200;
+            });
         }
         else 
         {
