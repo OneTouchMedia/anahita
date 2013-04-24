@@ -82,6 +82,11 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	protected function _actionGet(KCommandContext $context)
 	{	  
         $this->getToolbar('menubar')->setTitle(null);
+        
+        if ( $this->modal ) {
+            $this->getView()->layout('add_modal');
+        }
+        
 		return parent::_actionGet($context);
 	}
 
