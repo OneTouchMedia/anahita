@@ -24,14 +24,7 @@
  * @link       http://www.anahitapolis.com
  */
 class ComBaseDispatcher extends LibBaseDispatcherDefault
-{
-	/**
-	 * The login url use to redirect if the user is not authorized
-	 * 
-	 * @var URI
-	 */
-	protected $_login_url;
-	
+{	
     /** 
      * Constructor.
      *
@@ -45,8 +38,6 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 		
 		if ( $config->auto_asset_import  )
 			$this->registerCallback('after.render', array($this, 'importAsset'));
-		
-		$this->_login_url = $config->login_url;
 	}
 	
 	/**
@@ -61,7 +52,6 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
 	protected function _initialize(KConfig $config)
 	{
 	    $config->append(array(
-	    	'login_url'			=> JRoute::_('option=people&view=session'),
 	        'auto_asset_import' => true
 	    ));
 	    
@@ -86,40 +76,7 @@ class ComBaseDispatcher extends LibBaseDispatcherDefault
         if ( !$this->_controller instanceof KControllerAbstract) {
             register_default(array('identifier'=>$this->_controller,'default'=>array('ComBaseControllerDefault')));
         }
-    }
-
-  	/**
-  	 * Dispatch Action
-  	 * 
-  	 * @param KCommandContext $context Context parameter
-     * 
-     * @return mixed
-     */
-    protected function _actionDispatch(KCommandContext $context)
-    {
-    	try 
-    	{
-    		$result = parent::_actionDispatch($context);
-    	} 
-        catch(KException $exception) 
-    	{
-    	    if ( $this->format == 'html' ) 
-    	    {
-    	        if ( $context->html_redirect )
-    	        {
-    	            if ( $context->html_redirect === true ) {
-    	                $context->html_redirect = KRequest::referrer();
-    	            }
-    	            
-    	            $this->getService('application')->redirect($context->html_redirect);
-    	        }
-    	    }
-    	    
-    	    throw $exception;    		
-    	}
-  
-    	return $result;
-    }    
+    }   
     
     /**
      * Handles a dispatch exception
