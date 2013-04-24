@@ -62,7 +62,7 @@ Class.refactor(Form.Validator.Inline, {
 		validate: function(event) 
 		{
 			var result = this.previous(event);
-			if ( event && event.target ) 
+			if ( result && event && event.target ) 
 			{
 				if ( !event.target.get('remoteValidators').isSuccess() )
 				{
@@ -72,6 +72,7 @@ Class.refactor(Form.Validator.Inline, {
 					});	
 				}
 			}
+			return result;
 		}
 	});
 	Element.Properties.remoteValidators = 
