@@ -19335,6 +19335,9 @@ Request.from = function(element, options) {
 	{
 		var validator = options.form.retrieve('validator');
 		var send 	  = request.send.bind(request);
+		options.form.addEvent('validationSuccessful', function(){
+			send();
+		});
 		Object.append(request, {
 			send : function() {
 				if  ( !validator.validate() ) {
@@ -19646,7 +19649,20 @@ Class.refactor(Form.Validator.Inline, {
 			return this.result.successMsg;
 		}
 	});
-	
+	Form.Validator.add('validate-passwod', {
+		errorMsg : function(element, props) {
+			return 'Passwords will contain at least (1) upper case letter <br/>' +  
+			'Passwords will contain at least (1) lower case letter<br/>' +
+			'Passwords will contain at least (1) number or special character<br/>' + 
+			'Passwords will contain at least (8) characters in length<br/>' +
+			'Password maximum length should not be arbitrarily limited ';
+		},
+		test 	: function(element, props) {
+			var value = element.get('value');
+			return true;
+			return value.match(/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/);
+		}
+	});
 	Form.Validator.add('validate-remote', {
 		successMsg : function(element, props) {
 			var remoteValidator = element

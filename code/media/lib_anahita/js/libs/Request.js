@@ -95,6 +95,9 @@ Request.from = function(element, options) {
 	{
 		var validator = options.form.retrieve('validator');
 		var send 	  = request.send.bind(request);
+		options.form.addEvent('validationSuccessful', function(){
+			send();
+		});
 		Object.append(request, {
 			send : function() {
 				if  ( !validator.validate() ) {
