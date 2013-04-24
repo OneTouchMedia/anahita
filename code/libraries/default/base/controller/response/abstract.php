@@ -174,6 +174,7 @@
              $this->setContent($value);
          }
          else {
+             $key = implode('-', array_map('ucfirst', KInflector::explode($key)));
              $this->setHeader($key, $value);
          }
      }
@@ -205,7 +206,7 @@
             }
             
             $this->setStatus($code, $message);
-            $this->setHeader('location', $location);
+            $this->setHeader('Location', $location);
         }
                 
         return $this;
@@ -268,8 +269,7 @@
       * @return void
       */
      public function setHeader($name, $value)
-     {
-         $name = implode('-', array_map('ucfirst', KInflector::explode($name)));
+     {         
          $this->_headers[$name] = $value;
      }
      
