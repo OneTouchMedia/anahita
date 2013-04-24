@@ -109,10 +109,8 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         } 
         catch(KControllerException $e) 
         {
-            if ( $this->format != 'html' ) {
-                throw $e;
-            }
             $context->response->setRedirect(JRoute::_('option=com_people&view=session'));
+            throw $e;
         }
     }
     
@@ -227,6 +225,12 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             $_SESSION['return'] = null;
             $this->login((array)$authentication, (bool)$data->remember);
             $this->getResponse()->status = KHttpResponse::CREATED;
+            //set the content to null for HTML
+            $this->getResponse()->__invoke(array(
+               'html' => function($response) {
+                   $response->status = 200;
+               }
+            ));
         }
         else 
         {
