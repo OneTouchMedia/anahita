@@ -109,7 +109,7 @@ class ComActorsTemplateHelper extends KTemplateHelperAbstract implements KServic
 		{
 			$src  = $actor->getPortraitURL($size);		
 			$name = KHelperString::ucwords($actor->name);
-			$img  = '<img '.$width .' title="'.$name.'" actorid="'.$actor->id.'" src="'.$src.'" id="actor-avatar-'.$actor->id.'" size="'.$size.'" class="actor-avatar actor-avatar-'.$actor->id.' '.$size.'" />';		
+			$img  = '<img '.$width .' alt="'.$name.'" actorid="'.$actor->id.'" src="'.$src.'" id="actor-avatar-'.$actor->id.'" size="'.$size.'" class="actor-avatar actor-avatar-'.$actor->id.' '.$size.'" />';		
 		}
 		else
 		{
