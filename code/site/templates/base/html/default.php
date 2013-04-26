@@ -22,6 +22,15 @@
     <?= @render('modules', '5', array('style'=>'simple')) ?>
     
     <?= @render('component') ?>
+    
+    <div class="container">
+    	<div class="row">
+    		<div class="span12">
+    			<p class="pull-right"><small><?= @render('copyright') ?></small></p>
+    		</div>
+    	</div>
+    </div>
+    
     <?= @render('analytics') ?> 
   </body>
 </html>

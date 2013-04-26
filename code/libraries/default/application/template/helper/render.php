@@ -316,13 +316,7 @@ class LibApplicationTemplateHelperRender extends KTemplateHelperAbstract
         if($config->poweredby)
         	$copyright .= ' - Powered by <a href="http://www.anahitapolis.com">Anahita ®</a>.';
         
-        return <<<EOF
-            <div class="row" id="row-copyright">
-                <div class="span12">
-                    $copyright
-                </div>
-            </div>
-EOF;
+       return $copyright;
     }
     
     /**
