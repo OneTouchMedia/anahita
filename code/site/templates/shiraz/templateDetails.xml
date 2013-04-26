@@ -17,8 +17,8 @@
 			<br/>
 			<br/>
 			
-			This template is developed for the Anahita® social networking platform and framework and the Anahita®  
-			social apps by <a href="http://www.anahitapolis.com" target="_blank">Anahitapolis.com</a>. 
+			This template is developed for the Anahita social networking platform and framework and the   
+		    apps distributed by <a href="http://www.anahitapolis.com" target="_blank">Anahitapolis.com</a>. 
 			It is available to you under the <a href="http://gplv3.fsf.org/" target="_blank">GPL3</a> license.
 			
 			<br/>
@@ -34,7 +34,7 @@
 				<li>Pages</li>
 			</ol>
 			
-			The Anahita® Shiraz template is developed by extending the <a target="_blank" href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> library.
+			The Anahita Shiraz template is developed by extending the <a target="_blank" href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> library.
 			]]>			
     </description>
     <exceptions>
@@ -97,7 +97,6 @@
                 <option value="0">Hide</option>
                 <option value="1">Show</option>
             </param>
-            <param name="copyright" type="text" default="" label="Copyright" description="Enter your copyright notice here." />
             <param name="poweredby" type="list" default="1" label="Powered By Anahita">
                 <option value="0">Hide</option>
                 <option value="1">Show</option>

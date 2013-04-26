@@ -292,34 +292,6 @@ class LibApplicationTemplateHelperRender extends KTemplateHelperAbstract
     }
     
     /**
-     * Renders a copy right
-     * 
-     * @param array $config Configuration
-     * 
-     * @return string
-     */
-    public function copyright($config = array())
-    {
-        $config = new KConfig($config);
-        
-        $config->append(array(
-            'copyright' => $this->_params->copyright,
-        	'poweredby' => $this->_params->poweredby
-        ));
-        
-        $copyright = $config->copyright;
-        
-        if ( empty($copyright) ) {
-            $copyright = 'Copyright '.date('Y').' '.JFactory::getConfig()->getValue('sitename');
-        }
-
-        if($config->poweredby)
-        	$copyright .= ' - Powered by <a href="http://www.anahitapolis.com">Anahita ®</a>.';
-        
-       return $copyright;
-    }
-    
-    /**
      * Render a google anayltic 
      * 
      * @param array $config Configuration
