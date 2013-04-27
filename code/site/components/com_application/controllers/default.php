@@ -57,32 +57,6 @@ class ComApplicationControllerDefault extends LibBaseControllerResource implemen
     public function __construct(KConfig $config)
     {
         parent::__construct($config);
-        
-        if ( empty($config->template) ) {
-            throw new KControllerException('theme option is required for '.__CLASS__);   
-        }
-        
-        //load the langauge        
-        JFactory::getLanguage()->load('tpl_'.$config->template);
- 
-        $params = '';
-        
-        if ( is_readable($file = JPATH_THEMES.'/'.$config->template.'/params.ini') ) {
-            $params = file_get_contents($file);  
-        }
-        
-        $params = new JParameter($params);
-        
-        $config->append(array(
-            'params'    => $params->toArray()            
-        ));
-                          
-        //set the view         
-        $identifier = 'tmpl://site/'.$config->template.'.view.'.
-                        $this->getIdentifier()->name.'.'.
-                        $this->format;
-                                
-        $this->_view = $this->getService($identifier, $config->toArray());
     }
     
     /**
@@ -97,9 +71,34 @@ class ComApplicationControllerDefault extends LibBaseControllerResource implemen
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-            'template' => 'base'   
-        ));   
-
+            'theme' => 'base'   
+        ));
+        
+        $config->append(array(
+            'view'=>'tmpl://site/'.$config->theme.'.view.'.$this->getIdentifier()->name.'.'.$config->request->getFormat()
+        ));
+        
         parent::_initialize($config);
+    }
+    
+    /**
+     * Renders the page
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return void
+     */
+    protected function _actionRender(KCommandContext $context)
+    {        
+        if ( $context->data instanceof KException ) {
+            $this->getView()->content($context->data);
+        } else {
+            $this->getView()->content($context->response->getContent());
+        }
+        
+        $content = $this->getView()->display();
+              
+        $context->response->setContent($content);
+        $context->response->setContentType($this->getView()->mimetype);
     }
 }

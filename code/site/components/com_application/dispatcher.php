@@ -23,34 +23,8 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComApplicationDispatcher extends KControllerAbstract implements KServiceInstantiatable
+class ComApplicationDispatcher extends LibApplicationDispatcher 
 {
-    /**
-     * Site Application
-     * 
-     * @var JSite
-     */
-    protected $_application;
-    
-    /**
-     * Force creation of a singleton
-     *
-     * @param KConfigInterface  $config    An optional KConfig object with configuration options
-     * @param KServiceInterface $container A KServiceInterface object
-     *
-     * @return KServiceInstantiatable
-     */
-    public static function getInstance(KConfigInterface $config, KServiceInterface $container)
-    {
-        if (!$container->has($config->service_identifier))
-        {
-            $classname = $config->service_identifier->classname;
-            $instance  = new $classname($config);
-            $container->set($config->service_identifier, $instance);            
-        }
-    
-        return $container->get($config->service_identifier);
-    }  
     
     /** 
      * Constructor.
@@ -79,9 +53,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-            'request'=> array('tmpl'=>'default')
-        ));   
-
+             'application' => 'site'     
+        ));
+        
         parent::_initialize($config);
     }
   
@@ -93,17 +67,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * @return boolean
      */
     protected function _actionRun(KCommandContext $context)
-    {
-        
-        //before dispatching then authorizer
-        $this->registerCallback('before.dispatch', array($this, 'route'));
-        
-        //render the result
-        $this->registerCallback('after.dispatch', array($this, 'render'));
-        
-        //render after an error
-        $this->registerCallback('after.error',  array($this, 'render'));
-        
+    {                
         //initialize the application and load system plugins
         $this->_application->initialise();
                      
@@ -111,7 +75,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         
         $this->_application->triggerEvent('onAfterInitialise');
         
-        $this->dispatch();
+        $this->route();
     }
    
     /**
@@ -122,158 +86,48 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * @return boolean
      */        
     protected function _actionDispatch(KCommandContext $context)
-    {        
-        $component = $this->option;
-        
-        if ( !empty($component) ) 
-        {            
-            $result  = JComponentHelper::renderComponent($component);
-            
-            //legacy. joomla event
-            $this->_application->triggerEvent('onAfterDispatch', array($result));
-        }
-        else {
-            throw new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND);
-        }
-        
-        return $result;
-    }
-    
-    /**
-     * Renders the output
-     * 
-     * @param KCommandContext $context Command chain context
-     * 
-     * @return boolean
-     */        
-    protected function _actionRender(KCommandContext $context)
     {
-    	$base_url = $this->getService('koowa:http.url', array('url'=>JURI::base()));
-    	    	
-        $config = array(
-            'base_url'  => $base_url,
-            'template'  => $this->_application->getTemplate(),
-            'request'   => $this->_request
-        );
-        
-        $name    = $context->result instanceof KException ? 'error' : 'page';
-        
-        $view    = $this->getService('com://site/application.controller.'.$name, $config)
-                        ->getView();
-        
-        //set the content type if already not set
-        //the content-type is set in the component dispatcher
-        //however when there's an exception through a system, no content-type is set
-        //to make a general assumption, we always check if content-type is not set
-        //then set it according to the page format.
-        //@TODO this can be done better. 
-        $content_type_sent = false;
-        
-        foreach(headers_list() as $header) {
-           if ( strpos($header, 'Content-Type') === 0 ) {                    
-                $content_type_sent = true;
-                break;
-           }
-        }
-        
-        if ( !$content_type_sent ) {
-            header('Content-Type: '.$view->mimetype);
-        }
+        parent::_actionDispatch($context);
                 
-        $view->layout($this->tmpl);
+        $this->_application->triggerEvent('onAfterDispatch', array($context));
         
-        $context->result = $view->content($context->result)->display();
+        //render if it's only an HTML
+        //otherwise just send back the request
+        if ( !$context->response->isRedirect() && 
+              $context->request->getFormat() == 'html' &&
+             !$context->request->isAjax()
+                )
+        {
+            $config = array(
+                'request'   => $context->request,
+                'response'  => $context->response,
+                'theme'     => $this->_application->getTemplate()
+            );
+            
+            $layout = $this->_request->get('tmpl','default');
+            
+            $this->getService('com://site/application.controller.page', $config)
+                ->layout($layout)
+                ->render();
+        }
         
-                              
-        JResponse::setBody($context->result);
+        $this->_application->triggerEvent('onAfterRender', array($context));
         
-        $this->_application->triggerEvent('onAfterRender');
-        
-        print JResponse::toString();
-        
-        exit(0);
+        $this->send($context);
     }
     
     /**
-     * Parses the route
+     * Routers
      * 
-     * @param KCommandContext $context Command chain context
-     * 
-     * @return boolean
-     */        
-    protected function _actionRoute(KCommandContext $context)
-    {
-        //route the application
-        $url  = clone KRequest::url();
-        $this->_application->getRouter()->parse($url);
-        JRequest::set($url->query, 'get', false);
-                            
-        // trigger the onAfterRoute events
-        $this->_application->triggerEvent('onAfterRoute');
-
-        //globally set ItemId
-        global $Itemid;
-        
-        $Itemid = KRequest::get('get.Itemid','int', 0);
-        
-        //set the request        
-        $this->setRequest(KRequest::get('get','raw'));
-        
-        $this->_request->append(array(        
-            'tmpl'   => KRequest::type() == 'AJAX' ? 'raw' : 'default',
-        ));
-    }
-    
-    /**
-     * Loads the application
+     * @param KCommandContext $context Dispatcher context
      * 
      * @return void
      */
-    protected function _actionLoad($context)
-    {        
-        //legacy register error handling
-        JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
-        
-        //register exception handler
-        set_exception_handler(array($this, 'error')); 
-                
-        //load the JSite
-        $this->getService('koowa:loader')->loadIdentifier('com://site/application.application');        
-                      
-        jimport('joomla.application.component.helper');
-        
-        //no need to create session when using CLI (command line interface)
-        
-        $this->_application = JFactory::getApplication('site', array('session'=>PHP_SAPI !== 'cli'));        
+    protected function _actionRoute(KCommandContext $context)
+    {
+        parent::_actionRoute($context);
 
-        global $mainframe;
-        
-        $mainframe = $this->_application;
-         
-        $error_reporting =  $this->_application->getCfg('error_reporting');
-        
-        define('JDEBUG', $this->_application->getCfg('debug'));
-        
-        //taken from nooku application dispatcher
-        if ($error_reporting > 0)
-        {
-            error_reporting( $error_reporting );
-            ini_set('display_errors',1);
-            ini_set('display_startup_errors',1);
-        }
-                
-        $this->getService()->set('application', $this->_application);
-        
-        //set the session handler to none for
-        if ( PHP_SAPI == 'cli' ) {
-            JFactory::getConfig()->setValue('config.session_handler','none');
-            JFactory::getConfig()->setValue('config.cache_handler','file');
-        }
-                        
-        //set the default timezone to UTC
-        date_default_timezone_set('UTC');              
-        
-        KRequest::root(str_replace('/'.$this->_application->getName(), '', KRequest::base()));
+        $this->dispatch();
     }
     
     /**
@@ -284,37 +138,46 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * 
      * @return KException
      */
-    protected function _actionError($context)
+    protected function _actionException($context)
     {
-        $error = $context->data;
+        $exception = $context->data;
                 
         //if JException then conver it to KException
-        if ( $context->data instanceof JException ) {
-            $error = new KException($context->data->getMessage(),$context->data->getCode());
+        if ( $exception instanceof JException ) {
+            $exception = new KException($exception->getMessage(),$exception->getCode());
         }
         
         //if cli just print the error and exit
-        if ( PHP_SAPI == 'cli' ) 
+        if ( PHP_SAPI == 'cli' )
         {
             print "\n";
-            print $error."\n";
+            print $exception."\n";
             print debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             exit(0);
         }
 
-        if ( KRequest::type() == 'AJAX' ) 
-        {
-            $this->_request->format = 'json';
-            $this->tmpl     = 'raw';
-        } 
-        else 
-            $this->tmpl = 'error';
+        $code = $exception->getCode();
         
-        
-        if ( !headers_sent() ) {
-            header(KHttpResponse::getHeader($error->getCode(), KRequest::protocol()));
+        //check if the error is code is valid
+        if ( $code < 400 || $code >= 600 ) {
+            $code = 500;
         }
-                               
-        return $error;
+                
+        $context->response->status = $code; 
+        $config = array(
+            'response'  => $context->response,
+            'request'   => $context->request,
+            'theme'     => $this->_application->getTemplate()
+        );
+
+        if ( $context->request->isAjax() ) {
+            $context->request->setFormat('json');
+        }
+        
+        $this->getService('com://site/application.controller.exception', $config)
+                ->layout('error')
+                ->render($exception);
+                
+        $this->send($context);
     }
 }

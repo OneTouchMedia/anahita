@@ -10,6 +10,8 @@
  * @version    SVN: $Id: view.php 13650 2012-04-11 08:56:41Z asanieyan $
  * @link       http://www.anahitapolis.com
  */
+
+
 // no direct access
 defined('JPATH_BASE') or die('Restricted access');
 defined('_JEXEC') or define('_JEXEC', 1);

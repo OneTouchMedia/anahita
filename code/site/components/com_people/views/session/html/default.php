@@ -1,6 +1,6 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
 
-<?php @service('application.dispatcher')->tmpl = 'component' ?>
+<?php @service('application.dispatcher')->getRequest()->tmpl = 'component' ?>
 
 <div class="row">
 	<div class="offset3 span6">	

@@ -1,7 +1,4 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
-<?php 
-@service('application.dispatcher')->tmpl = 'component';
-?>
 
 <div class="row">
 	<div class="offset3 span6">

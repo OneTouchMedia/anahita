@@ -59,7 +59,7 @@ abstract class ComMediumControllerPermissionAbstract extends LibBaseControllerPe
 		$action 	= 'com_'.$this->_mixer->getIdentifier()->package.':'.$this->_mixer->getIdentifier()->name.':add';
 	
 		//if repository is ownable then ask the actor if viewer can publish things
-		if ( $this->getRepository()->isOwnable() && in_array($this->layout, array('add', 'edit', 'form','composer')))
+		if ( $this->getRepository()->isOwnable() && in_array($this->getRequest()->get('layout'), array('add', 'edit', 'form','composer')))
 			return $actor->authorize('action', $action);
 	
 		if ( !$this->getItem() )

@@ -49,7 +49,7 @@ class ComBaseControllerToolbarDefault extends ComBaseControllerToolbarAbstract
     public function onAfterControllerGet(KEvent $event)
     {        
         $can_render = $this->getController()->isDispatched() 
-                        && $this->getController()->getResponse()->isHtml()
+                        && $this->getController()->getRequest()->getFormat() == 'html'
                         && $this->getController()->getView() instanceof LibBaseViewTemplate
                         && KRequest::type()   == 'HTTP';
 
@@ -141,7 +141,7 @@ class ComBaseControllerToolbarDefault extends ComBaseControllerToolbarAbstract
         
         //lets add the reverse of the first
         //button if any onle if it's html request 
-        if ( $this->getController()->format != 'html' )
+        if ( $this->getController()->getRequest()->getFormat() != 'html' )
             return;
             
         $action_value   = !$voted ? 'unvote' : 'vote';

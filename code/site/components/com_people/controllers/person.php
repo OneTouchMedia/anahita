@@ -177,12 +177,6 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $this->getResponse()->status  = KHttpResponse::CREATED; 
         
         $this->setItem($person);
-
-        //we don't want to return
-        //the person
-        $this->getResponse()->ifHtml(function($response){
-            $response->status = 200;
-        });
                 
         return $person;
         

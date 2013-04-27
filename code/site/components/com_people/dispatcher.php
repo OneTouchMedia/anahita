@@ -23,7 +23,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComPeopleDispatcher extends ComBaseDispatcher
+class ComPeopleDispatcher extends ComBaseDispatcherDefault
 {    
     /**
      * Constructor.
@@ -56,7 +56,7 @@ class ComPeopleDispatcher extends ComBaseDispatcher
 	 * Handles passowrd token before dispatching 
 	 * 
 	 * (non-PHPdoc)
-	 * @see ComBaseDispatcher::_actionDispatch()
+	 * @see ComBaseDispatcherDefault::_actionDispatch()
 	 */
 	protected function _actionDispatch(KCommandContext $context)
 	{

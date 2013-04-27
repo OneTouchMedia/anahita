@@ -38,7 +38,7 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
 	{
 		$this->commit();
         
-		if ( $context->response->isHtml() ) 
+		if ( $context->request->getFormat() == 'html' ) 
         {
             return $this->getView()
                 ->getTemplate()
@@ -47,9 +47,9 @@ class ComBaseControllerBehaviorVotable extends KControllerBehaviorAbstract
             
             $voters     = $this->getItem()->voteups->voter;
             $controller = $this->getService('com://site/actors.controller.actor')
-                 ->view('actors')
-                 ->format($this->format); 
-                       
+                             ->view('actors')
+                             ->format($context->request->getFormat()); 
+
             $controller->getState()->setList($voters);
             return $controller->getView()->display();            
         }

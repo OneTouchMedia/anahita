@@ -90,7 +90,7 @@ class ComNotificationsControllerNotification extends ComBaseControllerService
         
         $set = parent::_actionBrowse($context)->order('creationTime','DESC');
           
-        if ( $this->layout != 'popover' ) {
+        if ( $this->getRequest()->get('layout') != 'popover' ) {
             $set->limit(0);
         }
         

@@ -112,8 +112,8 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	    $context->comment = $comment;	   
 	    if ( $this->isDispatched() ) 
 	    {
-	        $context->response->content = $this->getCommentController()->display();	  
-	        if ( $context->response->isHtml() ) 
+	        $context->response->content = $this->getCommentController()->display();
+	        if ( $context->request->getFormat() == 'html' ) 
 	        {
 	            $offset = $this->getItem()->getCommentOffset( $comment->id );
 	            $start  = (int)($offset / $this->limit) * $this->limit;
@@ -164,12 +164,11 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	        $identifier = clone $this->getIdentifier();
 	        $identifier->path = array('controller');
 	        $identifier->name = 'comment';
-	        register_default(array('identifier'=>$identifier, 'default'=>'ComBaseControllerComment'));
-	        $request = new KConfig(array('format'=>$this->format));
+	        $request = new KConfig(array('format'=>$this->getRequest()->getFormat()));
 	        $request->append(pick($this->_mixer->getRequest()->comment,array()));
 	        $this->_comment_controller = $this->getService($identifier, array(
-	                'request'  => $request,
-	                'response' => $this->getResponse()
+                    'request'  => $request,
+                    'response' => $this->getResponse()
 	        ));
 	        //set the parent
 	        if ( $this->getItem() ) {

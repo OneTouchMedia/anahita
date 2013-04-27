@@ -81,7 +81,7 @@ class ComActorsControllerBehaviorAdministrable extends KControllerBehaviorAbstra
 	 */
 	protected function _actionGetcandidates(KCommandContext $context)
 	{		
-		if ( $this->format != 'html' )
+		if ( $context->request->getFormat() != 'html' )
 		{
 			$data = $context->data;
 			$canditates = $this->getItem()->getAdminCanditates();
