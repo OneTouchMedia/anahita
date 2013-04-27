@@ -58,6 +58,8 @@ require_once JPATH_CONFIGURATION . '/configuration.php';
 
 require_once( JPATH_LIBRARIES.'/anahita/anahita.php');
 
+$config = new JConfig();
+
 //instantiate anahita and nooku
 Anahita::getInstance(array(           
     'cache_prefix'  => md5($config->secret).'-cache-koowa',

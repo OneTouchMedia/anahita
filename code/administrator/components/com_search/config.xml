@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<config>
-	<params>
-		<param menu="hide"  name="search_blacklist" type="textarea" label="Blacklist" description="Add a comma separated list of keywords to blacklist from the search" cols="100" rows="5"/>
-	</params>
-</config>

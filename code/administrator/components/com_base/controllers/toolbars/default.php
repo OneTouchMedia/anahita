@@ -96,7 +96,7 @@ class ComBaseControllerToolbarDefault extends ComDefaultControllerToolbarDefault
      */
     public function onAfterControllerBrowse(KEvent $event)
     {        
-        if( $this->getController()->isExecutable() && $this->getController()->canAdd() )
+        if( $this->getController()->canAdd() )
         {
             $identifier = $this->getController()->getIdentifier();
             $config     = array('attribs' => array(

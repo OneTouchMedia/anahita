@@ -31,6 +31,13 @@ class JAdministrator extends JApplication
      * @var string
      */
     protected $_template;
+    
+    /**
+     * Application Router
+     *
+     * @var 
+     */    
+    protected $_router;
         
 	/**
 	* Class constructor
@@ -106,7 +113,10 @@ class JAdministrator extends JApplication
 	 */
 	function &getRouter()
 	{
-		$router =& parent::getRouter('administrator');
+	    if ( !isset($this->_router) ) {
+	        $router = KService::get('com://admin/application.router');    
+	    }
+		
 		return $router;
 	}
 

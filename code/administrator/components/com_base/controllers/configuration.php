@@ -95,13 +95,8 @@ class ComBaseControllerConfiguration extends ComBaseControllerResource
     {
         parent::setView($view);
         
-        if( !($this->_view instanceof LibBaseViewAbstract) ) 
-        {
-            $defaults[] = 'ComBaseView'.ucfirst($this->view).ucfirst($this->_view->name);
-            $defaults[] = 'ComBaseView'.ucfirst($this->_view->name);
-            
-            //allows to select confiugration view
-            register_default(array('identifier'=>$this->_view, 'default'=>$defaults));                        
+        if( !($this->_view instanceof LibBaseViewAbstract) ) {
+            unregister_default($this->_view);
         }
     }    
 }

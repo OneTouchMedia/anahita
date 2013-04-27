@@ -23,38 +23,8 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComApplicationDispatcher extends KControllerAbstract implements KServiceInstantiatable
-{
-    /**
-     * Application
-     * 
-     * @var JApplication
-     */
-    protected $_application;
-    
-    /**
-     * Force creation of a singleton
-     *
-     * @param KConfigInterface  $config    An optional KConfig object with configuration options
-     * @param KServiceInterface $container A KServiceInterface object
-     *
-     * @return KServiceInstantiatable
-     */
-    public static function getInstance(KConfigInterface $config, KServiceInterface $container)
-    {
-        if (!$container->has($config->service_identifier))
-        {
-            $classname = $config->service_identifier->classname;
-            $instance  = new $classname($config);
-            $container->set($config->service_identifier, $instance);
-            
-            //Add the service alias to allow easy access to the singleton
-            $container->setAlias('application', $config->service_identifier);
-        }
-    
-        return $container->get($config->service_identifier);
-    }  
-    
+class ComApplicationDispatcher extends LibApplicationDispatcher
+{    
     /** 
      * Constructor.
      *
@@ -67,21 +37,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         parent::__construct($config);
         
         //parse route
-        $this->registerCallback('after.run',   array($this, 'dispatch'));
-
-        //befire authorizing route        
-        $this->registerCallback('before.authorize', array($this, 'route'));
-        
-        //before dispatching then authorizer
-        $this->registerCallback('before.dispatch', array($this, 'authorize'));
-        
-        //render the result
-        $this->registerCallback('after.dispatch', array($this, 'render'));       
-        
-        //legacy register error handling
-        JError::setErrorHandling( E_ERROR, 'callback', array($this, 'error'));
-        //register exception handler
-        set_exception_handler(array($this, 'error'));        
+        $this->registerCallback('before.run',   array($this, 'load'));      
     }
         
     /**
@@ -96,7 +52,7 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _initialize(KConfig $config)
     {
         $config->append(array(
-           
+            'application' => 'administrator'                             
         ));   
 
         parent::_initialize($config);
@@ -104,51 +60,26 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
   
     /**
      * Run the application dispatcher
-     * 
+     *
      * @param KCommandContext $context Command chain context
-     * 
+     *
      * @return boolean
      */
     protected function _actionRun(KCommandContext $context)
-    {       
-        //load the JSite
-        KLoader::loadIdentifier('com://admin/application.application');
-        
+    {
         jimport('joomla.application.component.helper');
         jimport('joomla.document.renderer');
-        require_once(JPATH_LIBRARIES.'/joomla/document/renderer.php');                        
+        require_once(JPATH_LIBRARIES.'/joomla/document/renderer.php');
         require_once(JPATH_BASE.'/includes/toolbar.php');
-        
-        $this->_application = JFactory::getApplication('administrator');
-       	
-        $this->getService()->set('application', $this->_application);
-       	
-        global $mainframe;
-        
-        $mainframe = $this->_application; 
-                 
-        $error_reporting =  $this->_application->getCfg('error_reporting');
-        
-        define('JDEBUG', $this->_application->getCfg('debug'));
-        
-        //taken from nooku application dispatcher
-        if ($error_reporting > 0 )
-        {
-            error_reporting( $error_reporting );
-            ini_set( 'display_errors', 1 );
-        }
-                        
-        //set the default timezone to UTC
-        date_default_timezone_set('UTC');
-        
-        KRequest::root(str_replace('/'.$this->_application->getName(), '', KRequest::base()));
         
         //initialize the application and load system plugins
         $this->_application->initialise();
-        
+         
         JPluginHelper::importPlugin('system');
         
-        $this->_application->triggerEvent('onAfterInitialise');        
+        $this->_application->triggerEvent('onAfterInitialise');
+    
+        $this->route();
     }
     
     /**
@@ -160,21 +91,23 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      */        
     protected function _actionDispatch(KCommandContext $context)
     {        
-        $component = $this->option;
+        parent::_actionDispatch($context);
         
-        if ( !empty($component) && JComponentHelper::isEnabled($component) ) 
+        $this->_application->triggerEvent('onAfterDispatch', array($context));
+        
+        //render if it's only an HTML
+        //otherwise just send back the request
+        if ( !$context->response->isRedirect() &&
+              $context->request->getFormat() == 'html' &&
+             !$context->request->isAjax()
+        )
         {
-            $result = JComponentHelper::renderComponent($component);
-            
-            //legacy. joomla event
-            $this->_application->triggerEvent('onAfterDispatch', array($result));
-        }
-        else {
-            $context->setError(new KDispatcherException(JText::_('Component Not Found'), KHttpResponse::NOT_FOUND));
-            return false;
-        }
+            $this->render($context);
+        } 
         
-        return $result;
+        $this->_application->triggerEvent('onAfterRender', array($context));
+        
+        $this->send($context);
     }
         
     /**
@@ -187,14 +120,15 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
     protected function _actionRender(KCommandContext $context)
     {        
         //old school of rendering for the backend for now        
-        $component  = $this->option;
-        $template   = $this->_application->getTemplate();
-        $file       = $this->tmpl;
+        $component  = $this->getComponent()->getIdentifier()->package;
 
-        if($component == 'com_login') {
+        $template   = $this->_application->getTemplate();
+        $file       = $this->_request->get('tmpl','index');
+
+        if($component == 'login') {
             $file = 'login';
         }
-
+        
         $config = array(
             'template'  => $template,
             'file'      => $file.'.php',
@@ -206,67 +140,50 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
         $document->setTitle( htmlspecialchars_decode($this->_application->getCfg('sitename' )). ' - ' .JText::_( 'Administration' ));
         $document->setDescription( $this->_application->getCfg('MetaDesc') );
         
-        $document->setBuffer($context->result, 'component');
+        $document->setBuffer($context->response->getContent(), 'component');
+        $content = $document->render(false, $config);
+        
+        //lets do some parsing. mission template and legacy stuff
+        $content = preg_replace_callback('#(src|href)="templates\/#',function($matches){
+           return $matches[1].'="'.KRequest::base().'/templates/';
+        }, $content);
+        
+        $content = preg_replace_callback('#action="index.php"#',function($matches){
+            return 'action="'.JRoute::_('index.php?').'"';
+        }, $content);
                 
-        $context->result = $document->render($this->_application->getCfg('caching'), $config);
-        
-        JResponse::setBody($context->result);
-        
-        $this->_application->triggerEvent('onAfterRender');
-        
-        print JResponse::toString();
-        
-        exit(0);
+        $context->response->setContent($content);       
     }
     
     /**
-     * Parses the route
+     * Router action
      * 
-     * @param KCommandContext $context Command chain context
-     * 
-     * @return boolean
-     */        
-    protected function _actionRoute(KCommandContext $context)
-    {
-        //route the application
-        $this->_application->route();
-                
-        // trigger the onAfterRoute events
-        $this->_application->triggerEvent('onAfterRoute');
-       
-        //set the request        
-        $this->setRequest(KRequest::get('get','raw'));
-
-        $this->_request->option = KRequest::get('request.option','cmd');
-        
-        //set the tmpl to the default        
-        $this->_request->tmpl = KRequest::get('get.tmpl','cmd','index');
-    }
-    
-    /**
-     * Only admin can login in the backend
-     * 
-     * @param KCommandContext $context Command chain context
-     * 
-     * @return boolean
+     * @param KCommandContext $context
      */
-    protected function _actionAuthorize(KCommandContext $context)
-    {
-        $component = strtolower($this->option);
+    protected function _actionRoute(KCommandContext $context)
+    {     
+        //legacy
+        if ( KRequest::has('post.option') ) {
+            KRequest::set('get.option',KRequest::get('post.option', 'cmd'));
+        }
+        
+        parent::_actionRoute($context);
+        
+        $component = $this->getRequest()->get('option');
         
         $user =& JFactory::getUser();
         
         if (!$user->authorize('login', 'administrator')) {
             $component = 'com_login';
         }
-
+        
         if( empty($component) ) {
             $component = 'com_cpanel';
         }
-        
-        KRequest::set('get.option', $component);
-        
-        $this->option = $component;
+        $this->getRequest()->set('option',  $component);
+        JRequest::set($this->getRequest()->toArray(),'get');
+        $this->setComponent(substr($component, 4));
+        $this->dispatch();
     }
         
     /**
@@ -277,17 +194,9 @@ class ComApplicationDispatcher extends KControllerAbstract implements KServiceIn
      * 
      * @return KException
      */
-    protected function _actionError($context)
+    protected function _actionException($context)
     {
         $error = $context->data;
-           
-        //if JException then conver it to KException
-        if ( $context->data instanceof KException ) {
-            $error = new JException($context->data->getMessage(),$context->data->getCode());
-        }
-        if ( $error instanceof Exception ) {
-        	$error = new JException($error->getMessage(),$error->getCode());
-        }
         JError::customErrorPage($error);
         exit(0);
     }    
