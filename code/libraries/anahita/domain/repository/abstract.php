@@ -582,6 +582,10 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  	 */
  	public function find($needle, $fetch = true)
  	{
+ 	    if ( empty($needle) ) {
+ 	        throw new InvalidArgumentException('No condition pased to the repository::find');
+ 	    }
+ 	    
  		if ( !is_array($needle) ) {
  			$needle = array($this->_description->getIdentityProperty()->getName()=>$needle); 			
  		}
