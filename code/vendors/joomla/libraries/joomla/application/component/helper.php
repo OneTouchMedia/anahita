@@ -117,6 +117,8 @@ class JComponentHelper
         //new way of doing it
         if ( !file_exists($path) ) 
         {
+            $identifier->name = 'dispatcher';
+            register_default(array('identifier'=>$identifier,'default'=>'ComBaseDispatcherDefault'));
             $dispatcher = ComBaseDispatcher::getInstance();
             KService::setAlias('component.dispatcher', $dispatcher->getIdentifier());
             KService::set('component.dispatcher', $dispatcher);
