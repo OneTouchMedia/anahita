@@ -60,15 +60,17 @@
 			}
 			else 
 			{
-				Object.set(sections, {header:'',footer:'',body:''});
-				Object.each(sections, function(content,section) {
+				Object.add(sections, {header:'',footer:'',body:''});
+				['header','footer','body'].each(function(section){
 					var element = this.element.getElement('.modal-' + section);
+					var content = sections[section];
 					if ( content ) {
 						element.show();
 						element.set('html', content);
 					} else {
 						element.hide();
-					}
+					}					
+					
 				}.bind(this));
 				var buttons = (sections.buttons || []).map(function(button) {
 					Object.set(button, {
@@ -87,7 +89,7 @@
 					return btn;
 				});
 				if ( buttons.length ) {
-					this.element.getElement('.modal-footer').adopt(data.buttons);
+					this.element.getElement('.modal-footer').adopt(buttons);
 					this.element.getElement('.modal-footer').show();
 				}				
 			}			

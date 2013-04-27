@@ -50,9 +50,9 @@ Request.from = function(element, options) {
 	Object.add(options,{
 	    fireSubmitEvent : true,
 		useSpinner	    : true,
-		spinnerTarget   : spinnerTarget || options.form || this
+		spinnerTarget   : spinnerTarget || options.form || element
 	});
-
+	
 	if ( element.retrieve('request') ) 
 		element.retrieve('request').cancel();
 	
@@ -132,30 +132,29 @@ Element.implement(
  * Request Delegagor. Creates a AJAX request 
  */
 (function(){
-	var request = function(el, api) {
-		var options = {};
-		if ( api.get('form') ) {
-			options.form = document.getElement(api.get('form'));			
+	var request = function(el, api) 
+	{
+		if ( !el.retrieve('raw-options') ) 
+		{
+			var rawOption = el.get('data-request-options') || '{}';
+			el.set('data-request-options','{}');
+			el.store('raw-options', rawOption);						
 		}
-		options = Object.merge((function() {
-			return JSON.decode.bind(el).attempt(el.get('data-request-options') || '{}');
-		}.bind(el)).apply(), options);
-		
+		var options   = JSON.decode.bind(el).attempt(el.retrieve('raw-options'));
+		//if option is a function then call it
 		if ( instanceOf(options, Function) ) {
 			options = options.apply(el);
 		}
 		
-		if ( instanceOf(options.replace, String) ) {
-			options.replace = el.getElement(options.replace);
-		}
-		
-		if ( update = document.getElement(options.update) ) {
-			options.update = update;	
-		}
-		
-		if ( instanceOf(options.remove, String) ) {
-			options.remove = el.getElement(options.remove);
-		}
+		['form','replace','update','remove'].each(function(name){
+			var el = api.getAs(String, name) || options[name];
+			if ( el ) options[name] = el			
+			if ( instanceOf(options[name], String) ) {
+				options[name] = document.getElement(options[name]);
+			}
+		});	
+						
+		var autoFollow = api.getAs(Boolean, 'redirect') || false;
 		
 		Object.add(options,{
 			onTrigger : Function.from()
@@ -164,10 +163,17 @@ Element.implement(
 		var request = el.ajaxRequest(options),
 		uri		    = new URI();
 		options.onTrigger.apply(el, [request, event]);
-		request.addEvent('success', function() {
-			if ( this.xhr.getResponseHeader('Location') ) {				
-				document.location = this.xhr.getResponseHeader('Location');
+		request.addEvent('success', function() {			
+			if ( autoFollow ) 
+			{
+				location = this.xhr.getResponseHeader('Content-Location') ||
+					this.xhr.getResponseHeader('Location');
+				
+				if ( location ) {
+					window.location = location;
+				} 
 			}
+			
 		});
 		request.send();
 	};
