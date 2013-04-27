@@ -169,15 +169,7 @@ abstract class LibBaseViewAbstract extends KObject
         //If one argument is passed we assume a setter method is being called
         if ( !isset($this->_mixed_methods[$method]) && count($args) == 1 ) 
         {
-        	//the methods like set[Value] will remove the set from the method
-        	if ( substr($method, 0, 3) == 'set' ) 
-            {  
-                deprecated('using view::__call');
-        		$method = KInflector::variablize(substr($method, 3));
-        	}
-        	
-            $this->set(KInflector::underscore($method), $args[0]);
-            
+            $this->set(KInflector::underscore($method), $args[0]);            
         	return $this; 
         }
                 

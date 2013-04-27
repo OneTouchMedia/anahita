@@ -19,7 +19,7 @@
  */
 
 /**
- * Abstract Controller Response Object
+ * Response Object
  *
  * @category   Anahita
  * @package    Lib_Base
@@ -29,7 +29,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
- abstract class LibBaseControllerResponseAbstract extends KObject
+ class LibBaseControllerResponse extends KObject
  {
     /**
      * Response status code 
@@ -247,6 +247,7 @@
      public function setContentType($type)
      {
          $this->_content_type = $type;
+         $this->_headers['Content-Type'] = $type.'; charset=utf-8';
          return $this;
      }
      
@@ -293,41 +294,7 @@
      public function getHeaders()
      {
          return $this->_headers;
-     }
-     
-     /**
-      * Send the headers
-      * 
-      * @return void
-      */
-     public function sendHeaders()
-     {
-        //temporay for now
-        if ( $this->isJson() ) {
-            $this->location = null;
-        }
-        
-        $headers   = array();
-        $headers[] = 'HTTP/1.1'.' '.$this->getStatusCode().' '.$this->getStatusMessage();
-         
-        if ( $this->_content_type ) {
-            $headers[] = 'Content-Type: '.$this->_content_type;
-        }
-        
-        foreach($this->_headers as $name => $value) {            
-            $headers[] = $name.': '.$value;
-        }
-        $headers = array_reverse($headers);
-        foreach($headers as $header) 
-        {
-            if ( strpos($header,'Location:') === 0 ) {
-                header($header, true, $this->_status_code);
-            } 
-            else {
-                header($header);
-            }
-        }
-     }
+     }     
      
      /**
      * Check if an http status code is an error
@@ -359,36 +326,5 @@
     {
         $code = $this->getStatusCode();
         return (200 <= $code && 300 > $code);
-    }     
-    
-    /**
-     * Check if the method starts with is[format] then see
-     * if the response is a type of format
-     * 
-     * (non-PHPdoc)
-     * @see KObject::__call()
-     */
-    public function __call($method, $arguments)
-    {
-        $parts = KInflector::explode($method);
-        
-        if ( count($parts) > 1 ) 
-        {
-            $format = strtolower($parts[1]);             
-            if ( $parts[0] == 'is') {   
-                return $format == $this->getIdentifier()->name;
-            } 
-            elseif ( $parts[0] == 'if' )  
-            {
-                if ( $format == $this->getIdentifier()->name ) 
-                {
-                    $callback = $arguments[0];
-                    $callback($this);                    
-                }
-                return $this;
-            }
-        }
-        
-        return parent::__call($method, $arguments);
     }
  }

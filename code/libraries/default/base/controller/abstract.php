@@ -50,10 +50,6 @@ class LibBaseControllerAbstract extends KControllerAbstract
     public function __construct( KConfig $config)
     {
         parent::__construct($config);  
-
-        if ( !$config->response ) {
-            $config->response = 'com:base.controller.response.'.pick($this->format,'default');
-        }
         
         $this->_response = $config->response;
     }
@@ -70,7 +66,7 @@ class LibBaseControllerAbstract extends KControllerAbstract
     protected function _initialize(KConfig $config)
     {         
         $config->append(array(
-            'response' => null   
+            'response' => 'com:base.controller.response'   
         ));
         
         parent::_initialize($config);    
@@ -99,7 +95,7 @@ class LibBaseControllerAbstract extends KControllerAbstract
      */
     public function setRequest(array $request)
     {
-        $this->_request = new KConfig();
+        $this->_request = new LibBaseControllerRequest();
         
         foreach($request as $key => $value) {
             $this->_request->$key = $value;
@@ -198,13 +194,13 @@ class LibBaseControllerAbstract extends KControllerAbstract
      */
     public function getResponse()
     {
-        if(!$this->_response instanceof LibBaseControllerResponseAbstract)
+        if(!$this->_response instanceof LibBaseControllerResponse)
         {
             $this->_response = $this->getService($this->_response);
             
-            if ( !$this->_response instanceof LibBaseControllerResponseAbstract ) {
+            if ( !$this->_response instanceof LibBaseControllerResponse ) {
                 throw new 
-                    UnexpectedValueException('Response must be an instanceof LibBaseControllerResponseAbstract');    
+                    UnexpectedValueException('Response must be an instanceof LibBaseControllerResponse');    
             }
         }
     
@@ -233,6 +229,7 @@ class LibBaseControllerAbstract extends KControllerAbstract
     {
         $context = parent::getCommandContext();
         $context->response = $this->getResponse();
+        $context->request  = $this->getRequest();
         return $context;
     }
         

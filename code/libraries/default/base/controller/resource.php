@@ -153,15 +153,15 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
             $config = array(                
                 'media_url' => KRequest::root().'/media',
                 'base_url'  => KRequest::url()->getUrl(KHttpUrl::BASE),
-                'state'     => $this->getState()                
+                'state'     => $this->getState()                             
             );
-
+            
+            if ( $this->_request->has('layout') ) {
+                $config['layout'] = $this->_request->get('layout');
+            }
+            
             $this->_view = $this->getService($this->_view, $config);
             
-            //Set the layout
-            if(isset($this->_state->layout)) {
-                $this->_view->setLayout($this->_state->layout);
-            }
         }
         
         return $this->_view;
@@ -185,7 +185,7 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
             {
                 $identifier          = clone $this->getIdentifier();
                 $identifier->path    = array('view', $view);
-                $identifier->name    = pick($this->format, 'html');
+                $identifier->name    = $this->_request->getFormat();
             }
             else $identifier = $this->getIdentifier($view);
             
@@ -211,6 +211,12 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
     {
         if ( $key == 'view' ) {
             $this->_view = $value;    
+        }
+        //Check for layout, view or format property
+        if(in_array($key, array('layout', 'format')))
+        {
+            $this->getRequest()->set($key, $value);
+            return $this;
         }
         
         return parent::__set($key, $value);        

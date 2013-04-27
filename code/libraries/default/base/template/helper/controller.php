@@ -76,8 +76,7 @@ class LibBaseTemplateHelperController extends KTemplateHelperAbstract
 	        else { 
 	            $identifier = $this->getIdentifier($name);
 	        }
-            
-	        register_default(array('identifier'=>$identifier,'default'=>array('ComBaseControllerDefault')));
+            	        
             $controller = $this->getService($identifier, array('request' => array()));
 	        self::$_controllers['controller.'.$name] = $controller;
 	    }

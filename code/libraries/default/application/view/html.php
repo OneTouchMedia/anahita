@@ -49,10 +49,15 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
      */ 
     public function __construct(KConfig $config)
     {
+        $config->media_url = 'base://media';
+        $config->base_url  = $config->service_container->get('application')->getRouter()->getBaseUrl();
+        
         parent::__construct($config);
         
         $this->_params  = $config->params;        
                
+        JFactory::getLanguage()->load('tpl_'.$this->getIdentifier()->package);
+        
         $this->getTemplate()->getFilter('alias')
             ->append(array('@render(\''=>'$this->renderHelper(\'render.'))
             ->append(array('base://'=>$this->getBaseUrl().'/'), KTemplateFilter::MODE_WRITE);
@@ -68,11 +73,16 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
     * @return void
     */
     protected function _initialize(KConfig $config)
-    {
+    {        
+        if ( is_readable($file = JPATH_THEMES.'/'.$this->getIdentifier()->package.'/params.ini') ) {
+            $params = file_get_contents($file);
+        }
+                
+        $params  = new JParameter($params);
+        
         $config->append(array(
             'mimetype'          => 'text/html',
-            'params'            => array(),        
-            'media_url'         => 'base://media',
+            'params'            => $params->toArray(),                    
             'template_filters'  => array('shorttag','html','alias')
         ));
                 
@@ -121,14 +131,21 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
             }
         }
         
-        if ( $this->getLayout() != 'raw' ) {
-            $this->output = $this->getTemplate()->loadTemplate($this->getLayout(), array('output'=>$this->content))->render();            
-        }
-        else {
-            $this->output = $this->content;   
-        }
+        $this->output = $this->getTemplate()->loadTemplate($this->getLayout(), array('output'=>$this->content))->render();
         
         return $this->output;
+    }
+    
+    /**
+     * Set the template parameters
+     * 
+     * @param array $params
+     * 
+     * @return void
+     */
+    public function setParams($params)
+    {
+        $this->_params = new KConfig($params);
     }
     
     /**
