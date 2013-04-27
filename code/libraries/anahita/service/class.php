@@ -90,6 +90,7 @@ class AnServiceClass
 	static function setDefaultClass($identifier, $classname)
 	{
 	    self::$_defaults[(string)$identifier] = $classname;
+	    unset(self::$_identifiers[(string)$identifier]);
 	}	
 	
     /**
@@ -282,4 +283,9 @@ function get_prefix($object, $config = array())
 function register_default($config)
 {
     AnServiceClass::registerDefault($config);
+}
+
+function unregister_default($identifier)
+{
+    AnServiceClass::setDefaultClass($identifier, null);
 }
