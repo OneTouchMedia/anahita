@@ -37,11 +37,13 @@ class ComBaseDispatcherDefault extends LibBaseDispatcherComponent
         //if there are no views then
         //lets redirect to configuration
         if ( !file_exists(JPATH_COMPONENT.'/views') &&
-              file_exists(JPATH_COMPONENT.'/config.xml')   
+              file_exists(JPATH_COMPONENT.'/config.xml')
+              && $context->request->get('view') != 'configurations'   
                  ) 
         {
-            $this->setController('configuration');
-            $this->getRequest()->set('view', 'configurations');
+            KRequest::url()->setQuery('view=configurations');
+            $context->response->setRedirect(KRequest::url());
+            return false;
         }
 
         parent::_actionGet($context);

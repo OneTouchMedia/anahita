@@ -9,11 +9,7 @@
         <?= @template('tmpl/navbar') ?>
       
         <?= @render('component') ?>
-        
-        <div class="container">
-            <?= @render('copyright') ?>
-        </div>
-        
+
         <?= @render('analytics') ?>
     </body>
 </html>
