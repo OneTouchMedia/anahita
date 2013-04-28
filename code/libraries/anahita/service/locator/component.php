@@ -52,53 +52,69 @@ class AnServiceLocatorComponent extends KServiceLocatorComponent
 		    //be a registered default class
 		    $classname = AnServiceClass::findDefaultClass($identifier);
 		    //hack
-		    if ( !$classname || $classname == 'AnDomainBehaviorDefault') 
-		    {
-		        //Create the fallback path and make an exception for views
-		        $classpath = $identifier->path;
-		        $classtype = !empty($classpath) ? array_shift($classpath) : '';
-		        $paths   = array();               
-		        $paths[] = ucfirst($classtype).KInflector::camelize(implode('_', $classpath));
-		        if ($classtype == 'view' ) {
-		            $paths[] = ucfirst($classtype);
-		        }
-		        
-                $paths   = array_unique($paths);
-                               		        		        
-		        $namespaces = array();
-		        $namespaces[] = 'Com'.ucfirst($identifier->package);
-		        $namespaces[] = 'Lib'.ucfirst($identifier->package);
-		        $namespaces[] = 'ComBase';
-		        $namespaces[] = 'LibBase';
-		        $namespaces[] = 'ComDefault';		        
-		        $namespaces[] = 'An';
-		        $namespaces[] = 'K';
-		        $namespaces = array_unique($namespaces);
-		        $classes    = array();
-		        foreach($namespaces as $namespace) 
-		        {
-		            foreach($paths as $path)
-		            {
-		                $names = array();
-		                $names[] = ucfirst($identifier->name);
-		                $names[] = empty($path) ? ucfirst($identifier->name).'Default' : 'Default';
-		                foreach($names as $name)
-		                {
-		                    $class     = $namespace.$path.$name;
-		                    $classes[] = $class;
-		                    if ( $loader->loadClass($class, $identifier->basepath) ) {
-		                        $classname = $class;
-		                        break 3;
-		                    }
-		                }		                		                		                
-		            }
-		            		            
-		            
-		        }			        
-// 		        print $identifier;var_dump($classes);print'<br />';	        
+		    if ( $classname == 'AnDomainBehaviorDefault' ) {
+		        $classname = null;
+		    }
+		    if ( !$classname ) {
+		        $classname = $this->_findClass($identifier);	        
 		    }
 		}
 		
 		return $classname;
 	}
+	
+	/**
+	 * Find a class
+	 * 
+	 * @param KServiceIdentifier $identifier
+	 * 
+	 * @return string
+	 */
+	protected function _findClass($identifier)
+	{
+	    $loader    = $this->getService('koowa:loader');
+	    $classname = null;
+	    //Create the fallback path and make an exception for views
+	    $classpath = $identifier->path;
+	    $classtype = !empty($classpath) ? array_shift($classpath) : '';
+	    $paths   = array();
+	    $paths[] = ucfirst($classtype).KInflector::camelize(implode('_', $classpath));
+	    if ($classtype == 'view' ) {
+	        $paths[] = ucfirst($classtype);
+	    }
+	    
+	    $paths   = array_unique($paths);
+	     
+	    $namespaces = array();
+	    $namespaces[] = 'Com'.ucfirst($identifier->package);
+	    $namespaces[] = 'Lib'.ucfirst($identifier->package);
+	    $namespaces[] = 'ComBase';
+	    $namespaces[] = 'LibBase';
+	    $namespaces[] = 'ComDefault';
+	    $namespaces[] = 'An';
+	    $namespaces[] = 'K';
+	    $namespaces = array_unique($namespaces);
+	    $classes    = array();
+	    foreach($namespaces as $namespace)
+	    {
+	        foreach($paths as $path)
+	        {
+	            $names = array();
+	            $names[] = ucfirst($identifier->name);
+	            $names[] = empty($path) ? ucfirst($identifier->name).'Default' : 'Default';
+	            foreach($names as $name)
+	            {
+	                $class     = $namespace.$path.$name;
+	                $classes[] = $class;
+	                if ( $loader->findPath($class, $identifier->basepath) &&
+	                     $loader->loadClass($class, $identifier->basepath) ) {
+	                    $classname = $class;
+	                    break 3;
+	                }
+	            }
+	        }
+	    }
+	    return $classname;
+	}
+	
 }

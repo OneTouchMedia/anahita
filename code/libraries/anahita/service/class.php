@@ -154,7 +154,7 @@ class AnServiceClass
         }
         
         $classbase = 'Lib'.ucfirst($identifier->package).KInflector::implode($identifier->path);
-        
+        $loader    = KService::get('koowa:loader');
         $classname = $classbase.ucfirst($identifier->name);
         
         if ( !class_exists($classname) )
@@ -185,10 +185,13 @@ class AnServiceClass
                        $classes[] = $config['fallback'];                      
                    }
                }
-               
                foreach($classes as $class) 
                {
-                   if ( class_exists($class) )
+                   //make sure to find  path first
+                   //then try to load it 
+                   if ( $loader->findPath($class, $identifier->basepath) &&                                                      
+                        $loader->loadClass($class, $identifier->basepath)                             
+                           )
                    {
                        $classname = $class;
                        break;
