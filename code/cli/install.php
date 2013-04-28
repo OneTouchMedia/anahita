@@ -1,12 +1,12 @@
 <?php 
 
-require_once('init.php');
+define('PATH', array_pop($_SERVER['argv']));
 
-$path = @$_SERVER['argv'][1];
+require_once('init.php');
 
 $installer = KService::get('com://dev/installer.controller.default',array(
         'request' => array(
-            'path' => $path     
+            'path' => PATH     
         )
 ));
 

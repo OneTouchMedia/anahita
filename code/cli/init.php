@@ -8,17 +8,9 @@ else
     $__FILE__ = $_SERVER['PWD'].'/'.$_SERVER['SCRIPT_NAME'];
 $dir  = realpath(preg_replace('/\/cli.*/','', $__FILE__));
 
-define('JPATH_BASE', $dir);
-
+define('JPATH_BASE', $dir.'/administrator');
 require_once JPATH_BASE.'/includes/framework.php';
 
-KService::get('koowa:loader')->loadIdentifier('com://site/application.aliases');
-KService::get('com://site/application.dispatcher')->load();
+KService::get('application.dispatcher')->load();
 
-KServiceIdentifier::setApplication('dev', JPATH_BASE.'/cli');
-
-function cli_exception_handler($e) {
-    print "\n".'Exception : '.$e->getMessage()."\n\n";   
-}
-
-set_exception_handler('cli_exception_handler');
+KServiceIdentifier::setApplication('dev', JPATH_SITE.'/cli');
