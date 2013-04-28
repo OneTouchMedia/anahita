@@ -19387,10 +19387,10 @@ Element.implement(
 		}
 		
 		['form','replace','update','remove'].each(function(name){
-			var el = api.getAs(String, name) || options[name];
-			if ( el ) options[name] = el			
+			var value = api.getAs(String, name) || options[name];
+			if ( value ) options[name] = value			
 			if ( instanceOf(options[name], String) ) {
-				options[name] = document.getElement(options[name]);
+				options[name] = el.getElement(options[name]) || document.getElement(options[name]);
 			}
 		});	
 						

@@ -25,7 +25,7 @@
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
-class ComMediumDomainAuthorizerComponent extends LibBaseDomainAuthorizerDefault
+class ComMediumDomainAuthorizerComponent extends LibBaseDomainAuthorizerAbstract
 {    
 	/**
 	 * Authorizes whether the viewer can pubilsh anything within this component or not
