@@ -32,16 +32,18 @@ class ComBaseDispatcherDefault extends LibBaseDispatcherComponent
      * (non-PHPdoc)
      * @see LibBaseDispatcherComponent::_actionGet()
      */
-    protected function __actionGet(KCommandContext $context)
-    {        
-        if ( !$context->request->has('view') ) 
+    protected function _actionGet(KCommandContext $context)
+    {   
+        //if there are no views then
+        //lets redirect to configuration
+        if ( !file_exists(JPATH_COMPONENT.'/views') &&
+              file_exists(JPATH_COMPONENT.'/config.xml')   
+                 ) 
         {
-            
-            $context->request->set('view', 'configurations');
             $this->setController('configuration');
-            print $this->getController()->getIdentifier();
-            die;
+            $this->getRequest()->set('view', 'configurations');
         }
+
         parent::_actionGet($context);
     }
     
