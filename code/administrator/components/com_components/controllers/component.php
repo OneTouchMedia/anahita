@@ -97,7 +97,8 @@ class ComComponentsControllerComponent extends ComBaseControllerService
      */
     protected function _actionRead(KCommandContext $context)
     {
-    	parent::_actionRead($context);    	
+        $component = $this->getService('repos://site/components')->find($this->_request->get('id'));        
+    	$this->setItem($component);    	
     	$this->actor_identifiers = $this->getService('com://admin/components.domain.set.actoridentifier');
     }
 }

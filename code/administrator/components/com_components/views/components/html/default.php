@@ -22,9 +22,9 @@ $direction = '';
 				<td align="center"><?= ++$i; ?></td>
 				<td align="center"><?= @helper('grid.checkbox', array('row'=>$component)); ?></td>
 				<td>
-					<span class="editlinktip hasTip" title="<?= @escape($component->option); ?>">
+					<span class="editlinktip hasTip" title="<?= @escape($component->getName()); ?>">
 						<a href="<?= @route('view=component&id='.$component->id.'&hidemainmenu=1')?>">
-							<?= @escape($component->option); ?>
+							<?= @escape($component->getName()); ?>
 						</a>
 					</span>
 				</td>
