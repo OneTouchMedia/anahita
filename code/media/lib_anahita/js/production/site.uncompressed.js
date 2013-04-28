@@ -19265,7 +19265,7 @@ Request.from = function(element, options) {
 	{
 		if ( element.get('tag') == 'form' ) 
 			Object.add(options,{
-				method : 'get',
+				method : element.get('method') || 'get',
 				form : element
 			});
 		else if ( element.form ) {
