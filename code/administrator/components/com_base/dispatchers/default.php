@@ -41,8 +41,9 @@ class ComBaseDispatcherDefault extends LibBaseDispatcherComponent
               && $context->request->get('view') != 'configurations'   
                  ) 
         {
-            KRequest::url()->setQuery('view=configurations');
-            $context->response->setRedirect(KRequest::url());
+            $query = $context->request->toArray();
+            $query['view'] = 'configurations';
+            $context->response->setRedirect(JRoute::_($query));
             return false;
         }
 
