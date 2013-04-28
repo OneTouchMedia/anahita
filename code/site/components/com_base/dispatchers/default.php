@@ -36,8 +36,9 @@ class ComBaseDispatcherDefault extends LibBaseDispatcherComponent
 	{
 		parent::__construct($config);
 		
-		if ( $config->auto_asset_import  )
-			$this->registerCallback('after.render', array($this, 'importAsset'));
+		if ( $config->auto_asset_import  ) {
+			$this->registerCallback('after.get', array($this, 'importAsset'));
+		}
 	}
 	
 	/**
