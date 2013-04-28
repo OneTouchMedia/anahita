@@ -1,7 +1,6 @@
 <?php defined('KOOWA') or die; ?>
 <?php if( $entity->voteUpCount > 0 ) : ?>
 <popup:header>
-	<a href="#" class="close">x</a>
 	<h3><?= $entity->voteUpCount == 1 ? @text('LIB-AN-VOTE-ONE-VOTED') : sprintf(@text('LIB-AN-VOTE-OTHER-VOTED'), $entity->voteUpCount)?></h3>
 </popup:header>
 <div class="popup-body">
