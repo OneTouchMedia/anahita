@@ -90,12 +90,12 @@ class ConfigApplicationView
 			<div id="page-server">
 				<table class="noshow">
 					<tr>
-						<td width="66%">
+						<td width="65%">
 							<?php require_once($tmplpath.DS.'config_server.php'); ?>
 							<?php require_once($tmplpath.DS.'config_locale.php'); ?>
 							
 						</td>
-						<td width="33%">
+						<td width="35%">
 							<?php require_once($tmplpath.DS.'config_database.php'); ?>
 							<?php require_once($tmplpath.DS.'config_mail.php'); ?>
 						</td>
