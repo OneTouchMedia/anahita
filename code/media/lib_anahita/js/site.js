@@ -1006,7 +1006,8 @@ var EditEntityOptions = function() {
 	return {
 		replace : this.getParent('form'),
 		url		: function() {
-			return this.form.get('action') + '&layout=list&reset=1';
+			var url = this.form.get('action').toURI().setData({layout:'list'}).toString();
+			return url;
 		}
 	}
 }
