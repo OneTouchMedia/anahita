@@ -36,7 +36,7 @@
 				}
 			} else {
 				var url    = api.get('url') || el.get('href');
-				var data   = JSON.encode(api.get('data')) || el.get('href').toURI().getData();
+				var data   = JSON.decode(el.get('data-data')) || el.get('href').toURI().getData();
 				var target = api.get('target') || el.get('target');
 				var form   = Element.Form({action:url, data:data});
 				var spinner   = el.getElement(api.get('spinner')) || el;

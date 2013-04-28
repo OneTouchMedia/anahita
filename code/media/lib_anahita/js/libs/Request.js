@@ -16,8 +16,8 @@ Request.from = function(element, options) {
 		{
 			//legacy
 			var data = element.get('href').toURI().getData();
-			if ( element.get('data') ) {
-				data = JSON.decode(element.get('data'));
+			if ( element.get('data-data') ) {
+				data = JSON.decode(element.get('data-data'));
 			}
 			Object.add(options, {data : data});
 		}

@@ -45,7 +45,7 @@ final class ComBaseControllerDefault extends ComBaseControllerService implements
                 $identifier          = clone $config->service_identifier;
                 $identifier->type    = 'repos';
                 $identifier->path = array('domain','entity');
-                $default  = array('prefix'=>$container->get($identifier)->getClone(), 'default'=>'ComBaseControllerDefault');
+                $default  = array('prefix'=>$container->get($identifier)->getClone(), 'fallback'=>'ComBaseControllerDefault');
             }
             catch(Exception $e) {
                 $default = 'Com'.ucfirst($config->service_identifier->package).'ControllerDefault';
