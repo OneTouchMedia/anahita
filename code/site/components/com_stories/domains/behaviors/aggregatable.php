@@ -339,6 +339,6 @@ class ComStoriesDomainBehaviorAggregatable extends AnDomainBehaviorAbstract
             return false;    
         }
         
-        return count($this->getIds()) > 0;
+        return count($this->getIds()) > 1;
     }             
 }

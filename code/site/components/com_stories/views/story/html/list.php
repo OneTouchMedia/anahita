@@ -17,11 +17,11 @@
             
             <?php
                $votable_item = null;               
-               if ( !$item->aggregated() && $item->object ) { 
+               if ( !$item->aggregated() && $item->object && $item->object->isVotable() ) { 
                     $votable_item = $item->object;
                }
             ?>
-            <?php if ( $votable_item && $votable_item->isVotable() ) : ?> 
+            <?php if ( $votable_item ) : ?> 
             <div class="vote-count-wrapper" id="vote-count-wrapper-<?= $votable_item->id ?>">
             <?= @helper('ui.voters', $votable_item); ?>
             </div>
