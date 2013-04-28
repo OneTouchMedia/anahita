@@ -131,7 +131,17 @@ Element.implement(
 /**
  * Request Delegagor. Creates a AJAX request 
  */
-(function(){
+(function() {
+	var getOptions = function(el) 
+	{
+		if ( !el.retrieve('raw-options') ) 
+		{
+			var rawOption = el.get('data-request-options') || '{}';
+			el.set('data-request-options','{}');
+			el.store('raw-options', rawOption);						
+		}
+		return JSON.decode.bind(el).attempt(el.retrieve('raw-options'));		
+	}
 	var request = function(el, api) 
 	{
 		if ( !el.retrieve('raw-options') ) 
@@ -140,7 +150,7 @@ Element.implement(
 			el.set('data-request-options','{}');
 			el.store('raw-options', rawOption);						
 		}
-		var options   = JSON.decode.bind(el).attempt(el.retrieve('raw-options'));
+		var options   = getOptions(el);
 		//if option is a function then call it
 		if ( instanceOf(options, Function) ) {
 			options = options.apply(el);
@@ -180,10 +190,12 @@ Element.implement(
 	Behavior.addGlobalFilter('Request', {
     	setup : function(el, api)
     	{
-    		var form = document.getElement(api.get('form') || el);
+    		var options = getOptions(el);    		
+    		var form    = document.getElement(api.get('form') || el);
     		
-    		if ( !form ) 
+    		if ( !form ) { 
     			return;
+    		}
 			
     		var submit = function() {
 				request(el,api);

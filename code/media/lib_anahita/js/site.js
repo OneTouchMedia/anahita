@@ -1028,9 +1028,10 @@ var EntityHelper = new Class({
 		if(this.form.title.value.clean().length < 3)
 			return false;
 		
+		var url = this.form.get('action').toURI().setData({layout:'list'}).toString();
 		this.form.ajaxRequest({
 			method : 'post',
-			url : this.form.get('action') + '&layout=list&reset=1',
+			url  : url,
 			data : this.form,
 			inject : {
 				element : document.getElement('.an-entities'),
