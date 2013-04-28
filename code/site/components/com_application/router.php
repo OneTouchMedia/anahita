@@ -36,9 +36,9 @@ class ComApplicationRouter extends LibApplicationRouter
 	{
 	    $this->_fixUrlForParsing($url);
 	    
-	    //if the url path is empty then
-	    //the url path is menu
-	    if ( empty($url->path) ) {
+	    //if the url path is empty then and no option
+	    //isset the add the menu path by default
+	    if ( empty($url->path) && !isset($url->query['option'])) {
 	        $url->path = 'menu';
 	    }
 	    
