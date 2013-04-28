@@ -190,9 +190,6 @@ class LibApplicationDispatcher extends LibBaseDispatcherApplication
                         KRequest::url()->path = KRequest::base();
                         parse_str($arg, $_GET);
                     }
-                    $_GET['format'] = 'json';
-                    KRequest::url()->format = 'json';                
-                    KRequest::url()->setQuery($_GET);
                  }
                  
                  else {
@@ -200,6 +197,10 @@ class LibApplicationDispatcher extends LibBaseDispatcherApplication
                  }
              }
         }
+        
+        $_GET['format'] = 'json';
+        KRequest::url()->format = 'json';
+        KRequest::url()->setQuery($_GET);
         
         //if there's a file then just load the file and exit
         if ( !empty($file) ) 
