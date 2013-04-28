@@ -20276,9 +20276,18 @@ var parseLess = function()
 				['header','footer','body'].each(function(section){
 					var element = this.element.getElement('.modal-' + section);
 					var content = sections[section];
-					if ( content ) {
+					if ( content ) 
+					{
 						element.show();
 						element.set('html', content);
+						//if header doesn't have a close
+						//then add it
+						if ( section == 'header' && !element.getElement('.close') ) 
+						{
+							var close = new Element('button',{'class':'close','aria-hidden':true,'html':'&times;'});
+							close.inject(element, 'top');
+						}
+												
 					} else {
 						element.hide();
 					}					

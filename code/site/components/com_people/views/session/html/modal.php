@@ -1,7 +1,6 @@
 <?php defined('KOOWA') or die('Restricted access') ?>
     
 <popup:header>
-	<a href="#" class="close">x</a>
 	<h3><?= @text('COM-PEOPLE-SESSION-TITLE') ?></h3>
 </popup:header>
 
