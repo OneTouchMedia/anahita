@@ -44,9 +44,9 @@ class AnServiceLocatorComponent extends KServiceLocatorComponent
 	{	        
 	    $path      = KInflector::camelize(implode('_', $identifier->path));
         $classname = 'Com'.ucfirst($identifier->package).$path.ucfirst($identifier->name);
-        
+        $loader    = $this->getService('koowa:loader');
       	//Manually load the class to set the basepath
-		if (!$this->getService('koowa:loader')->loadClass($classname, $identifier->basepath))
+		if (!$loader->loadClass($classname, $identifier->basepath))
 		{
 		    //the default can be in either in the default folder
 		    //be a registered default class
@@ -86,7 +86,7 @@ class AnServiceLocatorComponent extends KServiceLocatorComponent
 		                {
 		                    $class     = $namespace.$path.$name;
 		                    $classes[] = $class;
-		                    if ( $this->getService('koowa:loader')->loadClass($class, $identifier->basepath) ) {
+		                    if ( $loader->loadClass($class, $identifier->basepath) ) {
 		                        $classname = $class;
 		                        break 3;
 		                    }
