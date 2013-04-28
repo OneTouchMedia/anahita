@@ -16,7 +16,8 @@ $config = new JConfig();
 $config->cache_prefix  = md5($config->secret).'-cache-system';
 $config->cache_enabled = $config->caching;
 
-KService::setAlias('application.registry', 'com://site/application.registry');
+KService::setAlias('application.dispatcher','com://admin/application.dispatcher');
+KService::setAlias('application.registry', 'com://admin/application.registry');
 KService::setConfig('application.registry', array('cache_prefix'=>$config->cache_prefix,'cache_enabled'=>$config->cache_enabled));
 
 ?>
