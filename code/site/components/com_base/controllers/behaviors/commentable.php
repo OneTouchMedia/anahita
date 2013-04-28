@@ -44,8 +44,7 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	{	
 	    if ( $this->cid )
         {                        
-	        $context->response->content = $this->getCommentController()->id($this->cid)
-	                ->display();	  
+	        $context->response->content = $this->getCommentController()->id($this->cid)->display();	                	  
 	        return false;      
 	    }
         elseif ($this->permalink && KRequest::type() != 'AJAX' ) 
@@ -164,7 +163,11 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	        $identifier = clone $this->getIdentifier();
 	        $identifier->path = array('controller');
 	        $identifier->name = 'comment';
-	        $request = new KConfig(array('format'=>$this->getRequest()->getFormat()));
+	        $request = new LibBaseControllerRequest(array('format'=>$this->getRequest()->getFormat()));
+	        if  ( $this->getRequest()->has('get') ) 
+	        {
+	            $request->set('get', $this->getRequest()->get('get'));
+	        }
 	        $request->append(pick($this->_mixer->getRequest()->comment,array()));
 	        $this->_comment_controller = $this->getService($identifier, array(
                     'request'  => $request,
