@@ -816,6 +816,23 @@ function is_hash_array($array)
 }
 
 /**
+ * Return the value of an array at $index or null of not found. A negative number
+ * can be passed to return the value from am index counting from the end of the 
+ * array
+ * 
+ * @param array $array The array
+ * @param int   $index The index
+ */
+function array_value($array, $index)
+{
+    $index = (int)$index;
+    if ( $index < 0 ) {
+        $index = count($array) + $index;
+    }
+    return isset($array[$index]) ? $array[$index] : null;
+}
+
+/**
  * Fix config bug when hash array and list array are mixed together
  * 
  * @param array $array
