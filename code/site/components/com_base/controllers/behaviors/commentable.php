@@ -43,11 +43,12 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 	protected function _beforeControllerGet(KCommandContext $context)
 	{	
 	    if ( $this->cid )
-        {                        
-	        $context->response->content = $this->getCommentController()->id($this->cid)->display();	                	  
+        {
+	        $context->response->content 
+	            = $this->getCommentController()->id($this->cid)->display();
 	        return false;      
 	    }
-        elseif ($this->permalink && KRequest::type() != 'AJAX' ) 
+        elseif ($this->permalink && !$context->request->isAjax() ) 
 		{
            $cid	= (int)preg_replace('/[^\d]+/', '', $this->permalink);
 		   $offset = $this->getItem()->getCommentOffset( $cid );
@@ -59,9 +60,8 @@ class ComBaseControllerBehaviorCommentable extends KControllerBehaviorAbstract
 		   }
 		   unset($query['permalink']);							
 		   $url->setQuery($query);
-		   $this->getService('application')
-				->redirect($url.'#scroll='.$this->permalink);			
-			return;
+		   $context->response->setRedirect($url.'#scroll='.$this->permalink);		   			
+           return false;
 		}
 	}
 	
