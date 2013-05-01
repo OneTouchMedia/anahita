@@ -510,6 +510,6 @@ where enable.type like 'ComAppsDomainEntityAssignment,com:apps.domain.entity.ass
 
 function anahita_24()
 {
-	dbexec("DELETE FROM jos_modules_menu WHERE moduleid IN (SELECT id FROM jos_modules WHERE module IN ('mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items'))");
-	dbexec("DELETE FROM jos_modules WHERE module IN ('mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items')");	
+	dbexec("DELETE FROM jos_modules_menu WHERE moduleid IN (SELECT id FROM jos_modules WHERE module IN ('mod_feed','mod_login', 'mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items'))");
+	dbexec("DELETE FROM jos_modules WHERE module IN ('mod_feed', 'mod_login', 'mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items')");	
 }
