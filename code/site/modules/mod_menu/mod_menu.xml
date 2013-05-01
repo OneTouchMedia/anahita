@@ -14,7 +14,7 @@
     </files>
     <params>
         <param name="menutype" type="mos_menu" default="" label="Menu Name" description="The name of the menu (default is mainmenu)" />
-        <param name="menustyle" type="list" default="" label="Menu Style" description="Select the style of menu (default is Top Navigaton)">
+        <param name="menustyle" type="list" default="" label="Menu Style" description="Select the style of menu (default is Navbar)">
             <option value="">Navbar</option>
             <option value="nav-pills">Pills</option>
             <option value="nav-pills nav-stacked">Stacked Pills</option>
