@@ -26,6 +26,46 @@
 class ComMenuRouter extends ComBaseRouterDefault
 {
     /**
+     * The query to use for when a user is logged in and accessing the
+     * home page
+     * 
+     * @var array
+     */
+    protected $_home_query = array();
+    
+    /** 
+     * Constructor.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     * 
+     * @return void
+     */ 
+    public function __construct(KConfig $config)
+    {
+        parent::__construct($config);
+        
+        $this->_home_query = $config['home_query'];
+    }
+        
+    /**
+     * Initializes the default configuration for the object
+     *
+     * Called from {@link __construct()} as a first step of object instantiation.
+     *
+     * @param KConfig $config An optional KConfig object with configuration options.
+     *
+     * @return void
+     */
+    protected function _initialize(KConfig $config)
+    {
+        $config->append(array(
+            'home_query' => array('option'=>'com_dashboard','view'=>'dashboard')
+        ));
+    
+        parent::_initialize($config);
+    } 
+    
+    /**
      * (non-PHPdoc)
      * @see ComBaseRouterAbstract::build()
      */
@@ -60,8 +100,25 @@ class ComMenuRouter extends ComBaseRouterDefault
         if ( !empty($segments) ) {
             $route  = implode('/', $segments);
             $items	= $menu->getItems('route', $route);
-        } else {
-            $items  = $menu->getItems('home', true);
+        } else 
+        {
+            $user = JFactory::getUser();
+            if ( $user->id > 0 && !empty($this->_home_query) ) 
+            {
+                //tries to find a corresponding menu
+                //and set menu id
+                $query  = $this->_home_query;
+                $link   = 'index.php?'.http_build_query($query);
+                if ( $items = $menu->getItems('link', $link) ) 
+                {
+                    $item = array_pop($items);
+                    $query['Itemid'] = $item->id;
+                }
+                return $this->_home_query;
+            }
+            else { 
+                $items  = $menu->getItems('home', true);
+            }
         }
 
         if ( !empty($items) )
