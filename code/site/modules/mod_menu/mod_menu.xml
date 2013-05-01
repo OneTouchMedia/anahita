@@ -18,6 +18,7 @@
             <option value="">Navbar</option>
             <option value="nav-pills">Pills</option>
             <option value="nav-pills nav-stacked">Stacked Pills</option>
+            <option value="mobile">Mobile</option>
         </param>
         <param name="cache" type="list" default="0" label="Caching" description="Select whether to cache the content of this module">
             <option value="1">Use global</option>
