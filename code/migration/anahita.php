@@ -507,3 +507,9 @@ where enable.type like 'ComAppsDomainEntityAssignment,com:apps.domain.entity.ass
 	dbexec("delete from jos_components where `option` like 'com_apps'");
 	dbexec("INSERT INTO `jos_components` VALUES(35, 'Components', 'option=com_components', 0, 0, 'option=com_components', 'Components', 'com_components', 0, 'js/ThemeOffice/component.png', 1, '', 1);");
 }
+
+function anahita_24()
+{
+	dbexec("DELETE FROM jos_modules_menu WHERE moduleid IN (SELECT id FROM jos_modules WHERE module IN ('mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items'))");
+	dbexec("DELETE FROM jos_modules WHERE module IN ('mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items')");	
+}
