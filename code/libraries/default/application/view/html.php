@@ -96,7 +96,7 @@ class LibApplicationViewHtml extends LibBaseViewTemplate
      */
     public function display()
     {
-        if ( $this->content instanceof KException ) 
+        if ( $this->content instanceof Exception ) 
         {
         	$error   = $this->content;
             

@@ -121,7 +121,8 @@
 	var popup;	
 	Delegator.register('click', 'BS.showPopup', {
 		handler: function(event, link, api) {
-			var target, url;	
+			var target, url;
+			url = link.get('href');
 			event.preventDefault();
 			if ( api.get('target') ) {
 				target = link.getElement(api.get('target'));

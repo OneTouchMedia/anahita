@@ -107,7 +107,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
             $result = $this->execute('add', $context);
             return $result;
         } 
-        catch(KControllerException $e) 
+        catch(RuntimeException $e) 
         {
             $context->response->setRedirect(JRoute::_('option=com_people&view=session'));
             throw $e;
@@ -122,9 +122,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      * 
      * @return void
      * 
-     * @throws KControllerException with KHttpResponse::UNAUTHORIZED code If authentication failed
-     * @throws KControllerException with KHttpResponse::FORBIDDEN code If person is authenticated but forbidden
-     * @throws KControllerException with KHttpResponse::INTERNAL_SERVER_ERROR code for unkown error
+     * @throws LibBaseControllerExceptionUnauthorized If authentication failed
+     * @throws LibBaseControllerExceptionForbidden    If person is authenticated but forbidden
+     * @throws RuntimeException code for unkown error
      */
     public function login(array $user, $remember = false)
     {		
@@ -137,7 +137,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     	// Import the user plugin group
 		JPluginHelper::importPlugin('user');
     	$options = array();	    	
-    	$results = JFactory::getApplication()->triggerEvent('onLoginUser', array($user, $options));
+    	$results = @JFactory::getApplication()->triggerEvent('onLoginUser', array($user, $options));
     	$failed  = false;
     		
 		foreach($results as $result)
@@ -175,18 +175,18 @@ class ComPeopleControllerSession extends ComBaseControllerResource
     		
 			if ( $user && $user->block ) 
 			{
-			    $this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED', 'error');			    
-                throw new KControllerException('User is blocked', KHttpResponse::FORBIDDEN);
+			    $this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-BLOCKED', 'error');		
+			    throw new LibBaseControllerExceptionForbidden('User is blocked');
 			}
 						
 			$this->setMessage('COM-PEOPLE-AUTHENTICATION-PERSON-UNKOWN', 'error');			
-			throw new KControllerException('Unkown Error');
+			throw new RuntimeException('Unkown Error');
 		}
 
 		// Trigger onLoginFailure Event		
 		$this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error');
     	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$user));
-    	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
+    	throw new LibBaseControllerExceptionUnauthorized('Authentication Failed. Check username/password');    	
     }
     
     /**
@@ -196,9 +196,9 @@ class ComPeopleControllerSession extends ComBaseControllerResource
      * 
      * @return void
      * 
-     * @throws KControllerException with KHttpResponse::UNAUTHORIZED code If authentication failed
-     * @throws KControllerException with KHttpResponse::FORBIDDEN code If person is authenticated but forbidden
-     * @throws KControllerException with KHttpResponse::INTERNAL_SERVER_ERROR code for unkown error
+     * @throws LibBaseControllerExceptionUnauthorized If authentication failed
+     * @throws LibBaseControllerExceptionForbidden    If person is authenticated but forbidden
+     * @throws RuntimeException for unkown error
      */
     protected function _actionAdd(KCommandContext $context)
     {
@@ -230,7 +230,7 @@ class ComPeopleControllerSession extends ComBaseControllerResource
         {
             $this->setMessage('COM-PEOPLE-AUTHENTICATION-FAILED', 'error');
         	JFactory::getApplication()->triggerEvent('onLoginFailure', array((array)$authentication));
-        	throw new KControllerException('Authentication Failed. Check username/password', KHttpResponse::UNAUTHORIZED);
+        	throw new LibBaseControllerExceptionUnauthorized('Authentication Failed. Check username/password');        	
         }
     }
     

@@ -165,7 +165,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         
         //if person is null then user has not been saved
         if ( !$person ) {
-            throw new KControllerException('Unexpected error when saving user');
+            throw new RuntimeException('Unexpected error when saving user');
         }
         
         //set the portrait image
@@ -229,12 +229,12 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         }
         
         if ( !$user->save() ) {
-            throw new KControllerException('Unexpected error when saving user');
+            throw new RuntimeException('Unexpected error when saving user');
             return false;               
         }
         
         if ( !$person->save() ) {
-            throw new KControllerException('Unexpected error when saving user');
+            throw new RuntimeException('Unexpected error when saving user');
         }
         
         $this->getResponse()->status = KHttpResponse::RESET_CONTENT;

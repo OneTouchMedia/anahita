@@ -144,7 +144,7 @@ class ComApplicationDispatcher extends LibApplicationDispatcher
                 
         //if JException then conver it to KException
         if ( $exception instanceof JException ) {
-            $exception = new KException($exception->getMessage(),$exception->getCode());
+            $exception = new RuntimeException($exception->getMessage(),$exception->getCode());
         }
         
         //if cli just print the error and exit

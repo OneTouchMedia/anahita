@@ -243,11 +243,11 @@ class LibBaseControllerBehaviorIdentifiable extends KControllerBehaviorAbstract
             
             if ( empty($entity) || !count($entity)) 
             {
-                $exception = new KControllerException('Resource Not Found', KHttpResponse::NOT_FOUND);
+                $exception = new LibBaseControllerExceptionNotFound('Resource Not Found');
                 
                 //see if the entity exits or not
                 if ( $query->disableChain()->fetch() ) {
-                    $exception = new KControllerException('Method Not Allowed', KHttpResponse::METHOD_NOT_ALLOWED);
+                    $exception = new LibBaseControllerExceptionMethodNotAllowed('Method Not Allowed');
                 }
                 
                 throw $exception;

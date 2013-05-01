@@ -52,17 +52,7 @@ class LibApplicationViewJson extends LibBaseViewJson
                 $errors  = $this->content->getErrors();
             }
             $data['errors'] = $this->_toData($errors);
-            
-//            if ( JDEBUG ) 
-//            {
-//                $traces[] = $this->content->getFile().':'.$this->content->getLine();
-//                foreach($this->content->getTrace() as $trace) {
-//                    $traces[] = $trace['file'].':'.$trace['line'];
-//                }
-//                
-//                $data['trace'] = $traces;  
-//            }
-            
+                        
            //Encode data
             $this->output = json_encode($data);            
         }
@@ -83,7 +73,7 @@ class LibApplicationViewJson extends LibBaseViewJson
         
         foreach($errors as $error) 
         {
-            if ( $error instanceof KExceptionInterface ) {
+            if ( $error instanceof Exception ) {
                 $data[] = array('code'=>$error->getCode(),'message'=>$error->getMessage());   
             } elseif ( $error instanceof AnError ) {
                 $data[] = $error->toArray();

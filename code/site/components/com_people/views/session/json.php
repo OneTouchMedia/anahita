@@ -33,8 +33,8 @@ class ComPeopleViewSessionJson extends ComBaseViewJson
 	 */
 	public function display()
 	{
-		if ( !$this->_state->getItem() ) {			
-			throw new KControllerException('User is not logged in', KHttpResponse::UNAUTHORIZED);
+		if ( !$this->_state->getItem() ) {
+		    throw new LibBaseControllerExceptionUnauthorized('User is not logged in');
 		} else {
 			return parent::display();
 		}
