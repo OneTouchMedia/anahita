@@ -73,18 +73,17 @@ abstract class LibBaseControllerPermissionAbstract extends KControllerBehaviorAb
             $action = $parts[1];
     
             //Check if the action exists
-            if(!in_array($action, $context->caller->getActions()))
+            if(!in_array($action, $context->caller->getActions()) )
             {
-                throw new KControllerException(
-                		'Action '.ucfirst($action).' Not Implemented', KHttpResponse::NOT_IMPLEMENTED
-                );
+                throw new LibBaseControllerExceptionNotImplemented(
+                        'Action '.ucfirst($action).' Not Implemented');
             }
                         
             if ( $this->_mixer->canExecute($action) === false ) 
             {
-                throw new KControllerException(
-                        'Action '.ucfirst($action).' Not Allowed', KHttpResponse::METHOD_NOT_ALLOWED
-                    );
+                throw new LibBaseControllerExceptionMethodNotAllowed(
+                        'Action '.ucfirst($action).' Not Allowed'
+                        );
             }
         }
     
