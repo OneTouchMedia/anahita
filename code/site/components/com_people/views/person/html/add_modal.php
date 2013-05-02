@@ -58,5 +58,5 @@
 </form>
 
 <popup:footer>
-    <button data-behavior="Request" data-request-form="#registration-form" class="btn btn-large btn-primary"><?= @text('COM-PEOPLE-ACTION-REGISTER') ?></button>
+    <button data-behavior="Request" data-request-form="#registration-form" data-request-redirect="true" class="btn btn-large btn-primary"><?= @text('COM-PEOPLE-ACTION-REGISTER') ?></button>
 </popup:footer>
