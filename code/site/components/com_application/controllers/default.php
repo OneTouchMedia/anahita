@@ -90,7 +90,7 @@ class ComApplicationControllerDefault extends LibBaseControllerResource implemen
      */
     protected function _actionRender(KCommandContext $context)
     {        
-        if ( $context->data instanceof KException ) {
+        if ( $context->data instanceof Exception ) {
             $this->getView()->content($context->data);
         } else {
             $this->getView()->content($context->response->getContent());
