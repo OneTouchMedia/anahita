@@ -63,7 +63,7 @@ $config = new JConfig();
 //instantiate anahita and nooku
 Anahita::getInstance(array(           
     'cache_prefix'  => md5($config->secret).'-cache-koowa',
-    'cache_enabled' => false
+    'cache_enabled' => $config->caching
 ));
 
 KServiceIdentifier::setApplication('site' , JPATH_SITE);
