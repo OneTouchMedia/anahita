@@ -32,7 +32,7 @@
  class LibBaseDispatcherResponseTransportHtml extends LibBaseDispatcherResponseTransportAbstract
  {
      /**
-      * For all the HTML request unless its ajax, perform a redirect if the location
+      * For all the success HTML responses unless its ajax, perform a redirect if the location
       * is set 
       * 
       * (non-PHPdoc)
@@ -43,7 +43,7 @@
          $response = $this->getResponse();
          $headers  = $response->getHeaders();
          if ( isset($headers['Location'])
-                 && !$response->isRedirect()
+                 && $response->isSuccess()
                  && !$response->getRequest()->isAjax()
          ) {
              $response->setStatus(KHttpResponse::SEE_OTHER);
