@@ -69,16 +69,16 @@ class PlgSystemAnahita extends JPlugin
         if ( !empty($data) ) 
         {
             try {
+                $data['rememmber'] = true;
                 //@TODO what happens when a user is blocked
                 KService::get('com://site/people.controller.session')
-                ->login($data, true);
+                ->add($data);
             }
             
-            catch(KControllerException $e) {
+            catch(RuntimeException $e) {
                 //only throws exception if we are using JSON format
                 //otherwise let the current app handle it
-                if ( KRequest::format() == 'json' &&
-                        $e->getCode() == KHttpResponse::UNAUTHORIZED ) {
+                if ( KRequest::format() == 'json') {
                     throw $e;
                 }
             }
