@@ -28,6 +28,29 @@
 class LibBaseDispatcherComponent extends LibBaseDispatcherAbstract
 {
     /**
+     * Force creation of a singleton
+     *
+     * @param KConfigInterface  $config    An optional KConfig object with configuration options
+     * @param KServiceInterface $container A KServiceInterface object
+     *
+     * @return KServiceInstantiatable
+     */
+    public static function getInstance(KConfigInterface $config, KServiceInterface $container)
+    {
+        if (!$container->has($config->service_identifier))
+        {
+            $classname = $config->service_identifier->classname;
+            $instance  = new $classname($config);
+            $container->set($config->service_identifier, $instance);
+            
+            //Add the service alias to allow easy access to the singleton
+            $container->setAlias('component.dispatcher', $config->service_identifier);            
+        }
+    
+        return $container->get($config->service_identifier);
+    }
+        
+    /**
      * Constructor.
      *
      * @param KConfig $config An optional KConfig object with configuration options.
@@ -111,7 +134,7 @@ class LibBaseDispatcherComponent extends LibBaseDispatcherAbstract
         {
             $action = $context->data['_action'];
             if(in_array($action, array('browse', 'read', 'display'))) {
-                throw new KControllerException('Action: '.$action.' not allowed');
+                throw new LibBaseControllerExceptionMethodNotAllowed('Action: '.$action.' not allowed');
             }
         }
         

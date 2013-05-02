@@ -42,6 +42,7 @@ class LibBaseDispatcherApplication extends LibBaseDispatcherAbstract implements 
             $classname = $config->service_identifier->classname;
             $instance  = new $classname($config);
             $container->set($config->service_identifier, $instance);
+            $container->setAlias('application.dispatcher', $config->service_identifier);
         }
     
         return $container->get($config->service_identifier);
@@ -142,10 +143,10 @@ class LibBaseDispatcherApplication extends LibBaseDispatcherAbstract implements 
         define( 'JPATH_COMPONENT_SITE',				JPATH_SITE.DS.'components'.DS.$name);
         define( 'JPATH_COMPONENT_ADMINISTRATOR',	JPATH_ADMINISTRATOR.DS.'components'.DS.$name);
         if ( !file_exists(JPATH_COMPONENT) ) {
-            throw new KControllerException('Component not found', KHttpResponse::NOT_FOUND);
+            throw new LibBaseControllerExceptionNotFound('Component not found');
         }
         if ( !JComponentHelper::isEnabled($name) ) {
-            throw new KControllerException('Component is disabled', KHttpResponse::FORBIDDEN);
+            throw new LibBaseControllerExceptionForbidden('Component is disabled');            
         }
         $this->getComponent()->dispatch($context);
     }
