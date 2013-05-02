@@ -37,10 +37,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	public function __construct(KConfig $config)
 	{
 		parent::__construct($config);
-		
-		if ( $this->activationRequired() ) {
-		    $this->registerCallback('after.add', array($this, 'mailActivationLink'));
-		}
+					
 		$this->registerCallback('after.add', array($this, 'notifyAdminsNewUser'));
 	}
 		
@@ -56,8 +53,7 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
 	protected function _initialize(KConfig $config)
 	{	
 		$config->append(array(			
-			'behaviors'			  => array('validatable','com://site/mailer.controller.behavior.mailer'),
-		    'login_callback'      => array($this, 'login')
+			'behaviors'	=> array('validatable','com://site/mailer.controller.behavior.mailer')		    
 		));
 		
 		parent::_initialize($config);
@@ -177,6 +173,18 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         $this->getResponse()->status  = KHttpResponse::CREATED; 
         
         $this->setItem($person);
+        
+        if ( !$person->enabled ) {
+            $this->registerCallback('after.add', array($this, 'mailActivationLink'));
+        }
+        elseif ( $this->isDispatched() ) 
+        {
+            if ( $context->request->getFormat() == 'html' ) 
+            {
+                $context->response->status = 200;
+                $this->registerCallback('after.add', array($this, 'login'));
+            }
+        }
                 
         return $person;
         
