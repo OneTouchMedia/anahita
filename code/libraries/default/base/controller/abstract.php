@@ -226,10 +226,11 @@ class LibBaseControllerAbstract extends KControllerAbstract
      * @return KCommandContext
      */
     public function getCommandContext()
-    {
+    {        
         $context = parent::getCommandContext();
         $context->response = $this->getResponse();
-        $context->request  = $this->getRequest();
+        $context->request  = $this->getRequest();        
+         
         return $context;
     }
         

@@ -107,8 +107,8 @@ class LibBaseControllerResource extends LibBaseControllerAbstract
         {
             $result = $this->execute($action, $context);
             
-            if ( is_string($result) ) {
-                $context->response->setContent($result);
+            if ( is_string($result) || $result === false ) {
+                $context->response->setContent($result.' ');
             }
         }
         
