@@ -98,7 +98,7 @@ class ComInstallerAdapterComponent extends ComInstallerAdapterAbstract
         $component  = $components->findOrAddNew(array('option'=>$this->_name,'parent'=>0), array('data'=>array('params'=>'')));
         
         //remove any child component
-        $components->getQuery()->option($this->_name)->parent('0','>')->destroy();
+        $components->getQuery()->option($this->_name)->parent('0','>')->delete()->save();
         
         //save the component
         //$component->save();
