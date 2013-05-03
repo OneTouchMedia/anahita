@@ -37,10 +37,6 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
     public function __construct(KConfig $config)
     {
         parent::__construct($config);
-        
-        //add the anahita:event.command        
-        $this->getCommandChain()
-            ->enqueue( $this->getService('anahita:command.event'), KCommand::PRIORITY_LOWEST);
           
         $this->registerCallback(array('after.delete','after.add'), array($this, 'redirect'));
         

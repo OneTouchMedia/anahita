@@ -36,10 +36,7 @@ class ComBaseControllerComment extends ComBaseControllerService
 	{
 		parent::__construct($config);
 		
-		$this->registerCallback(array('after.voteup','after.votedown'), array($this,'getvoters'));
-        
-        $this->getCommandChain()
-            ->enqueue( $this->getService('anahita:command.event'), KCommand::PRIORITY_LOWEST);        
+		$this->registerCallback(array('after.voteup','after.votedown'), array($this,'getvoters'));                
 	}
 
    /**

@@ -102,10 +102,7 @@ class Anahita
                 
         //create a central event dispatcher           
         KService::set('anahita:event.dispatcher', KService::get('koowa:event.dispatcher'));
-        
-        //create an event command with central event dispatcher
-        KService::set('anahita:command.event', 
-                    KService::get('koowa:command.event', array('event_dispatcher'=>KService::get('anahita:event.dispatcher'))));
+               
     }
     
     /**
