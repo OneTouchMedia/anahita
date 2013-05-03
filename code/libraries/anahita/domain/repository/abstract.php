@@ -565,7 +565,7 @@ abstract class AnDomainRepositoryAbstract extends KCommand
  	public function extract($entity)
  	{
  		if ( $entity->persisted() ) {
- 			$entity->destroy();
+ 			$entity->delete()->save();
  		}
  		
  		$this->_space->extractEntity($entity);

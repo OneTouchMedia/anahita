@@ -30,7 +30,7 @@ abstract class AnDomainEntitysetAbstract extends AnObjectSet
 	/**
 	 * Repository
 	 * 
-	 * @var AnDomainRepositorAbstract 
+	 * @var AnDomainRepositoryAbstract 
 	 */
 	protected $_repository;
 
@@ -470,27 +470,32 @@ abstract class AnDomainEntitysetAbstract extends AnObjectSet
     	
     	return $data;
     }
-    
-    /**
-     * Destroy a collection of entities
-     *
-     * @return void
-     */
-    public function destroy()
-    {
-    	$this->delete();
-    	return $this->_repository->getSpace()->commitEntities();
-    }
         
     /**
-     * Deletes all the entities
+     * Deletes all the entities by loading them and marking them for 
+     * deletion
      *
      * @return void
      */
     public function delete()
     {
-    	return parent::__call('delete');
+    	foreach($this as $entity) {
+    	    $entity->delete();
+    	}
+    	return $this;
     }
+    
+	/**
+	 * Forwards the call to the space commit entities
+	 * 
+     * @param mixed &$failed Return the failed set
+     * 
+	 * @return boolean
+	 */
+	public function save(&$failed = null)
+	{
+		return $this->getRepository()->getSpace()->commitEntities($failed);
+	}
         
     /**
      * (non-PHPdoc)

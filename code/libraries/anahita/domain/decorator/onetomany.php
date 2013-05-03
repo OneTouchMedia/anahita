@@ -273,7 +273,23 @@ class AnDomainDecoratorOnetomany extends AnObjectDecorator
 
         $this->extract($object);
         return $this;
-    }         
+    }    
+
+    /**
+     * Destory a set of entities without instantiating them
+     *
+     * If no condition is passed then all the entities within this set
+     * is destroyed
+     *
+     * @param array $conditions
+     *
+     * @return
+     */
+    public function destroy($conditions = array())
+    {
+        $conditions[$this->_property] = $this->_root;
+        $this->getRepository()->destroy($conditions);
+    }
 
     /**
      * Return an entity of the aggregated type and set the initial
@@ -294,6 +310,5 @@ class AnDomainDecoratorOnetomany extends AnObjectDecorator
     	$entity = $this->getRepository()->getEntity($config);
     	$this->insert($entity);
     	return $entity;
-    }    
-    
+    }        
 }

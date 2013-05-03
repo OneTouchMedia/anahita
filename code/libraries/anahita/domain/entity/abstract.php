@@ -933,26 +933,15 @@ abstract class AnDomainEntityAbstract extends KObject implements ArrayAccess, Se
 	/**
 	 * Set the state of the entity to deleted. Not the entity is not persisted but
 	 * its state only changed to deleted. 
-	 * 
+	 *  
 	 * @return boolean
 	 */
 	public function delete()
 	{		
-		return $this->getRepository()->getSpace()
+		$this->getRepository()->getSpace()
 				->setEntityState($this, AnDomain::STATE_DELETED);
-	}
-	
-	/**
-	 * The entity state is both changed to deleted and it's persistet
-	 * 
-	 * @return boolean
-	 */
-	public function destroy()
-	{
-		if ( $this->delete() )
-			return $this->save();
-            
-		return false;
+
+		return $this;
 	}
 								
 	/**

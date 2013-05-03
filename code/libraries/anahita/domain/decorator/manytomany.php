@@ -168,21 +168,6 @@ class AnDomainDecoratorManytomany extends AnDomainDecoratorOnetomany
     	
     	return $relation;
     }
-    
-    /**
-     * Overwrite the entity default destroy behavior. Deletes all the relations that connects the aggregate root to the
-     * target entities. Dose not delete the targets !
-     * 
-     * @return void
-     */
-    public function destroy()
-    {
-        foreach($this as $target) {
-            $this->extract($target);
-        }
-        
-        return $this->getRepository()->getSpace()->commitEntities();   
-    }
         
     /**
      * Overwrite the entity default delete behavior. Deletes all the relations that connects the aggregate root to the
@@ -195,5 +180,6 @@ class AnDomainDecoratorManytomany extends AnDomainDecoratorOnetomany
         foreach($this as $target) {
             $this->extract($target);
         }
+        return $this;
     }    
 }
