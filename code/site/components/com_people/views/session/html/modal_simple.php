@@ -31,7 +31,7 @@
 	<a href="<?= @route('view=token') ?>" class="pull-left">
 	<?= @text('COM-PEOPLE-SESSION-FORGOT-PASSWORD'); ?>
 	</a>
-    <button data-behavior="Request" data-request-form="#modal-login-form" name="Submit" class="btn btn-large btn-primary">
+    <button data-behavior="<?= isset($ajax) ? 'Request' : 'Submit'?>" data-request-form="#modal-login-form" data-submit-form="#modal-login-form" name="Submit" class="btn btn-large btn-primary">
     	<?= @text('COM-PEOPLE-ACTION-LOGIN') ?>
     </button>    
 </popup:footer>
