@@ -214,6 +214,6 @@ class PlgSystemAnahita extends JPlugin
 		    KService::get('anahita:event.dispatcher')->addEventSubscriber($app->getDelegate());
 		}
 		
-		$person->destroy();
+		$person->delete()->save();
 	}
 }
