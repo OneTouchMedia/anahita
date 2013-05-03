@@ -223,14 +223,14 @@ Class.refactor(Form.Validator.Inline, {
 	Form.Validator.add('validate-remote', {
 		successMsg : function(element, props) {
 			var remoteValidator = element
-			.set('remoteValidator', {props:props})
+			.set('remoteValidator', props)
 			.get('remoteValidator');
 			
 			return remoteValidator.getSuccessMsg();			
 		},	
 		errorMsg: function(element, props) {
 			var remoteValidator = element
-				.set('remoteValidator', {props:props})
+				.set('remoteValidator', props)
 				.get('remoteValidator');
 			
 			return remoteValidator.getErrorMsg();		    
@@ -238,7 +238,7 @@ Class.refactor(Form.Validator.Inline, {
 		test 	: function(element, props) 
 		{
 			var remoteValidator = element
-				.set('remoteValidator', {props:props})
+				.set('remoteValidator', props)
 				.get('remoteValidator');
 			
 			remoteValidator.validate();
