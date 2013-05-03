@@ -19591,7 +19591,7 @@ Class.refactor(Form.Validator.Inline, {
 			return this.retrieve('remoteValidator');
 		},
 		set : function(props) {
-			if ( !this.retrieve('remoteValidator') ) {	
+			if ( !this.retrieve('remoteValidator') ) {				
 				this.store('remoteValidator', new RemoteValidator(this, props));
 				this.form.get('remoteValidators').add(this.retrieve('remoteValidator'));				
 			}
@@ -19685,14 +19685,14 @@ Class.refactor(Form.Validator.Inline, {
 	Form.Validator.add('validate-remote', {
 		successMsg : function(element, props) {
 			var remoteValidator = element
-			.set('remoteValidator', {props:props})
+			.set('remoteValidator', props)
 			.get('remoteValidator');
 			
 			return remoteValidator.getSuccessMsg();			
 		},	
 		errorMsg: function(element, props) {
 			var remoteValidator = element
-				.set('remoteValidator', {props:props})
+				.set('remoteValidator', props)
 				.get('remoteValidator');
 			
 			return remoteValidator.getErrorMsg();		    

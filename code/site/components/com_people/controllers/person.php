@@ -235,7 +235,10 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
         if ( $data->password ) {
             $user->set('password', $person->getPassword(true));
         }
-        
+        if ( @$data->params->timezone ) {            
+            $user->_params->set('timezone', $data->params->timezone);              
+        }
+
         if ( !$user->save() ) {
             throw new RuntimeException('Unexpected error when saving user');
             return false;               

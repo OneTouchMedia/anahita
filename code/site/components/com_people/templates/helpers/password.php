@@ -28,11 +28,18 @@ class ComPeopleTemplateHelperPassword extends KTemplateHelperAbstract
     /**
      * Renders a password input with the validation
      * 
+     * @param boolean $required A boolean flag whether the password is
+     * required or not 
+     * 
      * @return void
      */
-    public function input()
+    public function input($required = true)
     {
+        $validators = '';
         $min = ComPeopleFilterPassword::$MIN_LENGTH;
-        return '<input data-validators="required minLength:'.$min.' validate-passwod" type="password" id="password" name="password" />';
+        if ( $required ) {
+            $validators .= 'required  minLength:'.$min;
+        }
+        return '<input data-validators="'.$validators.' validate-passwod" type="password" id="password" name="password" />';
     }
 }
