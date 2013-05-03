@@ -39,6 +39,12 @@ class ComBaseDispatcherDefault extends LibBaseDispatcherComponent
 		if ( $config->auto_asset_import  ) {
 			$this->registerCallback('after.get', array($this, 'importAsset'));
 		}
+		
+		if ( $config->request->getFormat() == 'html' &&
+		     !$config->request->isAjax()
+		        ) {
+		    set_exception_handler(array($this, 'exception'));
+		}
 	}
 	
 	/**
@@ -138,5 +144,30 @@ class ComBaseDispatcherDefault extends LibBaseDispatcherComponent
         $description = preg_replace( '/\s+/', ' ', $description );
         $description = htmlspecialchars($view->getTemplate()->renderHelper('text.truncate', $description, array('length'=>160)));          
         $document->setDescription($description);         
+    }
+    
+    /**
+     * Allows the component to handle exception. By default this
+     * action passes the exception to the application exception handler
+     * 
+     * @param KCommandContext $context Command context
+     * 
+     * @return void
+     */
+    protected function _actionException(KCommandContext $context)
+    {       
+        if ( !JFactory::getUser()->id && 
+                $context->data instanceof LibBaseControllerExceptionUnauthorized ) 
+        {
+            $this->getController()->setMessage('COM-PEOPLE-PLEASE-LOGIN-TO-SEE');
+            $return = base64_encode(KRequest::url());
+            $context->response->setRedirect(JRoute::_('option=com_people&view=session&return='.$return));
+            $context->response->send();
+            exit(0);
+        }
+        else { 
+            $this->getService('application.dispatcher')
+                ->execute('exception', $context);      
+        }
     }
 }

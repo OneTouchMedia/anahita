@@ -78,4 +78,26 @@ class ComPeopleDispatcher extends ComBaseDispatcherDefault
 	    	    
 	    return parent::_actionDispatch($context);
 	}
+	
+	/**
+	 * If session throws LibBaseControllerExceptionUnauthorized exception
+	 * that means the user has entere wrong credentials. In that case
+	 * let the application handle the error 
+	 * 
+	 * (non-PHPdoc)
+	 * @see ComBaseDispatcherDefault::_actionException()
+	 */
+	protected function _actionException(KCommandContext $context)
+	{
+	    if ( $context->data instanceof LibBaseControllerExceptionUnauthorized
+	            &&  $this->getController() instanceof ComPeopleControllerSession 
+	            
+	            )
+	    {
+	       $context->response->send();
+	       exit(0);           
+	    }
+	    else 
+	        parent::_actionException($context);	    
+	}
 }
