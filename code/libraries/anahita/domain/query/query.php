@@ -860,7 +860,9 @@ class AnDomainQuery extends KObject implements KCommandInterface
 	}	
 	
     /**
-     * Forwards the call to the repository destory. @see AnDomainRepositoryAbstract::destory()     
+     * Forwards the call to the repository destory. 
+     * 
+     * @see AnDomainRepositoryAbstract::destory()     
      * 
      * @return void
      */
