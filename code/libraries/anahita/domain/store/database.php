@@ -153,7 +153,7 @@ class AnDomainStoreDatabase extends KObject implements AnDomainStoreInterface
 		    
 		    $mode = $modes[$mode];
 
-		    $context['data'] = $this->_adapter->select((string)$query, $mode);
+		    $context['data'] = $this->_adapter->select(to_str($query), $mode);
 		    
 		    $this->getCommandChain()->run('after.fetch', $context);
 		}
@@ -294,7 +294,7 @@ class AnDomainStoreDatabase extends KObject implements AnDomainStoreInterface
 		
 		if($this->getCommandChain()->run('before.execute', $context) !== false)
 		{
-			$context->result = $this->_adapter->execute($context->query);
+			$context->result = $this->_adapter->execute(to_str($context->query));
 			$this->getCommandChain()->run('after.execute', $context);
 		}
 		
