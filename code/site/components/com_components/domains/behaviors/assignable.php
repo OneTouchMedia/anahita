@@ -99,10 +99,6 @@ class ComComponentsDomainBehaviorAssignable extends LibBaseDomainBehaviorEnablea
 	 */
 	protected function _initialize(KConfig $config)
 	{
-		
-		//'name'	         => ucfirst(str_replace('com_','', $config->component)),
-		//'description'    => translate(array(strtoupper(str_replace('_','-',$config->component)).'-APP-DESCRIPTION'), false)
-				
 		$config->append(array(
 				'profile_name'		  => ucfirst($this->getIdentifier()->package),
 				'profile_description' => JText::_('COM-'.$this->getIdentifier()->package.'-APP-DESCRIPTION'),

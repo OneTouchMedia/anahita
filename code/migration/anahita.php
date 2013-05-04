@@ -501,15 +501,38 @@ inner join jos_anahita_nodes as app on app.id = enable.node_b_id
 inner join jos_anahita_nodes as actortype on actortype.id = enable.node_a_id
 where enable.type like 'ComAppsDomainEntityAssignment,com:apps.domain.entity.assignment'
 ");
+	//add optional access
+	$query = <<<EOF
+	insert into jos_anahita_nodes (component,type,name,access)
+select distinct node.component,'ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment',edge1.node_a_type,0
+from jos_anahita_nodes as node 
+ inner join jos_anahita_edges as edge1 on edge1.node_b_id = node.id and edge1.type like 'ComAppsDomainEntityEnable,com:apps.domain.entity.enable' 
+ left join jos_anahita_edges as edge on edge.node_b_id = node.id and edge.type like 'ComAppsDomainEntityAssignment,com:apps.domain.entity.assignment'  
+ where node.type like 'ComAppsDomainEntityApp,com:apps.domain.entity.app' and edge.node_a_id IS NULL
+;    	
+EOF;
+	dbexec($query);
+	//add com_notes as always to all actortypes
+	dbexec("insert into jos_anahita_nodes(component,type,name,access) select distinct 'com_notes','ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment',node_a_type,'1' from jos_anahita_edges where type like 'ComAppsDomainEntityEnable,com:apps.domain.entity.enable'");
 	dbexec("delete from jos_anahita_nodes where type like 'ComApps%'");
 	dbexec("delete from jos_anahita_edges where type like 'ComApps%'");
 	
 	dbexec("delete from jos_components where `option` like 'com_apps'");
 	dbexec("INSERT INTO `jos_components` VALUES(35, 'Components', 'option=com_components', 0, 0, 'option=com_components', 'Components', 'com_components', 0, 'js/ThemeOffice/component.png', 1, '', 1);");
+	//order the assignable components
+	dbexec("set @order := 0");
+	dbexec("update jos_components set ordering = (@order := @order + 1) where parent = 0 and `option` IN (SELECT distinct component from jos_anahita_nodes where type LIKE 'ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment')");
 }
 
 function anahita_24()
 {
 	dbexec("DELETE FROM jos_modules_menu WHERE moduleid IN (SELECT id FROM jos_modules WHERE module IN ('mod_search', 'mod_feed','mod_login', 'mod_search', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items'))");
 	dbexec("DELETE FROM jos_modules WHERE module IN ('mod_search', 'mod_feed', 'mod_login', 'mod_breadcrumbs', 'mod_sections', 'mod_syndicate', 'mod_latestnews', 'mod_newsflash', 'mod_related_items')");	
+}
+
+function anahita_25()
+{
+    dbexec("create index group_id on jos_core_acl_groups_aro_map (group_id)");
+    dbexec("create index aro_id on jos_core_acl_groups_aro_map (aro_id)");
+    dbexec("create index value on jos_core_acl_aro (value)");
 }

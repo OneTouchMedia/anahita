@@ -29,6 +29,18 @@ KService::get('koowa:loader')->loadIdentifier('com://site/components.domain.beha
  */
 class ComComponentsDomainQueryComponent extends AnDomainQuery
 {
+    /**
+     * Called before the update query 
+     * 
+     * @param KCommandContext $context
+     * 
+     * @return void;
+     */
+    protected function _beforeQueryUpdate(KCommandContext $context)
+    {
+        $this->option($this->getService('com://admin/components.domain.set.assignablecomponent')->option);
+    }
+    
 	/**
 	 * Provides option to return assignable/nonassigable components
 	 * 

@@ -11,6 +11,6 @@ $dir  = realpath(preg_replace('/\/cli.*/','', $__FILE__));
 define('JPATH_BASE', $dir.'/administrator');
 require_once JPATH_BASE.'/includes/framework.php';
 
-KService::get('application.dispatcher')->load();
+KService::get('com://admin/application.dispatcher')->load();
 
 KServiceIdentifier::setApplication('dev', JPATH_SITE.'/cli');
