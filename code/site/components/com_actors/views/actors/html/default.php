@@ -1,6 +1,6 @@
 <?php defined('KOOWA') or die; ?>
 
-<module position="sidebar-b" style="simple"></module>
+<module position="sidebar-b" style="none"></module>
 
 <?= @helper('ui.filterbox', @route('layout=list')) ?>
 

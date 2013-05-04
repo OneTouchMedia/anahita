@@ -2,7 +2,7 @@
 
 <?php @commands('toolbar') ?>
 
-<module position="sidebar-b" style="simple"></module>
+<module position="sidebar-b" style="none"></module>
 
 <?= @template('note') ?>
 
