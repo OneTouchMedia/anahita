@@ -32,9 +32,7 @@ class ConfigApplicationView
 		// Load component specific configurations
 		$table =& JTable::getInstance('component');
 		$table->loadByOption( 'com_users' );
-		$userparams = new JParameter( $table->params, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'config.xml' );
-		$table->loadByOption( 'com_media' );
-		$mediaparams = new JParameter( $table->params, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_media'.DS.'config.xml' );
+		$userparams = new JParameter( $table->params, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'config.xml' );		
 
 		// Build the component's submenu
 		$contents = '';
