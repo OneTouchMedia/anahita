@@ -89,7 +89,7 @@ class ComActorsViewSettingsHtml extends ComBaseViewHtml
 				$identifier = $this->getIdentifier($identifier);
 				foreach($actions as $action) {
 					$label  = JText::_(strtoupper('COM-'.$identifier->package.'-PERMISSION'.'-'.$identifier->name.'-'.$action));
-					$name 	= $identifier->package.':'.$identifier->name.':'.$action;
+					$name 	= 'com_'.$identifier->package.':'.$identifier->name.':'.$action;
 					$permissions[] = new KConfig(array('label'=>$label, 'name'=>$name));
 				}
 			}
