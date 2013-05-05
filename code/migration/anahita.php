@@ -518,10 +518,10 @@ EOF;
 	dbexec("delete from jos_anahita_edges where type like 'ComApps%'");
 	
 	dbexec("delete from jos_components where `option` like 'com_apps'");
-	dbexec("INSERT INTO `jos_components` VALUES(35, 'Components', 'option=com_components', 0, 0, 'option=com_components', 'Components', 'com_components', 0, 'js/ThemeOffice/component.png', 1, '', 1);");
+	dbexec("INSERT INTO `jos_components` VALUES(0, 'Components', 'option=com_components', 0, 0, 'option=com_components', 'Components', 'com_components', 0, 'js/ThemeOffice/component.png', 1, '', 1);");
 	//order the assignable components
 	dbexec("set @order := 0");
-	dbexec("update jos_components set ordering = (@order := @order + 1) where parent = 0 and `option` IN (SELECT distinct component from jos_anahita_nodes where type LIKE 'ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment')");
+	dbexec("update jos_components set ordering = (@order := @order + 1) where parent = 0 and `option` IN (SELECT distinct component from jos_anahita_nodes where type LIKE 'ComComponentsDomainEntityAssignment,com:components.domain.entity.assignment')");	
 }
 
 function anahita_24()
@@ -536,6 +536,7 @@ function anahita_25()
     dbexec("create index aro_id on jos_core_acl_groups_aro_map (aro_id)");
     dbexec("create index value on jos_core_acl_aro (value)");
     
+    dbexec("INSERT INTO `jos_components` VALUES(0, 'Mailer', 'option=com_mailer', 0, 0, 'option=mailer', 'Mailer', 'com_mailer', 0, 'js/ThemeOffice/component.png', 1, '', 1);");
     /*
     dbexec("alter table jos_anahita_nodes change access access varchar(50) NULL");
     dbexec("alter table jos_anahita_nodes add access_list text null after access");
