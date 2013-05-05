@@ -433,7 +433,8 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
                     ));                    
 	        }
             
-            foreach($options as $key => $value) {
+            foreach($options as $key => $value) 
+            {
                 if ( $actor->authorize('setprivacyvalue', array('value'=>$key)) === false ) {
                     unset($options[$key]);   
                 }
@@ -441,12 +442,6 @@ class ComBaseTemplateHelperUi extends KTemplateHelperAbstract
             
             $config->options = $options;
             
-	        if ( false && !$actor->authorize('administration') ) 
-            {
-                $options = KConfig::unbox($config->options);
-                array_pop($options);
-                $config->options = $options;
-            }
             
 	        if ( $config->entity ) 
             {

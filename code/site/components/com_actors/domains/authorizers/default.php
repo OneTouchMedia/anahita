@@ -75,8 +75,10 @@ class ComActorsDomainAuthorizerDefault extends LibBaseDomainAuthorizerDefault
             case LibBaseDomainBehaviorPrivatable::GUEST :
             case LibBaseDomainBehaviorPrivatable::REG :
                 $ret = true;
-            case LibBaseDomainBehaviorPrivatable::FOLLOWER :                
+                break;
+            case LibBaseDomainBehaviorPrivatable::FOLLOWER :                                
                 $ret = $this->_entity->isFollowable() && $this->_entity->leading($this->_viewer);
+                break;
             default :
                 $ret = $this->_entity->authorize('administration');
         }
