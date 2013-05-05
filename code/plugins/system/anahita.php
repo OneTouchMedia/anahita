@@ -196,24 +196,21 @@ class PlgSystemAnahita extends JPlugin
 	 * @param 	array		holds the user data
 	 */
 	public function onBeforeDeleteUser($user)
-	{							
-		$person = 	KService::get('repos://site/people.person')
-                    ->getQuery()
-                    ->disableChain()
-                    ->userId($user['id'])
-					->fetch();
-					;
-		
-		if(!$person)
-			return;
-        _die();
-		$apps = KService::get('repos://site/apps.app')->getQuery()->disableChain()->fetchSet();
-		
-		foreach($apps as $app) 
-		{
-		    KService::get('anahita:event.dispatcher')->addEventSubscriber($app->getDelegate());
-		}
-		
-		$person->delete()->save();
+	{
+	    $person = KService::get('repos://site/people.person')
+	        ->find(array('userId'=>$user['id']));
+	    
+	    if ( $person )
+	    {
+	        KService::get('repos://site/components')
+    	        ->fetchSet()
+	            ->registerEventDispatcher(KService::get('anahita:event.dispatcher'));
+	        
+	        KService::get('anahita:event.dispatcher')
+	            ->dispatchEvent('onDeleteActor', array('actor_id'=>$person->id));
+
+            $person->delete()->save();
+	        	        	           
+	    }
 	}
 }

@@ -535,4 +535,11 @@ function anahita_25()
     dbexec("create index group_id on jos_core_acl_groups_aro_map (group_id)");
     dbexec("create index aro_id on jos_core_acl_groups_aro_map (aro_id)");
     dbexec("create index value on jos_core_acl_aro (value)");
+    
+    /*
+    dbexec("alter table jos_anahita_nodes change access access varchar(50) NULL");
+    dbexec("alter table jos_anahita_nodes add access_list text null after access");
+    dbexec("update jos_anahita_nodes set access_list = access where (type like 'ComMediumDomainEntityMedium%' or type like 'ComActorsDomainEntityActor%') and access <> ''")
+    dbexec("update jos_anahita_nodes set access = 'custom' where access not in ('public','registered','special','followers','leaders','mutuals','admins') and (type like 'ComMediumDomainEntityMedium%' or type like 'ComActorsDomainEntityActor%') and access <> ''")
+    */
 }

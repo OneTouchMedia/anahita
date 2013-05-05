@@ -199,12 +199,15 @@ abstract class ComActorsControllerAbstract extends ComBaseControllerService
      */
     protected function _actionDelete(KCommandContext $context)
     {
-        $apps = $this->getService('repos:apps.app')->fetchSet();
-        
-        foreach($apps as $app) {
-            $this->getService('anahita:event.dispatcher')->addEventSubscriber($app->getDelegate());
-        }
+        $this->getService('repos://site/components')
+            ->fetchSet()
+            ->registerEventDispatcher($this->getService('anahita:event.dispatcher'));
+                         
         $result  = parent::_actionDelete($context);
+        
+        $this->getService('anahita:event.dispatcher')
+            ->dispatchEvent('onDeleteActor', array('actor_id'=>$this->getItem()));
+                
         return $result;
     }
     

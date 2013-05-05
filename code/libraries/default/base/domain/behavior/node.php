@@ -4,7 +4,7 @@
  * LICENSE: ##LICENSE##
  * 
  * @category   Anahita
- * @package    Com_Base
+ * @package    Lib_Base
  * @subpackage Domain_Behavior
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
@@ -18,14 +18,14 @@
  * Node behavior
  * 
  * @category   Anahita
- * @package    Com_Base
+ * @package    Lib_Base
  * @subpackage Domain_Behavior
  * @author     Arash Sanieyan <ash@anahitapolis.com>
  * @author     Rastin Mehr <rastin@anahitapolis.com>
  * @license    GNU GPLv3 <http://www.gnu.org/licenses/gpl-3.0.html>
  * @link       http://www.anahitapolis.com
  */
- class ComBaseDomainBehaviorNode extends AnDomainBehaviorAbstract
+ class LibBaseDomainBehaviorNode extends AnDomainBehaviorAbstract
  {
      /**
       * An array of repositories

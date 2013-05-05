@@ -97,11 +97,12 @@ class ComPeopleControllerPerson extends ComActorsControllerDefault
     {
         parent::_actionDelete($context);
         
-        $this->commit();
+        $this->commit();        
         
-        JFactory::getUser($this->getItem()->userId)->delete();     
-        
-        $this->getService('com:people.helper.person')->logout($this->getItem(), array('message'=>JText::_('COM-PEOPLE-PERSON-DELETED-MESSAGE')));               
+        JFactory::getUser($this->getItem()->userId)->delete();  
+
+        $this->getService('com://site/people.controller.session')
+            ->execute('delete', $context);                       
     }
     
     /**
